@@ -12,8 +12,9 @@ import re
 import random
 import string
 import hmac
+from google.appengine.api import mail
 
-domain = 'http://localhost:8080'
+domain = 'http://serve-life.appspot.com'#'http://localhost:8080'
 
 jinja_environment = jinja2.Environment(autoescape=True,
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
@@ -23,6 +24,7 @@ class User(db.Model):
     password_hash = db.StringProperty(required = True)
     email         = db.StringProperty(required = True)
     activated     = db.StringProperty(required = True)
+    activation_key= db.StringProperty(required = True)
 
 class ThinDB(db.Model):
     username      = db.StringProperty(required = True)
@@ -59,10 +61,11 @@ class SignupHandler(webapp2.RequestHandler):
             #save the new user unactivated
             rand_secret = "".join(random.choice(string.letters) for x in xrange(5))
             password_hash = rand_secret+'|'+hmac.new(rand_secret,password).hexdigest()
-            new_user = User(email=email,username=username,password_hash=password_hash,activated='False')
+            activation_key = hmac.new(rand_secret,username).hexdigest()
+            new_user = User(email=email,username=username,password_hash=password_hash,activated='False',activation_key=activation_key)
             new_user.put()
             #mail the activation link
-            activation_link = domain+'/activate_account?activation_key='+hmac.new(rand_secret,username).hexdigest()
+            activation_link = domain+'/account_activation?activation_key='+hmac.new(rand_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
             mail.send_mail(sender="Serve Life<mailbot@servelife.com>",
             to=email,
@@ -73,8 +76,22 @@ class SignupHandler(webapp2.RequestHandler):
         variables = {'email':email}
         self.response.out.write(template.render(variables))
 
+class ActivationHandler(webapp2.RequestHandler):
+    def get(self):
+        activation_key = self.request.get('activation_key')
+        user = User.all().filter('activation_key =', activation_key).get()
+        if user:
+            user.activated='True'
+            user.put()
+            self.response.out.write('Your account has been activated!')
+        else:
+            self.response.out.write('No such activation key!')
+
+
+
 
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/humans.txt', HumansTxtHandler),
-                               ('/signup', SignupHandler),],
+                               ('/signup', SignupHandler),
+                               ('/account_activation', ActivationHandler),],
                               debug=True)
