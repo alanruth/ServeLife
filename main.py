@@ -67,7 +67,9 @@ class SignupHandler(webapp2.RequestHandler):
             #mail the activation link
             activation_link = domain+'/account_activation?activation_key='+hmac.new(rand_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
-            mail.send_mail(sender="Serve Life<mailbot@servelife.com>",
+            #sender should be a authorised email id.
+            #for now use email@anubhavsinha.com
+            mail.send_mail(sender="Anubhav Sinha<email@anubhavsinha.com>",
             to=email,
             subject="Activate your Servelife account!",
             body="no html version",
