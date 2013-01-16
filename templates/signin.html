@@ -9,23 +9,11 @@
                         <div class="head">
                             <h4>Log in to your account</h4>
                         </div>
-                        <div class="social">
-                            <a class="face_login" href="#">
-                                <span class="face_icon">
-                                    <img src="img/i_face.png" alt="fb" alt=""/>
-                                </span>
-                                <span class="text">Sign in with Facebook</span>
-                            </a>
-                            <div class="division">
-                                <hr class="left">
-                                <span>or</span>
-                                <hr class="right">
-                            </div>
-                        </div>
+
                         <div class="form">
-                            <form>
-                                <input type="text" placeholder="Email"/>
-                                <input type="text" placeholder="Password"/>
+                            <form action="/sign_in" method="post">
+                                <input type="text" name="email" placeholder="Email"/>
+                                <input type="password" name="password" placeholder="Password"/>
                                 <div class="remember">
                                     <div class="left">
                                         <input id="remember_me" type="checkbox">
@@ -44,6 +32,5 @@
             </div>
         </div>
     </div>
-
 
 {% endblock %}

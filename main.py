@@ -14,7 +14,8 @@ import string
 import hmac
 from google.appengine.api import mail
 
-domain = 'http://serve-life.appspot.com'#'http://localhost:8080'
+#'http://localhost:8080'
+domain = 'http://serve-life.appspot.com'
 
 jinja_environment = jinja2.Environment(autoescape=True,
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
@@ -33,20 +34,41 @@ class ThinDB(db.Model):
     int_value     = db.IntegerProperty(required= True)
 
 
-class LandingPageHandler(webapp2.RequestHandler):
+def login_required(handler):
+    pass
+
+
+class SLRequestHandler(webapp2.RequestHandler):
+    user = None
+    def is_logged_in(self):
+        cookie = self.request.cookies.get('user_id')
+        if cookie!="" and cookie!=None:
+            cookie_split = cookie.split('|')
+            user_id = cookie_split[0]
+            rand_secret = cookie_split[1]
+            hash = cookie_split[2]
+            if hmac.new(str(rand_secret), str(user_id)).hexdigest()==str(hash):
+                self.user = User.get_by_id(int(user_id))
+                return True
+            else:
+                return False
+        else:
+            return False
+
+class LandingPageHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('home.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
 
-class HumansTxtHandler(webapp2.RequestHandler):
+class HumansTxtHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('humans.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
-class SignUpHandler(webapp2.RequestHandler):
+class SignUpHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('signup.html')
         variables = {}
@@ -59,13 +81,13 @@ class SignUpHandler(webapp2.RequestHandler):
         username_exists = User.all().filter('username =', username).get()
         if not username_exists:
             #save the new user unactivated
-            rand_secret = "".join(random.choice(string.letters) for x in xrange(5))
-            password_hash = rand_secret+'|'+hmac.new(rand_secret,password).hexdigest()
-            activation_key = hmac.new(rand_secret,username).hexdigest()
+            random_secret = "".join(random.choice(string.letters) for x in xrange(5))
+            password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
+            activation_key = hmac.new(random_secret,username).hexdigest()
             new_user = User(email=email,username=username,password_hash=password_hash,activated='False',activation_key=activation_key)
             new_user.put()
             #mail the activation link
-            activation_link = domain+'/account_activation?activation_key='+hmac.new(rand_secret,username).hexdigest()
+            activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
             #sender should be a authorised email id.
             #for now use email@anubhavsinha.com
@@ -78,7 +100,7 @@ class SignUpHandler(webapp2.RequestHandler):
         variables = {'email':email}
         self.response.out.write(template.render(variables))
 
-class ActivationHandler(webapp2.RequestHandler):
+class ActivationHandler(SLRequestHandler):
     def get(self):
         activation_key = self.request.get('activation_key')
         user = User.all().filter('activation_key =', activation_key).get()
@@ -90,19 +112,49 @@ class ActivationHandler(webapp2.RequestHandler):
             self.response.out.write('No such activation key!')
 
 
-class SignInHandler(webapp2.RequestHandler):
-
+class SignInHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('signin.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
     def post(self):
-        #process a login form
-        pass
+        email = self.request.get('email')
+        password = self.request.get('password')
+        user = User.all().filter('email =', email).get()
+        if user:
+            pass_split = user.password_hash.split('|')
+            random_secret = str(pass_split[0])
+            password_hash = str(pass_split[1])
+            if str(hmac.new(random_secret,password).hexdigest())==str(password_hash):
+                user_id =  str(user.key().id())
+                #user_id|random_secret|hash
+                cookie_value = user_id+'|'+random_secret+'|'+hmac.new(random_secret,user_id).hexdigest()
+                cookie = 'user_id = '+cookie_value+';Path = /'
+                self.response.headers.add_header('Set-Cookie',cookie)
+                self.redirect('/get_user_feed/'+user.username)
+            else:
+                self.response.out.write('password error!')
+        else:
+            self.response.out.write('no such email signup with us!')
 
 
+class LogOutHandler(SLRequestHandler):
+    def get(self):
+        self.response.headers.add_header('Set-Cookie','user_id=;Path = /')
+        self.redirect('/')
 
+class GetUserFeedHandler(SLRequestHandler):
+    def get(self, username):
+        user = 'mogambo'
+        if self.is_logged_in():
+            user = self.user
+            self.response.out.write('feed from username: '+username+'. Logged in user is:'+user.username)
+
+
+class GetUserTopicFeedHandler(SLRequestHandler):
+    def get(self, username, topic):
+        self.response.out.write('feed from username: '+username+' on topic: '+topic)
 
 
 
@@ -110,5 +162,8 @@ app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/humans.txt', HumansTxtHandler),
                                ('/sign_up', SignUpHandler),
                                ('/account_activation', ActivationHandler),
-                               ('/sign_in', SignInHandler),],
+                               ('/sign_in', SignInHandler),
+                               ('/log_out', LogOutHandler),
+                               ('/get_user_feed/(?P<username>.*)', GetUserFeedHandler),
+                               ('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),],
                               debug=True)
