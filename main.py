@@ -46,7 +46,7 @@ class HumansTxtHandler(webapp2.RequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
-class SignupHandler(webapp2.RequestHandler):
+class SignUpHandler(webapp2.RequestHandler):
     def get(self):
         template = jinja_environment.get_template('signup.html')
         variables = {}
@@ -90,10 +90,25 @@ class ActivationHandler(webapp2.RequestHandler):
             self.response.out.write('No such activation key!')
 
 
+class SignInHandler(webapp2.RequestHandler):
+
+    def get(self):
+        template = jinja_environment.get_template('signin.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+    def post(self):
+        #process a login form
+        pass
+
+
+
+
 
 
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/humans.txt', HumansTxtHandler),
-                               ('/signup', SignupHandler),
-                               ('/account_activation', ActivationHandler),],
+                               ('/sign_up', SignUpHandler),
+                               ('/account_activation', ActivationHandler),
+                               ('/sign_in', SignInHandler),],
                               debug=True)
