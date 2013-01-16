@@ -33,9 +33,16 @@ class ThinDB(db.Model):
     string_value  = db.StringProperty(required = True)
     int_value     = db.IntegerProperty(required= True)
 
+#decorator for protecting pages
+def login_required(function):
+    def _f(self, *args, **kwargs):
+        if self.is_logged_in():
+            function(self, *args, **kwargs)
+        else:
+            next_page = self.request.path
+            self.redirect('/sign_in?next=%s' %next_page)
 
-def login_required(handler):
-    pass
+    return _f
 
 
 class SLRequestHandler(webapp2.RequestHandler):
@@ -54,6 +61,7 @@ class SLRequestHandler(webapp2.RequestHandler):
                 return False
         else:
             return False
+
 
 class LandingPageHandler(SLRequestHandler):
     def get(self):
@@ -153,6 +161,7 @@ class GetUserFeedHandler(SLRequestHandler):
 
 
 class GetUserTopicFeedHandler(SLRequestHandler):
+    @login_required
     def get(self, username, topic):
         self.response.out.write('feed from username: '+username+' on topic: '+topic)
 
