@@ -29,9 +29,10 @@ class User(db.Model):
 
 class ThinDB(db.Model):
     username      = db.StringProperty(required = True)
-    key_          = db.StringProperty(required = True)
-    string_value  = db.StringProperty(required = True)
-    int_value     = db.IntegerProperty(required= True)
+    asset         = db.StringProperty(required = True)
+    asset_key     = db.StringProperty(required = True)
+    str_value     = db.StringProperty(required = False)
+    int_value     = db.IntegerProperty(required= False)
 
 #decorator for protecting pages
 def login_required(function):
@@ -65,7 +66,7 @@ class SLRequestHandler(webapp2.RequestHandler):
 
 class LandingPageHandler(SLRequestHandler):
     def get(self):
-        template = jinja_environment.get_template('home.html')
+        template = jinja_environment.get_template('index.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
@@ -165,6 +166,11 @@ class GetUserTopicFeedHandler(SLRequestHandler):
     def get(self, username, topic):
         self.response.out.write('feed from username: '+username+' on topic: '+topic)
 
+class AddCourseHandler(SLRequestHandler):
+    @login_required
+    def get(self):
+        #add course form
+        pass
 
 
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
@@ -174,5 +180,6 @@ app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/sign_in', SignInHandler),
                                ('/log_out', LogOutHandler),
                                ('/get_user_feed/(?P<username>.*)', GetUserFeedHandler),
-                               ('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),],
+                               ('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),
+                               ('/add_a_course', AddCourseHandler),],
                               debug=True)
