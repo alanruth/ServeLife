@@ -1,58 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Measure Template - Create Account</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
+    <title>ServeLife: {% block title %}{% endblock title %}</title>
+    <meta name="description" content={% block description %}{% endblock description %} >
+    <meta name="keywords" content="servelife, e-learning, social, learn, master, mentor, share, learn by doing, build expertise, learning ecosystem, online learning, talent management">
     <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap_and_overrides.css">
     <link rel="stylesheet" type="text/css" href="/static/css/signup.css">
     <link rel="stylesheet" type="text/css" href="/static/css/theme.css">
     <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+ 
+    <!-- GOOGLE ANALYTICS -->
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-37130170-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
 </head>
 <body>
-<div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="index.html">
-                <img src="/static/img/logo.png" alt="logo" />
-            </a>
-            <div class="nav-collapse collapse">
-                <ul class="nav pull-right">
-                    <li><a href="features.html">Features</a></li>
-                    <li><a href="pricing.html">Pricing</a></li>
-                    <li><a href="contact.html">Contact us</a></li>
-                    <li><a href="blog.html">Blog</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            External Pages
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="features.html">Features</a></li>
-                            <li><a href="pricing.html">Pricing</a></li>
-                            <li><a href="portfolio.html">Portfolio</a></li>
-                            <li><a href="coming-soon.html">Coming Soon</a></li>
-                            <li><a href="aboutus.html">About us</a></li>
-                            <li><a href="contact.html">Contact us</a></li>
-                            <li><a href="faq.html">FAQ</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a class="btn-header" href="/sign_up">Sign up</a>
-                    </li>
-                    <li><a class="btn-header" href="/sign_in">Sign in</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
 
-{% block page %}{% endblock %}
+{% block page %}{% endblock page %}
+
+{% block footer %}{% endblock footer %}
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>

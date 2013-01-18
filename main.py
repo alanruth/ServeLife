@@ -15,7 +15,7 @@ import hmac
 from google.appengine.api import mail
 
 #'http://localhost:8080'
-domain = 'http://serve-life.appspot.com'
+domain = 'http://learnmastermentor.appspot.com'
 
 jinja_environment = jinja2.Environment(autoescape=True,
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
@@ -70,6 +70,17 @@ class LandingPageHandler(SLRequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
+class BetaSignUpHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('betasignup.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+class PodcastHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('innovationintheenterprise.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
 
 class HumansTxtHandler(SLRequestHandler):
     def get(self):
@@ -174,6 +185,8 @@ class AddCourseHandler(SLRequestHandler):
 
 
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
+                               ('/betasignup',BetaSignUpHandler),
+                               ('/innovationintheenterprise', PodcastHandler),
                                ('/humans.txt', HumansTxtHandler),
                                ('/sign_up', SignUpHandler),
                                ('/account_activation', ActivationHandler),

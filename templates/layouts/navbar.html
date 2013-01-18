@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{%block navbar %}
+<!-- begins navbar -->
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+  <span class="icon-bar"></span>
+  <span class="icon-bar"></span>
+  <span class="icon-bar"></span>
+</a>
+<a href="/" class="brand scroller" data_section="body">
+  <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png" />
+</a>
+<div class="nav-collapse collapse">
+  <ul class="nav pull-right">
+    <li><a href="#" class="scroller" data-section="#features">Benefits</a></li>
+    <li><a href="#" class="scroller" data-section="#pricing">Pricing</a></li>
+    <li><a href="#" class="scroller" data-section="#about">About us</a></li>
+    <li><a href="/innovationintheenterprise">Podcasts</a></li>
+    <!--<li><a href="#">Blog</a></li>-->
+    <li>
+      <a href="/requestors/new" class="btn-header">Sign up</a>
+    </li>
+    <li>
+      <a href="/users/sign_in" class="btn-header">Sign in</a>
+    </li>
+  </ul>
+</div>
+<!-- ends navbar -->
+{% endblock %}
