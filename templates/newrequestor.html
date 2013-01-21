@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}Sign up for early access{% endblock title %}
+
+{% block description %}"Learn with purpose! ServeLife helps you acquire knowledge and put that knowledge to work building real world experience. Contribute. Collaborate. Be Discovered."{% endblock description %}
+
+{% block navbar %}
+<header class="navbar navbar-fixed-top">
+  <nav class="navbar-inner">
+    <div class="container">
+      <!-- begins navbar -->
+      <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </a>
+            <a href="/" class="brand scroller" data_section="body"><img alt="ServeLife" src="/assets/ServeLifeLogo185x41_white-a807b46d6dde53a3f028db8cbf036295.png" /></a>
+          </div>
+        </div>
+      </div>
+      <!-- ends navbar -->
+    </div>
+  </nav>
+</header>
+{% endblock navbar %}
+
+{% block page %}
+<div id="main" role="main">
+  <div class="container">
+    <div class="content">
+      <div class="row">
+        <div class="span12">
+          <div class="container">
+            <div>
+              <h3>Apply for Early Access</h3>
+              <p>ServeLife is accepting requests for early access to our pre-launch learning ecosystem. We seek individuals who
+                possess certain skills and expertise and are willing to contribute at least 10 hours per week on our initial learning
+                projects. Those participating will be provided recognition via a <strong>Founding Contributor</strong> badge, their profile
+                listed on the founding project's profile and <strong>peer feedback</strong> that will directly contribute to their
+                ServeLife community rankings. Currently there are two pre-launch projects accepting new contributors. To be considered,
+                please help us get to know you by answering a few questions.</p>
+            </div>
+            <div class="form">
+                <form accept-charset="UTF-8" action="/requestors" class="new_requestor" id="new_requestor" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="TlKw9MpcUGfkFr9A5rpeFrVGWWgBBno9Q3u/aquzPA0=" /></div>
+                <div class="row">
+                  <div class="span4">
+                    <legend>General profile information.</legend>
+                    <div class="row">
+                      <div class="span2">
+                        <label for="requestor_first_name">First name</label>
+                        <input class="span2" id="requestor_first_name" name="requestor[first_name]" size="30" type="text" />
+                      </div>
+                      <div class="span2">
+                        <label for="requestor_last_name">Last name</label>
+                        <input class="span2" id="requestor_last_name" name="requestor[last_name]" size="30" type="text" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_email">Email address</label>
+                        <input class="span4" id="requestor_email" name="requestor[email]" size="30" type="email" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span2">
+                        <label for="requestor_country">Country of residence</label>
+                          <select class="span2" id="requestor_country" name="requestor[country]" prompt="Please Select a Country">
+                          <option value="US">United States</option>
+                          <option disabled>-------------</option>
+                          <option value="AX">Åland Islands</option>
+                          <option value="AQ">Antarctica</option>
+                          <option value="AF">Afghanistan</option>
+                          <option value="AG">Antigua and Barbuda</option>
+                          <option value="AI">Anguilla</option>
+                          <option value="AL">Albania</option>
+                          <option value="AM">Armenia</option>
+                          <option value="AO">Angola</option>
+                          <option value="DZ">Algeria</option>
+                          <option value="AR">Argentina</option>
+                          <option value="AS">American Samoa</option>
+                          <option value="AT">Austria</option>
+                          <option value="AU">Australia</option>
+                          <option value="AW">Aruba</option>
+                          <option value="AD">Andorra</option>
+                          <option value="AZ">Azerbaijan</option>
+                          <option value="BD">Bangladesh</option>
+                          <option value="BB">Barbados</option>
+                          <option value="BA">Bosnia and Herzegovina</option>
+                          <option value="BE">Belgium</option>
+                          <option value="BF">Burkina Faso</option>
+                          <option value="BG">Bulgaria</option>
+                          <option value="BH">Bahrain</option>
+                          <option value="BI">Burundi</option>
+                          <option value="BJ">Benin</option>
+                          <option value="IO">British Indian Ocean Territory</option>
+                          <option value="BM">Bermuda</option>
+                          <option value="BN">Brunei Darussalam</option>
+                          <option value="BO">Bolivia, Plurinational State of</option>
+                          <option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+                          <option value="BR">Brazil</option>
+                          <option value="BZ">Belize</option>
+                          <option value="BT">Bhutan</option>
+                          <option value="BV">Bouvet Island</option>
+                          <option value="BW">Botswana</option>
+                          <option value="BY">Belarus</option>
+                          <option value="BS">Bahamas</option>
+                          <option value="CA">Canada</option>
+                          <option value="CC">Cocos (Keeling) Islands</option>
+                          <option value="CD">Congo, The Democratic Republic of the</option>
+                          <option value="CF">Central African Republic</option>
+                          <option value="CG">Congo</option>
+                          <option value="TD">Chad</option>
+                          <option value="CI">Côte d&#x27;Ivoire</option>
+                          <option value="CK">Cook Islands</option>
+                          <option value="CL">Chile</option>
+                          <option value="CM">Cameroon</option>
+                          <option value="CN">China</option>
+                          <option value="CO">Colombia</option>
+                          <option value="CR">Costa Rica</option>
+                          <option value="KY">Cayman Islands</option>
+                          <option value="CV">Cape Verde</option>
+                          <option value="CW">Curaçao</option>
+                          <option value="CX">Christmas Island</option>
+                          <option value="CY">Cyprus</option>
+                          <option value="CZ">Czech Republic</option>
+                          <option value="KH">Cambodia</option>
+                          <option value="HR">Croatia</option>
+                          <option value="KM">Comoros</option>
+                          <option value="CU">Cuba</option>
+                          <option value="DM">Dominica</option>
+                          <option value="DK">Denmark</option>
+                          <option value="DJ">Djibouti</option>
+                          <option value="DO">Dominican Republic</option>
+                          <option value="EG">Egypt</option>
+                          <option value="SV">El Salvador</option>
+                          <option value="ER">Eritrea</option>
+                          <option value="EE">Estonia</option>
+                          <option value="ET">Ethiopia</option>
+                          <option value="EC">Ecuador</option>
+                          <option value="GQ">Equatorial Guinea</option>
+                          <option value="FJ">Fiji</option>
+                          <option value="TF">French Southern Territories</option>
+                          <option value="FO">Faroe Islands</option>
+                          <option value="FR">France</option>
+                          <option value="FI">Finland</option>
+                          <option value="PF">French Polynesia</option>
+                          <option value="FK">Falkland Islands (Malvinas)</option>
+                          <option value="GF">French Guiana</option>
+                          <option value="GE">Georgia</option>
+                          <option value="GG">Guernsey</option>
+                          <option value="GH">Ghana</option>
+                          <option value="GI">Gibraltar</option>
+                          <option value="GL">Greenland</option>
+                          <option value="GM">Gambia</option>
+                          <option value="GN">Guinea</option>
+                          <option value="GP">Guadeloupe</option>
+                          <option value="GD">Grenada</option>
+                          <option value="GR">Greece</option>
+                          <option value="DE">Germany</option>
+                          <option value="GT">Guatemala</option>
+                          <option value="GU">Guam</option>
+                          <option value="GA">Gabon</option>
+                          <option value="GY">Guyana</option>
+                          <option value="GW">Guinea-Bissau</option>
+                          <option value="HM">Heard Island and McDonald Islands</option>
+                          <option value="HN">Honduras</option>
+                          <option value="HK">Hong Kong</option>
+                          <option value="HT">Haiti</option>
+                          <option value="HU">Hungary</option>
+                          <option value="VA">Holy See (Vatican City State)</option>
+                          <option value="IL">Israel</option>
+                          <option value="IE">Ireland</option>
+                          <option value="IM">Isle of Man</option>
+                          <option value="IN">India</option>
+                          <option value="ID">Indonesia</option>
+                          <option value="IQ">Iraq</option>
+                          <option value="IT">Italy</option>
+                          <option value="IS">Iceland</option>
+                          <option value="IR">Iran, Islamic Republic of</option>
+                          <option value="JE">Jersey</option>
+                          <option value="JM">Jamaica</option>
+                          <option value="JO">Jordan</option>
+                          <option value="JP">Japan</option>
+                          <option value="KG">Kyrgyzstan</option>
+                          <option value="KE">Kenya</option>
+                          <option value="KP">Korea, Democratic People&#x27;s Republic of</option>
+                          <option value="KI">Kiribati</option>
+                          <option value="KW">Kuwait</option>
+                          <option value="KR">Korea, Republic of</option>
+                          <option value="KZ">Kazakhstan</option>
+                          <option value="LA">Lao People&#x27;s Democratic Republic</option>
+                          <option value="LY">Libya</option>
+                          <option value="LV">Latvia</option>
+                          <option value="LU">Luxembourg</option>
+                          <option value="LT">Lithuania</option>
+                          <option value="LB">Lebanon</option>
+                          <option value="LS">Lesotho</option>
+                          <option value="LI">Liechtenstein</option>
+                          <option value="LR">Liberia</option>
+                          <option value="MW">Malawi</option>
+                          <option value="MY">Malaysia</option>
+                          <option value="MA">Morocco</option>
+                          <option value="FM">Micronesia, Federated States of</option>
+                          <option value="MZ">Mozambique</option>
+                          <option value="YT">Mayotte</option>
+                          <option value="MX">Mexico</option>
+                          <option value="MC">Monaco</option>
+                          <option value="MD">Moldova, Republic of</option>
+                          <option value="ME">Montenegro</option>
+                          <option value="MV">Maldives</option>
+                          <option value="MG">Madagascar</option>
+                          <option value="MH">Marshall Islands</option>
+                          <option value="MK">Macedonia, Republic of</option>
+                          <option value="MT">Malta</option>
+                          <option value="MM">Myanmar</option>
+                          <option value="MN">Mongolia</option>
+                          <option value="MO">Macao</option>
+                          <option value="MU">Mauritius</option>
+                          <option value="MQ">Martinique</option>
+                          <option value="MR">Mauritania</option>
+                          <option value="MS">Montserrat</option>
+                          <option value="ML">Mali</option>
+                          <option value="MP">Northern Mariana Islands</option>
+                          <option value="NP">Nepal</option>
+                          <option value="NR">Nauru</option>
+                          <option value="NU">Niue</option>
+                          <option value="NZ">New Zealand</option>
+                          <option value="NO">Norway</option>
+                          <option value="NA">Namibia</option>
+                          <option value="NL">Netherlands</option>
+                          <option value="NE">Niger</option>
+                          <option value="NF">Norfolk Island</option>
+                          <option value="NG">Nigeria</option>
+                          <option value="NI">Nicaragua</option>
+                          <option value="NC">New Caledonia</option>
+                          <option value="OM">Oman</option>
+                          <option value="PY">Paraguay</option>
+                          <option value="PT">Portugal</option>
+                          <option value="PS">Palestinian Territory, Occupied</option>
+                          <option value="PR">Puerto Rico</option>
+                          <option value="PN">Pitcairn</option>
+                          <option value="PA">Panama</option>
+                          <option value="PE">Peru</option>
+                          <option value="PW">Palau</option>
+                          <option value="PG">Papua New Guinea</option>
+                          <option value="PL">Poland</option>
+                          <option value="PK">Pakistan</option>
+                          <option value="PH">Philippines</option>
+                          <option value="QA">Qatar</option>
+                          <option value="RU">Russian Federation</option>
+                          <option value="RW">Rwanda</option>
+                          <option value="RO">Romania</option>
+                          <option value="RE">Réunion</option>
+                          <option value="KN">Saint Kitts and Nevis</option>
+                          <option value="PM">Saint Pierre and Miquelon</option>
+                          <option value="ES">Spain</option>
+                          <option value="MF">Saint Martin (French part)</option>
+                          <option value="LK">Sri Lanka</option>
+                          <option value="RS">Serbia</option>
+                          <option value="LC">Saint Lucia</option>
+                          <option value="ZA">South Africa</option>
+                          <option value="SA">Saudi Arabia</option>
+                          <option value="SB">Solomon Islands</option>
+                          <option value="SC">Seychelles</option>
+                          <option value="SD">Sudan</option>
+                          <option value="SE">Sweden</option>
+                          <option value="SG">Singapore</option>
+                          <option value="SH">Saint Helena, Ascension and Tristan da Cunha</option>
+                          <option value="SI">Slovenia</option>
+                          <option value="SJ">Svalbard and Jan Mayen</option>
+                          <option value="SK">Slovakia</option>
+                          <option value="SL">Sierra Leone</option>
+                          <option value="SM">San Marino</option>
+                          <option value="SN">Senegal</option>
+                          <option value="SO">Somalia</option>
+                          <option value="SR">Suriname</option>
+                          <option value="VC">Saint Vincent and the Grenadines</option>
+                          <option value="ST">Sao Tome and Principe</option>
+                          <option value="GS">South Georgia and the South Sandwich Islands</option>
+                          <option value="SX">Sint Maarten (Dutch part)</option>
+                          <option value="SY">Syrian Arab Republic</option>
+                          <option value="SZ">Swaziland</option>
+                          <option value="WS">Samoa</option>
+                          <option value="CH">Switzerland</option>
+                          <option value="BL">Saint Barthélemy</option>
+                          <option value="SS">South Sudan</option>
+                          <option value="TG">Togo</option>
+                          <option value="TJ">Tajikistan</option>
+                          <option value="TK">Tokelau</option>
+                          <option value="TL">Timor-Leste</option>
+                          <option value="TM">Turkmenistan</option>
+                          <option value="TN">Tunisia</option>
+                          <option value="TO">Tonga</option>
+                          <option value="TR">Turkey</option>
+                          <option value="TT">Trinidad and Tobago</option>
+                          <option value="TV">Tuvalu</option>
+                          <option value="TW">Taiwan, Province of China</option>
+                          <option value="TZ">Tanzania, United Republic of</option>
+                          <option value="TC">Turks and Caicos Islands</option>
+                          <option value="TH">Thailand</option>
+                          <option value="UM">United States Minor Outlying Islands</option>
+                          <option value="US">United States</option>
+                          <option value="UY">Uruguay</option>
+                          <option value="UZ">Uzbekistan</option>
+                          <option value="AE">United Arab Emirates</option>
+                          <option value="UG">Uganda</option>
+                          <option value="UA">Ukraine</option>
+                          <option value="GB">United Kingdom</option>
+                          <option value="VI">Virgin Islands, U.S.</option>
+                          <option value="VG">Virgin Islands, British</option>
+                          <option value="VU">Vanuatu</option>
+                          <option value="VE">Venezuela, Bolivarian Republic of</option>
+                          <option value="VN">Viet Nam</option>
+                          <option value="WF">Wallis and Futuna</option>
+                          <option value="EH">Western Sahara</option>
+                          <option value="YE">Yemen</option>
+                          <option value="ZM">Zambia</option>
+                          <option value="ZW">Zimbabwe</option>
+                        </select>
+                      </div>
+                      <div class="span2">
+                        <label for="requestor_education">Education level</label>
+                        <select class="span2" id="education" name="education">
+                          <option value="1">High School/Secondary</option>
+                          <option value="2">Attending College</option>
+                          <option value="3" selected="selected">Graduated College</option>
+                          <option value="4">Postgraduate Degree</option></select>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_linkedin">Linkedin profile URL</label>
+                        <input class="span4" id="requestor_linkedin" name="requestor[linkedin]" size="30" type="url" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_facebook">Facebook profile URL</label>
+                        <input class="span4" id="requestor_facebook" name="requestor[facebook]" size="30" type="url" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_blog">Personal blog</label>
+                        <input class="span4" id="requestor_blog" name="requestor[blog]" size="30" type="url" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span2">
+                        <label for="requestor_skype">Skype handle</label>
+                        <input class="span2" id="requestor_skype" name="requestor[skype]" size="30" type="text" />
+                      </div>
+                      <div class="span2">
+                        <label for="requestor_twitter">Twitter handle</label>
+                        <input class="span2" id="requestor_twitter" name="requestor[twitter]" size="30" type="text" />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_profession">Profession</label>
+                        <textarea class="span4" cols="40" id="requestor_profession" name="requestor[profession]" placeholder="What do you do for a living?" rows="1"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="span7 offset1">
+                    <legend>Questions that help us get to know you.</legend>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_expertise_name_1">Three areas of expertise that you could contribute.</label>
+                      </div>
+                      <div class="span3">
+                        <label for="requestor_expertise_sought_name_1">Three areas of expertise you desire to learn.</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <p>
+                          <input class="span2" id="requestor_expertise_name_1" name="requestor[expertise_name_1]" size="30" type="text" />
+                          <select class="span2" id="expertise_level_1" name="expertise_level_1">
+                            <option value="1" selected="selected">Expert</option>
+                            <option value="2">Master</option>
+                            <option value="3">Intermediate</option>
+                            <option value="4">Beginner</option>
+                          </select>
+                        </p>
+                        <p>
+                          <input class="span2" id="requestor_expertise_name_2" name="requestor[expertise_name_2]" size="30" type="text" />
+                          <select class="span2" id="expertise_level_2" name="expertise_level_2">
+                            <option value="1" selected="selected">Expert</option>
+                            <option value="2">Master</option>
+                            <option value="3">Intermediate</option>
+                            <option value="4">Beginner</option>
+                          </select>
+                        </p>
+                        <p>
+                          <input class="span2" id="requestor_expertise_name_3" name="requestor[expertise_name_3]" size="30" type="text" />
+                          <select class="span2" id="expertise_level_3" name="expertise_level_3"><option value="1" selected="selected">Expert</option>
+                            <option value="2">Master</option>
+                            <option value="3">Intermediate</option>
+                            <option value="4">Beginner</option>
+                          </select>
+                        </p>
+                      </div>
+                      <div class="span3">
+                        <p><input class="span3" id="requestor_expertise_sought_name_1" name="requestor[expertise_sought_name_1]" size="30" type="text" /></p>
+                        <p><input class="span3" id="requestor_expertise_sought_name_2" name="requestor[expertise_sought_name_2]" size="30" type="text" /></p>
+                        <p><input class="span3" id="requestor_expertise_sought_name_3" name="requestor[expertise_sought_name_3]" size="30" type="text" /></p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_reason_for_learning">How do you build expertise in new skills today?</label>
+                      </div>
+                      <div class="span3">
+                        <label for="requestor_learning_style">In what ways do you learn best?</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <textarea class="span4" cols="40" id="requestor_current_method" name="requestor[current_method]" rows="2"></textarea>
+                      </div>
+                      <div class="span3">
+                        <textarea class="span3" cols="40" id="requestor_learning_style" name="requestor[learning_style]" rows="2"></textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span4">
+                        <label for="requestor_remote_project">Have you ever worked remote on a team project?</label>
+                        <textarea class="span4" cols="40" id="requestor_remote_project" name="requestor[remote_project]" placeholder="Tell us about the project. What worked. What didn&#x27;t." rows="2"></textarea>
+                      </div>
+                      <div class="span3">
+                        <label for="requestor_reason_for_learning">What fuels your learning curiosity?</label>
+                        <textarea class="span3" cols="40" id="requestor_reason_for_learning" name="requestor[reason_for_learning]" placeholder="Why do you learn? What drives you?" rows="2"></textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span7">
+                        <label for="requestor_how_they_heard_of_us">How did you hear about ServeLife?</label>
+                        <textarea class="span7" cols="40" id="requestor_how_they_heard_of_us" name="requestor[how_they_heard_of_us]" rows="1"></textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="span7 offset4">
+                        <p>&nbsp;</p>
+                        <input class="btn btn-primary btn-large" name="commit" type="submit" value="Submit Request" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock page %}
