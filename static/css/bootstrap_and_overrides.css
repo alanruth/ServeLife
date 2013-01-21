@@ -1,7 +1,8 @@
 
-@import "bootstrap";
+/*@import "bootstrap";
 @import "bootstrap/mixins";
 @import "bootstrap-responsive";
+*/
 
 /*.content {
   background-color: #eee;
@@ -17,7 +18,7 @@ html {
 body {
   position: relative;
   padding-top: 69px;
-  background: #DDDCE2 url(content_bg.jpg) repeat left top;
+  background: #DDDCE2 url(../img/content_bg.jpg) repeat left top;
   -webkit-font-smoothing: antialiased;
   font-family: 'Lato', sans-serif;
 }

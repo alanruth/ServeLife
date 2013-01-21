@@ -26,14 +26,75 @@
 
     </script>
 </head>
+
 <body>
+  {% block navbar %}
+  <header class="navbar navbar-fixed-top">
+    <nav class="navbar-inner">
+      <div class="container">
+        <!-- begins navbar -->
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a href="/" class="brand scroller" data_section="body">
+          <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png" />
+        </a>
+        <div class="nav-collapse collapse">
+          <ul class="nav pull-right">
+            <li><a href="#" class="scroller" data-section="#features">Benefits</a></li>
+            <li><a href="#" class="scroller" data-section="#pricing">Pricing</a></li>
+            <li><a href="#" class="scroller" data-section="#about">About us</a></li>
+            <li><a href="/innovationintheenterprise">Podcasts</a></li>
+            <!--<li><a href="#">Blog</a></li>-->
+            <li>
+              <a href="/requestors/new" class="btn-header">Sign up</a>
+            </li>
+            <li>
+              <a href="/users/sign_in" class="btn-header">Sign in</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <!-- ends navbar -->
+  {% endblock navbar %}
 
-{% block page %}{% endblock page %}
+  {% block page %}{% endblock page %}
 
-{% block footer %}{% endblock footer %}
+  {% block footer %}
+  <!-- starts footer -->
+  <footer>
+    <div id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="row copyright">
+            <div class="span5">
+              <h3>Social</h3>
+              <a href="http://www.facebook.com/LearnWithPurpose" class="social fb" >
+                <i class="i_facebook"> </i>
+              </a>
+              <a href="#" class="social tw">
+                <i class="i_twitter"></i>
+              </a>
+              <a href="#" class="social yt">
+                <i class="i_youtube"></i>
+              </a>
+            </div>
+            <div class="span2 offset5 copy">
+              <p>&copy; 2013 - ServeLife, Inc.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  {% endblock footer %}
 
-<script src="http://code.jquery.com/jquery-latest.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/theme.js"></script>
-</body>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <script src="/static/js/theme.js"></script>
+  </body>
 </html>
