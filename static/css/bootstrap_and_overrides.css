@@ -22,6 +22,22 @@ body {
   -webkit-font-smoothing: antialiased;
   font-family: 'Lato', sans-serif;
 }
+.green {
+  color: #78CD51;
+}
+
+.red {
+  color: #FA603D;
+}
+
+.blue {
+  color: #67C2EF;
+}
+
+.yellow {
+  color: #FABB3D;
+}
+
 .scrolltop {
   background-color: #F1F1F1;
   border: 1px solid darkGray;
@@ -1707,13 +1723,149 @@ footer {
   }
 }
 
+/* Notifications on Icons */
+.notification {
+  position: absolute;
+  
+  line-height: 16px;
+  height: 16px;
+  padding: 3px 6px;
+  /*color: white !important;*/
+  text-shadow: 0 1px hsla(0, 0%, 0%, 0.25);
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 10px;
+    -webkit-border-radius: 50em;
+       -moz-border-radius: 50em;
+            border-radius: 50em;
+  -webkit-box-shadow: 0 1px 1px hsla(0, 0%, 0%, 0.08), inset 0 1px hsla(0, 100%, 100%, 0.3);
+     -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08), inset 0 1px rgba(255, 255, 255, 0.3);
+      box-shadow: 0 1px 1px hsla(0, 0%, 0%, 0.08), inset 0 1px hsla(0, 100%, 100%, 0.3);
+}
+
+.notification-small, 
+.notification {
+  border-color: #2FABE9;
+  background-color: #67C2EF;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, hsl(200, 80%, 82%)), color-stop(100%, hsl(200, 81%, 67%)));
+  background-image: -webkit-linear-gradient(top, hsl(200, 80%, 82%), hsl(200, 81%, 67%));
+  background-image: -moz-linear-gradient(top, hsl(200, 80%, 82%), hsl(200, 81%, 67%));
+  background-image: -ms-linear-gradient(top, hsl(200, 80%, 82%), hsl(200, 81%, 67%));
+  background-image: -o-linear-gradient(top, hsl(200, 80%, 82%), hsl(200, 81%, 67%));
+  background-image: linear-gradient(top, hsl(200, 80%, 82%), hsl(200, 81%, 67%));
+}
+
+.followers {
+  top:  -10px;
+  /* right:  -15px; */
+}
+
+.likes span {
+  top: -10px;
+  right: -20px;
+}
+
+.header-main {
+  margin-top: 60px;
+}
+
+.profile-details {
+  text-align: center;
+  /*margin-top: -5px;*/
+  border: 1px solid #DDDDDD;
+  border-radius: 10px 10px 10px 10px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #646464;
+  padding: 10px 0 0 0;
+  position: relative;
+}
+
+.likes img {
+  margin-bottom: 4px;
+}
+
+.profile-details p {
+  margin-top: 14px;
+}
 
 
 
+.articles img {
+  margin-bottom: -4px;
+}
 
+.articles span {
+  top: -10px;
+  right: -20px;
+}
 
+/* Circle stats
+=================================================================== */
 
+.circleStats {text-align: center; position: relative;}
+.circleStatsItem {
+  position: relative;
+  background: rgba(255,255,255,0.7);
+  -webkit-box-shadow: inset 0 0px 0 2px rgba(0,0,0,.2), 0 0px 0 4px rgba(0,0,0,.1);
+     -moz-box-shadow: inset 0 0px 0 2px rgba(0,0,0,.2), 0 0px 0 4px rgba(0,0,0,.1);
+          box-shadow: inset 0 0px 0 2px rgba(0,0,0,.2), 0 0px 0 4px rgba(0,0,0,.1);
+  -webkit-border-radius: 50em;
+     -moz-border-radius: 50em;
+          border-radius: 50em; 
+  width:120px; 
+  height: 120px;
+  margin: 10px auto;
+}
+  
+  
+.circleStatsItem i {
+  font-size: 30px; 
+  position: absolute; 
+  top:30%; 
+  margin-top: 0px; 
+  width: 100%; 
+  text-align: center
+}
 
+.circleStatsItem.orange, .circleStatsItem.orange i {color:#FA5833; }
+.circleStatsItem.lightorange, .circleStatsItem.lightorange i {color:#f4a70c; }
+.circleStatsItem.blue, .circleStatsItem.blue i {color:#2FABE9; }
+.circleStatsItem.green, .circleStatsItem.green i {color:#b9e672; }
+.circleStatsItem.yellow, .circleStatsItem.yellow i {color:#e7e572; }
+.circleStatsItem.pink, .circleStatsItem.pink i {color:#e42b75; }
+    
+.circleStatsItem input {
+  cursor: default;
+  box-shadow: none;
+  border: none;
+  height: auto;
+  position: absolute;
+  top:20px;
+  left: 120px;
+  border-color: rgba(0, 0, 0, 0.8);
+}
+  
+.circleStatsItem .plus {
+  font-size: 16px; 
+  position: absolute; 
+  top:55%; 
+  margin-left: 30px;
+}
 
+.circleStatsItem .percent {
+  font-size: 14px;
+  position: absolute;
+  top:57%; 
+  margin-left: 78px;
+}
+  
+  
+.circleStatsItem input:focus {
+  outline: 0;
+  outline: thin dotted 0;
+    -webkit-box-shadow: none;
+       -moz-box-shadow: none;
+          box-shadow: none;
+}
 
 

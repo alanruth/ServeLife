@@ -28,7 +28,10 @@
 </head>
 
 <body>
+
+  <!-- ANUBHAV: can we check to see if user is logged in? If so, we present different navbar/header -->
   {% block navbar %}
+  <!-- PUBLIC NAVBAR - USER NOT SIGNED IN -->
   <header class="navbar navbar-fixed-top">
     <nav class="navbar-inner">
       <div class="container">
@@ -59,7 +62,10 @@
       </div>
     </nav>
   </header>
-  <!-- ends navbar -->
+  <!-- ends public navbar -->
+
+
+  
   {% endblock navbar %}
 
   {% block page %}{% endblock page %}
@@ -93,8 +99,11 @@
   </footer>
   {% endblock footer %}
 
+  {% block javascript %}
   <script src="http://code.jquery.com/jquery-latest.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
   <script src="/static/js/theme.js"></script>
+  {% endblock javascript %}
+
   </body>
 </html>

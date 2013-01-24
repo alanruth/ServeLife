@@ -135,6 +135,12 @@ class PodcastHandler(SLRequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
+class ProfileHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('publicprofile.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
 class HumansTxtHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('humans.html')
@@ -240,6 +246,7 @@ class AddCourseHandler(SLRequestHandler):
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/betasignup',BetaSignUpHandler),
                                ('/innovationintheenterprise', PodcastHandler),
+                               ('/publicprofile', ProfileHandler),
                                ('/humans.txt', HumansTxtHandler),
                                ('/sign_up', SignUpHandler),
                                ('/account_activation', ActivationHandler),
