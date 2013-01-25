@@ -590,7 +590,7 @@ function circle_progess() {
         'readOnly': true,
         'width': 120,
         'height': 120,
-        'fgColor': '#2FABE9',
+        'fgColor': '#0088CC', //#2FABE9',
         'dynamicDraw': true,
         'thickness': 0.2,
         'tickColorizeValues': true,

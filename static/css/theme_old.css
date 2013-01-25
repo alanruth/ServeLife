@@ -1,14 +1,4 @@
-html {
-	margin: 0;
-}
-body {
-	position: relative;
-	padding-top: 69px;
-	background: #DDDCE2 url(../img/content_bg.jpg) repeat left top;
-	-webkit-font-smoothing: antialiased;
-	font-family: 'Lato', sans-serif !important;
-	color: #333;
-}
+
 .scrolltop {
 	background-color: #F1F1F1;
 	border: 1px solid darkGray;
