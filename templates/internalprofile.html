@@ -8,6 +8,45 @@
 
 <!-- NAVBAR SHOULD BE DETERMINED IN BASE -->
 
+{% block navbar %}
+<header class="navbar navbar-fixed-top">
+    <nav class="navbar-inner">
+      <div class="container">
+        <!-- begins navbar -->
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a href="/" class="brand scroller" data_section="body">
+          <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png" />
+        </a>
+        <div class="nav-collapse collapse">
+          <ul class="nav pull-right">
+            <li><a href="#" alt="Homebase">Homebase</a></li>
+            <li><a href="#" alt="Discover">Discover</a></li>
+            <li><a href="#" alt="Learn">Learn</a></li>
+            <li><a href="#" alt="Build">Build</a></li>
+            <li><a href="#" alt="Work">Work</a></li>
+            <li><a href="#" alt="Community">Community</a></li>
+            <li class="dropdown"><a href="#" class="btn btn-small btn-header dropdown-toggle" data-toggle="dropdown">alan@notionlabs.com<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Profile</a></li>
+                <li><a href="#">Account</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Support</a></li>
+                <li class="divider"></li>
+                <li><a href="/logout">Log Out</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+<!-- ends navbar -->
+{% endblock navbar %}
+
 {% block page %}
 <div class="container">
   <div class="row-fluid header-main">
@@ -109,7 +148,7 @@
   <hr>
 
   <div class="row-fluid skills">
-    <div class="box span6" ondesktop="span6" ontablet="span8" >
+    <div class="box span4" ondesktop="span4" ontablet="span6" >
       <div class="box-header">
         <h2>
           <img alt="lightbulb" src="/static/img/lightbulb.png" class="lightbulb" />
@@ -142,7 +181,7 @@
       </div>
     </div>
 
-    <div class="box span6" ondesktop="span6" ontablet="span8" >
+    <div class="box span4" ondesktop="span4" ontablet="span6" >
       <div class="box-header">
         <h2>
           <img alt="book" src="/static/img/book_open.png" />
@@ -374,12 +413,13 @@
 
 {% block javascript %}
 <!-- start: JavaScript -->
- <script src="/static/js/jquery-1.7.2.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <script src="/static/js/jquery-1.7.2.min.js"></script>
   <script src="/static/js/jquery-ui-1.8.21.custom.min.js"></script>
   <script src="/static/js/bootstrap.js"></script>
   <script src="/static/js/jquery.cookie.js"></script>
   <script src='/static/js/fullcalendar.min.js'></script>
-S  <script src='/static/js/jquery.dataTables.min.js'></script>
+  <script src='/static/js/jquery.dataTables.min.js'></script>
   <script src="/static/js/excanvas.js"></script>
   <script src="/static/js/jquery.flot.min.js"></script>
   <script src="/static/js/jquery.flot.pie.min.js"></script>
@@ -399,7 +439,8 @@ S  <script src='/static/js/jquery.dataTables.min.js'></script>
   <script src="/static/js/jquery.knob.js"></script>
   <script src="/static/js/jquery.sparkline.min.js"></script>
   <script src="/static/js/custom.js"></script>
-  <script type="text/javascript" src="assets/js/jquery.prettyPhoto.js"></script> 
+  <script type="text/javascript" src="/static/js/jquery.prettyPhoto.js"></script>
+  
     
  
   <!--<script src="http://code.jquery.com/jquery-latest.js"></script>

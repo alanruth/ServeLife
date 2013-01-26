@@ -103,7 +103,7 @@ body {
   transition: all .2s linear;
 }
 .navbar .nav > li > a:hover {
-  color: #ccc;
+  color: #0E90D2;
 }
 .navbar .nav > li.active > a,
 .navbar .nav > li.active:hover > a,
@@ -376,17 +376,27 @@ body {
 /* footer section */
 footer {
   background: url("/static/img/footer_bg.jpg") 0 0 repeat;
-  min-height: 300px;
-  margin-top: 100px;
+  min-height: 60px;
+  margin-top: 60px;
   color: #fff;
-  padding-top: 35px;
+  padding-top: 20px;
 }
+
 footer h3 {
   margin-bottom: 25px;
 }
-footer .blog_post {
-/*width: 80%;*/
-}
+
+/*#footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}*/
+
+/*footer .blog_post {
+width: 80%;*/
+/*}*/
+/*
 footer .blog_post .img-circle {
   width: 120px;
   height: 120px;
@@ -435,6 +445,7 @@ footer hr {
   border-bottom: 1px solid #363B43;
   margin: 8px 0px 0px 0px;
 }
+*/
 footer .copyright h3 {
   float: left;
 }
@@ -913,7 +924,7 @@ footer .copyright .copy p {
   margin: 0px 2px;
 }
 #footer.coming-soon {
-  min-height: 60px;
+  /*min-height: 60px; */
 }
 
 /* Sign Up
@@ -2030,8 +2041,8 @@ footer .copyright .copy p {
 }
 
 /* CUSTOM */
-footer {
-  min-height: 60px;
+.navbar .nav .dropdown-toggle .caret {
+  margin-top: 4px;
 }
 
 .field_with_errors input, .field_with_errors textarea, .field_with_errors select {
@@ -2111,4 +2122,27 @@ footer {
   text-shadow: 0px 1px 0px #fff;
   text-align: center;
   width: 100%;
+}
+
+.navbar .nav .dropdown .btn-header {
+    background: #414A57;
+    background: -moz-linear-gradient(top, #414A57 0%, #292f38 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#414A57), color-stop(100%,#292f38));
+    background: -webkit-linear-gradient(top, #414A57 0%,#292f38 100%);
+    background: -o-linear-gradient(top, #414A57 0%,#292f38 100%);
+    background: -ms-linear-gradient(top, #414A57 0%,#292f38 100%);
+    background: linear-gradient(to bottom, #414A57 0%,#292f38 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#414A57', endColorstr='#292f38',GradientType=0 );
+    border: 1px solid #13161b;
+    border-radius: 6px;
+    display: inline-block;
+    height: 10px;
+    line-height: 8px;
+    position: relative;
+    margin-left: 8px;
+    top: 0px;
+  }
+
+  .navbar .nav > li > a:focus {
+  color: #F8F8F8;
 }
