@@ -147,6 +147,18 @@ class InternalProfileHandler(SLRequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
+class TeamPublicProfileHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('teampublicprofile.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+class ProjectPublicProfileHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('projectpublicprofile.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
 class HumansTxtHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('humans.html')
@@ -254,6 +266,8 @@ app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/innovationintheenterprise', PodcastHandler),
                                ('/publicprofile', ProfileHandler),
                                ('/internalprofile', InternalProfileHandler),
+                               ('/teampublicprofile', TeamPublicProfileHandler),
+                               ('/projectpublicprofile', ProjectPublicProfileHandler),
                                ('/humans.txt', HumansTxtHandler),
                                ('/signup', SignUpHandler),
                                ('/account_activation', ActivationHandler),

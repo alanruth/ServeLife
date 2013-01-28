@@ -1767,6 +1767,12 @@ footer .copyright .copy p {
   right: -20px;
 }
 
+.riffs span{
+  top:  -10px;
+  right:  -15px;
+}
+
+
 .header-main {
   margin-top: 60px;
 }
@@ -1831,7 +1837,7 @@ footer .copyright .copy p {
 
 .circleStatsItem.orange, .circleStatsItem.orange i {color:#FA5833; }
 .circleStatsItem.lightorange, .circleStatsItem.lightorange i {color:#f4a70c; }
-.circleStatsItem.blue, .circleStatsItem.blue i {color:#0088CC; } /*{color:#2FABE9; }*/
+.circleStatsItem.blue, .circleStatsItem.blue i {color:#2FABE9; }
 .circleStatsItem.green, .circleStatsItem.green i {color:#b9e672; }
 .circleStatsItem.yellow, .circleStatsItem.yellow i {color:#e7e572; }
 .circleStatsItem.pink, .circleStatsItem.pink i {color:#e42b75; }
@@ -2145,4 +2151,19 @@ footer .copyright .copy p {
 
   .navbar .nav > li > a:focus {
   color: #F8F8F8;
+}
+
+.badge-list {
+  text-align: center;
+  margin-top: 10px;
+  border: 1px solid #DDDDDD;
+  border-radius: 10px 10px 10px 10px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #646464;
+  padding: 10px 0 0 0;
+  position: relative;
+}
+
+.help {
+  top: -10px;
 }

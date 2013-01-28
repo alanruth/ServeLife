@@ -1,67 +1,28 @@
 {% extends "base.html" %}
 
-<!-- NEED TO PULL MEMBER NAME FROM DB -->
-{% block title %}Insert Member Name{% endblock title %}
+<!-- NEED TO PULL TEAM NAME FROM DB -->
+{% block title %}Insert Team Name{% endblock title %}
 
-<!-- NEED TO PULL MEMBER HEADLINE FROM DB -->
-{% block description %}"ServeLife Member - [INSERT NAME]: [INSERT HEADLINE FROM PROFILE]"{% endblock description %}
+<!-- NEED TO PULL TEAM HEADLINE FROM DB -->
+{% block description %}"ServeLife Team - [INSERT NAME]: [INSERT HEADLINE FROM PROFILE]"{% endblock description %}
 
 <!-- NAVBAR SHOULD BE DETERMINED IN BASE -->
-
-{% block navbar %}
-<header class="navbar navbar-fixed-top">
-    <nav class="navbar-inner">
-      <div class="container">
-        <!-- begins navbar -->
-        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </a>
-        <a href="/" class="brand scroller" data_section="body">
-          <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png" />
-        </a>
-        <div class="nav-collapse collapse">
-          <ul class="nav pull-right">
-            <li><a href="#" alt="Home">Home</a></li>
-            <li><a href="#" alt="Discover">Discover</a></li>
-            <li><a href="#" alt="Learn">Learn</a></li>
-            <li><a href="#" alt="Build">Build</a></li>
-            <li><a href="#" alt="Work">Work</a></li>
-            <li><a href="#" alt="Community">Community</a></li>
-            <li class="dropdown"><a href="#" class="btn btn-small btn-header dropdown-toggle" data-toggle="dropdown">alan@notionlabs.com<b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Profile</a></li>
-                <li><a href="#">Account</a></li>
-                <li class="divider"></li>
-                <li><a href="#">Support</a></li>
-                <li class="divider"></li>
-                <li><a href="/logout">Log Out</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
-<!-- ends navbar -->
-{% endblock navbar %}
 
 {% block page %}
 <div class="container">
   <div class="row-fluid header-main">
     <div class="span2">
-      <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
-      <img alt="Alan Ruth" src="/static/img/alan180.png" class="thumbnail img-polaroid member-pic" />
+      <!-- INSERT PICTURE FROM PROFILE. IF NONE EXISTS, USE GENERIC TEAM AVATAR. Load team name as alt -->
+      <img alt="ServeLife" src="/static/img/servelifefbprofile.png" class="thumbnail img-polaroid member-pic" />
     </div>
     <div class="span5">
-      <!-- INSERT MEMBER CREATE DATE -->
-      <span class="pull-right"><strong>Member since</strong> [MM/YYYY]</span>
-      <!-- INSERT MEMBER NAME FROM PROFILE -->
-      <h2>Alan Ruth</h2>
-      <!-- INSERT MEMBER LEVEL FROM PROFILE -->
-      <h4>Master Craftsman</h4>
-      <!-- INSERT MEMBER HEADLINE FROM PROFILE - WE SHOULD LIMIT LENGTH OF HEADLINE -->
+      <!-- INSERT PROJECT CREATE DATE -->
+      <span class="pull-right"><strong>Project Initiated:</strong> [MM/YYYY]</span>
+      <!-- INSERT PROJECT NAME FROM PROFILE -->
+      <h2>LearnMasterMentor</h2>
+      <!-- INSERT PROJECT STATUS FROM PROFILE -->
+      <h4>Main Stream Project</h4>
+      <!-- INSERT PROJECT HEADLINE FROM PROFILE - WE SHOULD LIMIT LENGTH OF HEADLINE -->
       <p>Pellentesque sollicitudin congue diam, et gravida leo posuere at. Nunc <strong>fermentum erat</strong> at diam convallis vel porttitor purus congue. Proin blandit, odio ac aliquet fermentum, lectus est dictum nisl, ac elementum dui ante et ipsum. </p>
     </div>
     <div class="span5">
@@ -69,17 +30,17 @@
         <div class="profile-details span3 offset1">
           <img alt="Followers" src="/static/img/group2x.png" />
           <span class="notification followers">800</span>
-          <p>Followers</p>
+          <p>Followers<!--<img alt="help" src="/static/img/question_mark.png" class="help"/> --></p>
         </div>
         <div class="profile-details span3 offset1 likes">
           <img alt="Likes" src="/static/img/thumbs_up2x.png" />
           <span class="notification">800</span>
-          <p>Likes</p>
+          <p>Likes<!-- <img alt="help" src="/static/img/question_mark.png" class="help"/> --></p>
         </div>
-        <div class="profile-details span3 offset1 articles">
-          <img alt="Likes" src="/static/img/notes2x.png" />
+        <div class="profile-details span3 offset1 riffs">
+          <img alt="Riffs" src="/static/img/new_window2x.png" />
           <span class="notification">800</span>
-          <p>Articles</p>
+          <p>Riffs<!--<img alt="help" src="/static/img/question_mark.png" class="help"/>--></p>
         </div>
       </div>
       <div class="row-fluid">
@@ -87,15 +48,15 @@
           <p>Badges Go Here</p>
         </div>
       </div>
-    </div>  
-  </div>
+    </div>
+</div>
     
   <hr class="soften">
 
   <!-- Stats -->    
   <div class="row-fluid">
     <div class="circleStats">
-      <div class="span2" onTablet="span4" onDesktop="span2">
+      <div class="span2 offset1" onTablet="span4" onDesktop="span2">
         <div class="circleStatsItem red">
           <i class="fa-icon-thumbs-up"></i>
           <span class="plus">+</span>
@@ -113,7 +74,7 @@
         </div>
         <div class="box-small-title">Feedback</div>
       </div>
-      <div class="span2" onTablet="span4" onDesktop="span2">
+      <!--<div class="span2" onTablet="span4" onDesktop="span2">
         <div class="circleStatsItem yellow">
           <i class="fa-icon-user"></i>
           <span class="plus">+</span>
@@ -121,7 +82,7 @@
           <input type="text" value="12" class="yellowCircle" />
         </div>
         <div class="box-small-title">Participation</div>
-      </div>
+      </div> -->
       <div class="noMargin span2" onTablet="span4" onDesktop="span2">
         <div class="circleStatsItem pink">
           <i class="fa-icon-globe"></i>
@@ -160,7 +121,7 @@
         <h2>
           <img alt="lightbulb" src="/static/img/lightbulb.png" class="lightbulb" />
           <span class="break"></span>
-          Skill Development</h2>
+          Areas of Discovery</h2>
       </div> 
       <div class="box-content">
         <span class="label">Ruby/Rails</span>
@@ -193,7 +154,7 @@
         <h2>
           <img alt="book" src="/static/img/book_open.png" />
           <span class="break"></span>
-          Learning Projects in Progress
+          Learning Efforts in Progress
         </h2>
       </div>
       <div class="box-content">
@@ -214,7 +175,7 @@
       </div>
     </div>
 
-        <div class="box span4" ondesktop="span4" ontablet="span6" >
+    <div class="box span4" ondesktop="span4" ontablet="span6" >
       <div class="box-header">
         <h2>
           <img alt="lightbulb" src="/static/img/lightbulb.png" class="lightbulb" />
@@ -453,13 +414,12 @@
 
 {% block javascript %}
 <!-- start: JavaScript -->
-  <script src="/static/js/bootstrap.min.js"></script>
-  <script src="/static/js/jquery-1.7.2.min.js"></script>
+ <script src="/static/js/jquery-1.7.2.min.js"></script>
   <script src="/static/js/jquery-ui-1.8.21.custom.min.js"></script>
   <script src="/static/js/bootstrap.js"></script>
   <script src="/static/js/jquery.cookie.js"></script>
   <script src='/static/js/fullcalendar.min.js'></script>
-  <script src='/static/js/jquery.dataTables.min.js'></script>
+S  <script src='/static/js/jquery.dataTables.min.js'></script>
   <script src="/static/js/excanvas.js"></script>
   <script src="/static/js/jquery.flot.min.js"></script>
   <script src="/static/js/jquery.flot.pie.min.js"></script>
@@ -479,8 +439,7 @@
   <script src="/static/js/jquery.knob.js"></script>
   <script src="/static/js/jquery.sparkline.min.js"></script>
   <script src="/static/js/custom.js"></script>
-  <script type="text/javascript" src="/static/js/jquery.prettyPhoto.js"></script>
-  
+  <script type="text/javascript" src="assets/js/jquery.prettyPhoto.js"></script> 
     
  
   <!--<script src="http://code.jquery.com/jquery-latest.js"></script>
