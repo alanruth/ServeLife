@@ -3,4 +3,4 @@
 #ignore temp files
 *.*~
 #ignore pycharm .idea directory
-.idea
+/.idea/
