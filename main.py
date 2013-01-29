@@ -70,35 +70,27 @@ class PodcastHandler(SLRequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
-class ProfileHandler(SLRequestHandler):
+class UserProfileHandler(SLRequestHandler):
     def get(self, username):
         template = jinja_environment.get_template('publicprofile.html')
         variables = {'username': username}
         self.response.out.write(template.render(variables))
 
-class InternalProfileHandler(SLRequestHandler):
-    def get(self):
-        template = jinja_environment.get_template('internalprofile.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
 
-class TeamPublicProfileHandler(SLRequestHandler):
+
+class TeamProfileHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('teampublicprofile.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
-class ProjectPublicProfileHandler(SLRequestHandler):
+class ProjectProfileHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('projectpublicprofile.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
-class HumansTxtHandler(SLRequestHandler):
-    def get(self):
-        template = jinja_environment.get_template('humans.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+
 
 class SignUpHandler(SLRequestHandler):
     def get(self):
@@ -199,9 +191,9 @@ class AddCourseHandler(SLRequestHandler):
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/betasignup',BetaSignUpHandler),
                                ('/innovationintheenterprise', PodcastHandler),
-                               ('/userprofile/(?P<username>.*)', ProfileHandler),
-                               ('/teamprofile/(?P<team>.*)', TeamPublicProfileHandler),
-                               ('/projectprofile/(?P<project>.*)', ProjectPublicProfileHandler),
+                               ('/userprofile/(?P<username>.*)', UserProfileHandler),
+                               ('/teamprofile/(?P<team>.*)', TeamProfileHandler),
+                               ('/projectprofile/(?P<project>.*)', ProjectProfileHandler),
                                ('/signup', SignUpHandler),
                                ('/account_activation', ActivationHandler),
                                ('/signin', SignInHandler),
