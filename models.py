@@ -6,13 +6,33 @@ class User(db.Model):
     email         = db.StringProperty(required = True)
     activated     = db.StringProperty(required = True)
     activation_key= db.StringProperty(required = True)
+    created       = db.DateTimeProperty(required = True,auto_now_add = True)
 
-class ThinDB(db.Model):
+class UserThinDB(db.Model):
     username      = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
     asset_key     = db.StringProperty(required = True)
     str_value     = db.StringProperty(required = False)
     int_value     = db.IntegerProperty(required= False)
+    updated       = db.DateTimeProperty(required = True,auto_now = True)
+
+class TeamThinDB(db.Model):
+    teamname      = db.StringProperty(required = True)
+    asset         = db.StringProperty(required = True)
+    asset_key     = db.StringProperty(required = True)
+    str_value     = db.StringProperty(required = False)
+    int_value     = db.IntegerProperty(required= False)
+    updated       = db.DateTimeProperty(required = True,auto_now = True)
+
+class ProjectThinDB(db.Model):
+    projectname   = db.StringProperty(required = True)
+    asset         = db.StringProperty(required = True)
+    asset_key     = db.StringProperty(required = True)
+    str_value     = db.StringProperty(required = False)
+    int_value     = db.IntegerProperty(required= False)
+    updated       = db.DateTimeProperty(required = True,auto_now = True)
+
+
 
 class Member(db.Model):
     first_name    = db.StringProperty(required = True)
