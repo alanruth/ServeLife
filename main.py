@@ -131,6 +131,13 @@ class ActivationHandler(SLRequestHandler):
         if user:
             user.activated='True'
             user.put()
+            username = user.username
+            user_influence = UserThinDB(username=username,
+                                    asset= 'profile',
+                                    asset_key= 'influence',
+                                    str_value= '',
+                                    int_value= 100)
+            user_influence.put()
             self.response.out.write('Your account has been activated!')
         else:
             self.response.out.write('No such activation key!')
