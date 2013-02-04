@@ -122,9 +122,10 @@ class SignUpHandler(SLRequestHandler):
             except:
                 self.response.out.write('mail config not working..')
 
-        template = jinja_environment.get_template('login.html')
-        variables = {'email':email}
-        self.response.out.write(template.render(variables))
+            template = jinja_environment.get_template('login.html')
+            variables = {'email':email}
+            self.response.out.write(template.render(variables))
+        self.response.out.write('this username not available')
 
 class ActivationHandler(SLRequestHandler):
     def get(self):
