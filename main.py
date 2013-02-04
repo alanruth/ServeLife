@@ -6,7 +6,7 @@ import random
 import string
 import hmac
 from google.appengine.api import mail
-from models.models import *
+from models.models import User
 
 #'http://localhost:8080'
 domain = 'http://learnmastermentor.appspot.com'
@@ -90,7 +90,6 @@ class SignUpHandler(SLRequestHandler):
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
-
     def post(self):
         email = self.request.get('email')
         username = self.request.get('username')
@@ -107,18 +106,18 @@ class SignUpHandler(SLRequestHandler):
             activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
             try:
-                mail.send_mail(sender="ServeLife<alan@servelife.com>",
-                to=email,
-                subject="Activate your Servelife account!",
-                body="no html version",
-                html=email_template.render({'activation_link':activation_link}))
+                mail.send_mail(sender="ServeLife<alan@notionlabs.com>",
+                                to=email,
+                                subject="Activate your Servelife account!",
+                                body="no html version",
+                                html=email_template.render({'activation_link':activation_link}))
             except:
                 self.response.out.write('mail config not working..')
 
             template = jinja_environment.get_template('login.html')
             variables = {'email':email}
             self.response.out.write(template.render(variables))
-        self.response.out.write('this username not available')
+
 
 class ActivationHandler(SLRequestHandler):
     def get(self):

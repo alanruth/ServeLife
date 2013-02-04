@@ -33,7 +33,7 @@ class ProjectThinDB(db.Model):
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
 
-
+"""
 class Member(db.Model):
     first_name    = db.StringProperty(required = True)
     last_name     = db.StringProperty(required = True)
@@ -324,3 +324,4 @@ class MemberBadge(db.Model):
 
 #TeamBadge
 #ProjectBadge    
+"""
