@@ -6,7 +6,7 @@ import random
 import string
 import hmac
 from google.appengine.api import mail
-from models import User, UserThinDB
+from models.models import *
 
 #'http://localhost:8080'
 domain = 'http://learnmastermentor.appspot.com'
