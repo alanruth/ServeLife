@@ -1,19 +1,12 @@
 import webapp2
 import jinja2
-from models import *
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.ext import blobstore
 
 import os
-from google.appengine.api import search
-import logging
-import urllib
-from google.appengine.api import images
-import re
 import random
 import string
 import hmac
 from google.appengine.api import mail
+from models import User, UserThinDB
 
 #'http://localhost:8080'
 domain = 'http://learnmastermentor.appspot.com'
