@@ -113,12 +113,15 @@ class SignUpHandler(SLRequestHandler):
             #mail the activation link
             activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
+            try:
+                mail.send_mail(sender="ServeLife<alan@servelife.com>",
+                to=email,
+                subject="Activate your Servelife account!",
+                body="no html version",
+                html=email_template.render({'activation_link':activation_link}))
+            except:
+                self.response.out.write('mail config not working..')
 
-            mail.send_mail(sender="ServeLife<alan@servelife.com>",
-            to=email,
-            subject="Activate your Servelife account!",
-            body="no html version",
-            html=email_template.render({'activation_link':activation_link}))
         template = jinja_environment.get_template('login.html')
         variables = {'email':email}
         self.response.out.write(template.render(variables))
