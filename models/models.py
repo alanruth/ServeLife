@@ -8,7 +8,7 @@ class User(db.Model):
     activation_key= db.StringProperty(required = True)
     created       = db.DateTimeProperty(required = True,auto_now_add = True)
 
-class UserThidb(db.Model):
+class UserThinDB(db.Model):
     username      = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
     asset_key     = db.StringProperty(required = True)
@@ -16,7 +16,7 @@ class UserThidb(db.Model):
     int_value     = db.IntegerProperty(required= False)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
-class TeamThidb(db.Model):
+class TeamThinDB(db.Model):
     teamname      = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
     asset_key     = db.StringProperty(required = True)
@@ -24,7 +24,7 @@ class TeamThidb(db.Model):
     int_value     = db.IntegerProperty(required= False)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
-class ProjectThidb(db.Model):
+class ProjectThinDB(db.Model):
     projectname   = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
     asset_key     = db.StringProperty(required = True)
