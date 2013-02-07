@@ -1,12 +1,12 @@
 import webapp2
 import jinja2
-
 import os
 import random
 import string
 import hmac
 from google.appengine.api import mail
 from models.models import *
+import json
 
 #'http://localhost:8080'
 domain = 'http://learnmastermentor.appspot.com'
@@ -22,7 +22,7 @@ def login_required(function):
             function(self, *args, **kwargs)
         else:
             next_page = self.request.path
-            self.redirect('/sign_in?next=%s' %next_page)
+            self.redirect('/signin?next=%s' %next_page)
 
     return _f
 
@@ -63,14 +63,49 @@ class PodcastHandler(SLRequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
-class UserProfileEditHandler(SLRequestHandler):
-    def get(self, username):
-        template = jinja_environment.get_template('edituserprofile.html')
-        variables = {'username': username}
-        self.response.out.write(template.render(variables))
 
+class UserProfileEditHandler(SLRequestHandler):
+
+    @login_required
+    def get(self, username):
+        if self.is_logged_in():
+            user = self.user
+            #profileinfo is a json string with keys name, title and about
+            profile = UserThinDB.all().filter('username = ', user.username).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            print profile.str_value
+            profileinfo='{}'
+            if profile:
+                profileinfo=profile.str_value
+
+            """
+            variables = {'name': name,
+                         'title': title,
+                         'about':about}
+            """
+            variables = json.loads(profileinfo)
+            template = jinja_environment.get_template('edituserprofile.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
+
+    @login_required
     def post(self, username):
-        self.redirect('/userprofile/%s' %username)
+        if self.is_logged_in():
+            user = self.user
+            name = self.request.get('name')
+            title = self.request.get('title')
+            about = self.request.get('about')
+            profileinfo = {'name': name, 'about': about, 'title': title}
+            profile = UserThinDB.all().filter('username = ', user.username).filter('asset=','profile').filter('asset_key=','info').get()
+            if profile:
+                profile.str_value = json.dumps(profileinfo)
+                profile.put()
+            else:
+                profile = UserThinDB(username=user.username, asset='profile',asset_key='info', str_value=json.dumps(profileinfo), int_value=0)
+                profile.put()
+
+        else:
+            self.redirect('/signin')
 
 
 class UserProfileHandler(SLRequestHandler):
@@ -180,6 +215,7 @@ class LogOutHandler(SLRequestHandler):
         self.response.headers.add_header('Set-Cookie','user_id=;Path = /')
         self.redirect('/')
 
+@login_required
 class GetUserFeedHandler(SLRequestHandler):
     def get(self, username):
         user = 'mogambo'
