@@ -92,10 +92,16 @@ class UserProfileEditHandler(SLRequestHandler):
     def post(self, username):
         if self.is_logged_in():
             user = self.user
-            name = self.request.get('name')
-            title = self.request.get('title')
-            about = self.request.get('about')
-            profileinfo = {'name': name, 'about': about, 'title': title}
+            first_name = self.request.get('first_name')
+            last_name = self.request.get('last_name')
+            country = self.request.get('country')
+            city = self.request.get('city')
+            linkedin_url = self.request.get('linkedin_url')
+            facebook_url = self.request.get('facebook_url')
+            twitter_handle = self.request.get('twitter_handle')
+            skype_id = self.request.get('skype_id')
+            blog_url = self.request.get('blog_url')
+            profileinfo = {'first_name': first_name, 'last_name': last_name, 'country': country, 'city': city, 'linkedin_url': linkedin_url, 'facebook_url': facebook_url, 'twitter_handle': twitter_handle, 'skype_id': skype_id, 'blog_url': blog_url}
             profile = UserThinDB.all().filter('username = ', user.username).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
@@ -159,7 +165,7 @@ class SignUpHandler(SLRequestHandler):
             activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
             try:
-                mail.send_mail(sender="ServeLife <email@anubhavsinha.com>",
+                mail.send_mail(sender="ServeLife <mailer@servelife.com>",
                                 to=email,
                                 subject="Activate your Servelife account!",
                                 body="no html version",
