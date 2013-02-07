@@ -1,20 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-</head>
-<body>
-
-<form action='/userprofile/edit/{{username}}' method='POST'>
-    <input name="name" placeholder="name" value="{{name}}">
-    <input name="title" placeholder="title"value="{{title}}">
-    <input name="about" placeholder="about" value="{{about}}">
-    <input type="submit" value="save">
-
-</form>
-</body>
-</html>
-
 {% extends "base.html" %}
 
 {% block title %}ServeLife: New User Profile{% endblock title %}
@@ -37,34 +20,42 @@
 <p>Your ServeLife profile uniquely identifies you within the ServeLife ecosystem.</p>
 
 <div class="form">
-<form accept-charset="UTF-8" action="/userprofile/edit/{{ username }}" method="post">
+<form accept-charset="UTF-8" action="/members" class="new_member" id="new_member" method="post">
+<div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;"/><input
+        name="authenticity_token" type="hidden" value="BcKaXgS4MgFZJgkLW4uxdTDpqRwZ/yTb48vZ/0HBRfw="/></div>
 
 <div class="row">
 <div class="span6">
-<legend>User Information - Required</legend>
+<legend>Member Information</legend>
 <p>Your member information is visible to everyone both within the ServeLife ecosystem and visitors to your public-facing
     ServeLife profile page. Within the ServeLife ecosystem you will be known uniquely by the ServeLife member
     name you select. Once you select your member name, this cannot be changed. Select wisely.</p>
 
 <div class="row">
     <div class="span3">
-        <label for="user_first_name">First name</label>
-        <input class="span3" id="user_first_name" name="user[first_name]" size="30" type="text" value="{{ first_name }}"/>
+        <label for="member_member_name">Member Name</label>
+        <input class="span3" id="member_member_name" name="member[member_name]" size="30" type="text" value="{{ first_name }}"/>
+    </div>
+</div>
+<div class="row">
+    <div class="span3">
+        <label for="member_first_name">First name</label>
+        <input class="span3" id="member_first_name" name="member[first_name]" size="30" type="text"/>
     </div>
     <div class="span3">
-        <label for="user_last_name">Last name</label>
-        <input class="span3" id="user_last_name" name="user[last_name]" size="30" type="text" value="{{ last_name }}"/>
+        <label for="member_last_name">Last name</label>
+        <input class="span3" id="member_last_name" name="member[last_name]" size="30" type="text"/>
     </div>
 </div>
 
 <div class="row">
 <div class="span3">
-    <label for="user_city">City</label>
-    <input class="span3" id="user_city" name="user[city]" size="30" type="text" value="{{ city }}"/>
+    <label for="member_email">Email address</label>
+    <input class="span3" id="member_email" name="member[email]" size="30" type="email"/>
 </div>
 <div class="span3">
 <label for="member_country">Country of residence</label>
-<select class="span3" id="member_country" name="member[country]" prompt="Please Select a Country" value='{{ country }}'>
+<select class="span3" id="member_country" name="member[country]" prompt="Please Select a Country">
 <option value="US">United States</option>
 <option disabled>-------------</option>
 <option value="AX">Åland Islands</option>
@@ -322,44 +313,44 @@
 </div>
 
 <div class="span5 offset1">
-    <legend>Contact Information and Social Platforms - Optional</legend>
+    <legend>Contact Information and Social Platforms</legend>
     <p>Your contact information and social profile details are visible only within the ServeLife ecosystem by
-        members of your tribe (those users following you, those users you are following, your fellow team mates
+        members of your tribe (those members following you, those members you are following, your fellow team mates
         as well as fellow project mates).</p>
 
     <div class="row">
         <div class="span4">
-            <label for="user_linkedin">Linkedin profile URL</label>
-            <input class="span5" id="user_linkedin" name="member[LinkedIn]" size="30" type="url" value='{{ linkedin_url }}'/>
+            <label for="member_LinkedIn">Linkedin profile URL</label>
+            <input class="span5" id="member_LinkedIn" name="member[LinkedIn]" size="30" type="url"/>
         </div>
     </div>
     <div class="row">
         <div class="span4">
-            <label for="user_facebook">Facebook profile URL</label>
-            <input class="span5" id="user_facebook" name="user[facebook]" size="30" type="url" value='{{ facebook_url }}'/>
+            <label for="member_facebook">Facebook profile URL</label>
+            <input class="span5" id="member_facebook" name="member[facebook]" size="30" type="url"/>
         </div>
     </div>
     <div class="row">
         <div class="span4">
-            <label for="user_blog">Personal blog</label>
-            <input class="span5" id="user_blog" name="user[blog]" size="30" type="url" value="{{ blog_url }}"/>
+            <label for="member_blog">Personal blog</label>
+            <input class="span5" id="member_blog" name="member[blog]" size="30" type="url"/>
         </div>
     </div>
     <div class="row">
         <div class="span2">
-            <label for="user_skype">Skype handle</label>
-            <input class="span2" id="user_skype" name="user[skype]" size="30" type="text" value='{{ skype_id }}'/>
+            <label for="member_skype">Skype handle</label>
+            <input class="span2" id="member_skype" name="member[skype]" size="30" type="text"/>
         </div>
         <div class="span2">
-            <label for="user_twitter">Twitter handle</label>
-            <input class="span2" id="user_twitter" name="user[twitter]" size="30" type="text" value='{{ twitter_handle }}'/>
+            <label for="member_twitter">Twitter handle</label>
+            <input class="span2" id="member_twitter" name="member[twitter]" size="30" type="text"/>
         </div>
     </div>
 </div>
 </div>
 <hr>
 
-<div class="span3 offset2"><input class="btn btn-large btn-primary span3" name="commit" type="submit"
+<div class="span3 offset9"><input class="btn btn-large btn-primary span3" name="commit" type="submit"
                                   value="Create Profile"/></div>
 </form>
 </div>
