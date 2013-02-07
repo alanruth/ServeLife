@@ -96,13 +96,14 @@ class UserProfileEditHandler(SLRequestHandler):
             title = self.request.get('title')
             about = self.request.get('about')
             profileinfo = {'name': name, 'about': about, 'title': title}
-            profile = UserThinDB.all().filter('username = ', user.username).filter('asset=','profile').filter('asset_key=','info').get()
+            profile = UserThinDB.all().filter('username = ', user.username).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
                 profile.put()
             else:
                 profile = UserThinDB(username=user.username, asset='profile',asset_key='info', str_value=json.dumps(profileinfo), int_value=0)
                 profile.put()
+            self.redirect('/userprofile/'+user.username)
 
         else:
             self.redirect('/signin')
@@ -110,9 +111,16 @@ class UserProfileEditHandler(SLRequestHandler):
 
 class UserProfileHandler(SLRequestHandler):
     def get(self, username):
-        template = jinja_environment.get_template('publicprofile.html')
-        variables = {'username': username}
-        self.response.out.write(template.render(variables))
+        profile = UserThinDB.all().filter('username = ', username).filter('asset =','profile').filter('asset_key =','info').get()
+        if profile:
+            variables = json.loads(profile.str_value)
+            template = jinja_environment.get_template('publicprofile.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such user profile exists!')
+
+
+
 
 
 
