@@ -143,14 +143,14 @@ body {
 /* carousel section */
 #hero {
   padding-top: 50px;
-  //background: #ffffff; /* Old browsers */
-  //background: -moz-linear-gradient(top,  #ffffff 1%, #f9f9f9 100%); /* FF3.6+ */
-  //background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#ffffff), color-stop(100%,#f9f9f9)); /* Chrome,Safari4+ */
-  //background: -webkit-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); /* Chrome10+,Safari5.1+ */
-  //background: -o-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); /* Opera 11.10+ */
-  //background: -ms-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); /* IE10+ */
-  //background: linear-gradient(to bottom,  #ffffff 1%,#f9f9f9 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); /* IE6-9 */
+  /*//background: #ffffff; *//* Old browsers */
+  /*//background: -moz-linear-gradient(top,  #ffffff 1%, #f9f9f9 100%); *//* FF3.6+ */
+  /*//background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#ffffff), color-stop(100%,#f9f9f9)); *//* Chrome,Safari4+ */
+  /*//background: -webkit-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); *//* Chrome10+,Safari5.1+ */
+  /*//background: -o-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); *//* Opera 11.10+ */
+  /*//background: -ms-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); *//* IE10+ */
+  /*//background: linear-gradient(to bottom,  #ffffff 1%,#f9f9f9 100%); *//* W3C */
+  /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); *//* IE6-9 */
   height: auto;
   padding-bottom: 50px;
   border-bottom: 1px solid #d1d2d4;
@@ -191,14 +191,14 @@ body {
 }
 
 #intro p {
-  //margin-top: 25px;
+  /*//margin-top: 25px;*/
   width: 85%;
   font-size: 28px;
   margin: 0 auto;
   color: #252B34;
   font-weight: normal;
   text-shadow: white 2px 2px 1px;
-  //border-top: 1px solid #BEC0C3;
+  /*//border-top: 1px solid #BEC0C3;*/
   padding-top: 40px;
   line-height: 40px;
 }
@@ -825,24 +825,24 @@ footer .copyright .copy p {
   margin-top: 80px;
 
   /* Added from hero */
-  //background: #ffffff; /* Old browsers */
-  //background: -moz-linear-gradient(top,  #ffffff 1%, #f9f9f9 100%); /* FF3.6+ */
-  //background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#ffffff), color-stop(100%,#f9f9f9)); /* Chrome,Safari4+ */
-  //background: -webkit-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); /* Chrome10+,Safari5.1+ */
-  //background: -o-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); /* Opera 11.10+ */
-  //background: -ms-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); /* IE10+ */
-  //background: linear-gradient(to bottom,  #ffffff 1%,#f9f9f9 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); /* IE6-9 */
+  /*//background: #ffffff; *//* Old browsers */
+  /*//background: -moz-linear-gradient(top,  #ffffff 1%, #f9f9f9 100%); *//* FF3.6+ */
+  /*//background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#ffffff), color-stop(100%,#f9f9f9)); *//* Chrome,Safari4+ */
+  /*//background: -webkit-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); *//* Chrome10+,Safari5.1+ */
+  /*//background: -o-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); *//* Opera 11.10+ */
+  /*//background: -ms-linear-gradient(top,  #ffffff 1%,#f9f9f9 100%); *//* IE10+ */
+  /*//background: linear-gradient(to bottom,  #ffffff 1%,#f9f9f9 100%); *//* W3C */
+  /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); *//* IE6-9 */
   height: auto;
   padding-bottom: 50px;
   border-bottom: 1px solid #d1d2d4;
-  //box-shadow: 0px 3px 8px 0px #e7e7e7;
+  /*//box-shadow: 0px 3px 8px 0px #e7e7e7;*/
 }
 
 #comingsoon .countdown {
-  //padding-bottom: 60px;    /* was 120px */
-  //border-bottom: 1px solid #C0C2C5;
-  //box-shadow: 0px 2px 1px 0px #fff;
+  /*//padding-bottom: 60px;    *//* was 120px */
+  /*//border-bottom: 1px solid #C0C2C5;*/
+  /*//box-shadow: 0px 2px 1px 0px #fff;*/
 }
 #comingsoon .countdown .left h1 {
   margin-top: 0px;
@@ -1067,49 +1067,49 @@ footer .copyright .copy p {
   //height: 140px;
 }
 .hasCountdown .image {
-  //background: url(clock.png);
+  /*//background: url(clock.png);*/
   line-height: 90px;
   text-align: center;
-  //font-family: 'Dosis', sans-serif;
+  /*//font-family: 'Dosis', sans-serif;*/
   font-weight: bold;
   font-size: 40px;
-  //color: #7b7f86;
+  /*//color: #7b7f86;*/
   text-shadow: 1px 1px rgba(0,0,0,0.2);
-  //margin-bottom: 10px;
+  /*//margin-bottom: 10px;*/
   margin-left: 20px;
-  //width: 50px;
+  /*//width: 50px;*/
   height: 100px;
   color: #394350;
 }
 
 .hasCountdown .imagesecond {
-  //background: url(clock.png);
+  /*//background: url(clock.png);*/
   line-height: 90px;
   text-align: center;
-  //font-family: 'Dosis', sans-serif;
-  //font-weight: 500;
-  //font-size: 40px;
-  //color: #7b7f86;
+  /*//font-family: 'Dosis', sans-serif;*/
+  /*//font-weight: 500;*/
+  /*//font-size: 40px;*/
+  /*//color: #7b7f86;*/
   text-shadow: 1px 1px rgba(0,0,0,0.2);
-  //margin-bottom: 10px;
-  //width: 50px;
+  /*//margin-bottom: 10px;*/
+  /*//width: 50px;*/
   height: 100px;
 
   color: #394350;
   font-size: 40px;
   font-weight: bold;
-  //position: absolute;
-  //top: 33px;
+  /*//position: absolute;*/
+  /*//top: 33px;*/
   display: block;
-  //width: 100%;
-  //text-align: center;
+  /*//width: 100%;*/
+  /*//text-align: center;*/
 }
 
 .hasCountdown .text {
   display: block;
   width: 90px;
   text-align: center;
-  //color: #ebebeb;
+  /*//color: #ebebeb;*/
   color: #7A7D80;
   text-transform: uppercase;
   font-weight: bold;
@@ -2166,4 +2166,39 @@ footer .copyright .copy p {
 
 .help {
   top: -10px;
+}
+
+.social_header {
+/*position: inherit;*/
+    margin-top: -50px;
+/*// text-align: center;*/
+/*// border: 1px solid #DDDDDD;*/
+/*// border-radius: 10px 10px 10px 10px;*/
+/*// box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);*/
+/*// color: #646464;*/
+padding: 10px 0 0 0;
+position: relative;
+width: 100%;
+    }
+
+.rss-feed-desc {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #C1C1C1;
+    height: 14px;
+    line-height: 14px;
+//margin-left: 6px;
+    min-width: 15px;
+    padding: 1px 2px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.social_header img {
+//vertical-align: top;
+    margin-left: 25px;
+    padding-bottom: 7px;
+}
+
+#betasignup {
+    margin-right: 50px;
 }
