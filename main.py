@@ -72,7 +72,7 @@ class UserProfileEditHandler(SLRequestHandler):
             user = self.user
             #profileinfo is a json string with keys name, title and about
             profile = UserThinDB.all().filter('username = ', user.username).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            print profile.str_value
+            # print profile.str_value
             profileinfo='{}'
             if profile:
                 profileinfo=profile.str_value
@@ -217,7 +217,7 @@ class SignInHandler(SLRequestHandler):
                 cookie_value = user_id+'|'+random_secret+'|'+hmac.new(random_secret,user_id).hexdigest()
                 cookie = 'user_id = '+cookie_value+';Path = /'
                 self.response.headers.add_header('Set-Cookie',cookie)
-                self.redirect('/get_user_feed/'+user.username)
+                self.redirect('/userprofile/edit/'+user.username)
             else:
                 self.response.out.write('password error!')
         else:
