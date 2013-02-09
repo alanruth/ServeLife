@@ -125,11 +125,6 @@ class UserProfileHandler(SLRequestHandler):
         else:
             self.response.out.write('no such user profile exists!')
 
-
-
-
-
-
 class TeamProfileHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('teampublicprofile.html')
@@ -249,6 +244,42 @@ class AddCourseHandler(SLRequestHandler):
         #add course form
         pass
 
+class UserHomePageHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('home.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+class CourseProfilePageHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('coursehome.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+class ClassProfilePageHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('classhome.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+class KnowledgeCenterPageHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('knowledge.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+class LearningCenterPageHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('learn.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+class ProjectCenterPageHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('learn.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
 
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/betasignup',BetaSignUpHandler),
@@ -263,5 +294,12 @@ app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/logout', LogOutHandler),
                                ('/get_user_feed/(?P<username>.*)', GetUserFeedHandler),
                                ('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),
-                               ('/add_a_course', AddCourseHandler),],
+                               ('/add_a_course', AddCourseHandler),
+                               ('/home', UserHomePageHandler),
+                               ('/courseprofile', CourseProfilePageHandler),
+                               ('/classprofile', ClassProfilePageHandler),
+                               ('/knowledge', KnowledgeCenterPageHandler),
+                               ('/learn', LearningCenterPageHandler),
+                               ('/project', ProjectCenterPageHandler)
+                               ],
                               debug=True)
