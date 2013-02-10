@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Discover Home Page{% endblock title %}
+
+{% block description %}Discover is where ServeLife members can find knowledge on various topics within the ecosystem.{% endblock description %}
+
+{% block submenu %}
+    <div class="container">
+        <h2>{{ username }}'s Discover Home</h2>
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a href="#" alt="Hub">Hub</a></li>
+            <li><a href="#" alt="Topics">Topics</a></li>
+            <li><a href="#" alt="Articles">Articles</a></li>
+            <li><a href="#" alt="Questions">Q & A</a></li>
+            <li><a href="#" alt="Collaborations">Collaborations</a></li>
+            <li><a href="#" alt="Experiments">Experiments</a></li>
+        </ul>
+    </div>
+{% endblock submenu %}
+
+{% block page %}
+    <div class="container">
+        <h1>This is Discover's Homebase</h1>
+        <p>This page will serve as the homebase (mashup) for all topics the person is following. Serves as a jumping off
+            point into the specific topics and discovery projects the person is following.</p>
+        <ul>
+            <li>Ability to create a new topic area</li>
+            <li>Listing of topics followed with activity stats - take concept from mockup of profile page</li>
+            <li>Event Stream of Activities Across Topics Followed</li>
+            <li>Listing of the top articles added for the topics followed</li>
+            <li>Listing of top open questions on the topics followed</li>
+            <li>Listing of recent discovery projects created so user can discover new projects to follow.</li>
+            <li>listing of suggested topics to follow ? based upon some taxonomy relativity</li>
+        </ul>
+    </div>
+{% endblock page %}

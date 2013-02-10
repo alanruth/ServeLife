@@ -51,12 +51,6 @@ class LandingPageHandler(SLRequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
-class BetaSignUpHandler(SLRequestHandler):
-    def get(self):
-        template = jinja_environment.get_template('betasignup.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
-
 class PodcastHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('innovationintheenterprise.html')
@@ -64,7 +58,7 @@ class PodcastHandler(SLRequestHandler):
         self.response.out.write(template.render(variables))
 
 
-class UserProfileEditHandler(SLRequestHandler):
+class UserProfileNewHandler(SLRequestHandler):
 
     @login_required
     def get(self, username):
@@ -77,13 +71,15 @@ class UserProfileEditHandler(SLRequestHandler):
             if profile:
                 profileinfo=profile.str_value
 
+
             """
             variables = {'name': name,
                          'title': title,
                          'about':about}
             """
+
             variables = json.loads(profileinfo)
-            template = jinja_environment.get_template('edituserprofile.html')
+            template = jinja_environment.get_template('newuserprofile.html')
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
@@ -125,11 +121,13 @@ class UserProfileHandler(SLRequestHandler):
         else:
             self.response.out.write('no such user profile exists!')
 
+
 class TeamProfileHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('teampublicprofile.html')
         variables = {}
         self.response.out.write(template.render(variables))
+
 
 class ProjectProfileHandler(SLRequestHandler):
     def get(self):
@@ -138,12 +136,12 @@ class ProjectProfileHandler(SLRequestHandler):
         self.response.out.write(template.render(variables))
 
 
-
 class SignUpHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
+
     def post(self):
         email = self.request.get('email')
         username = self.request.get('username')
@@ -212,7 +210,13 @@ class SignInHandler(SLRequestHandler):
                 cookie_value = user_id+'|'+random_secret+'|'+hmac.new(random_secret,user_id).hexdigest()
                 cookie = 'user_id = '+cookie_value+';Path = /'
                 self.response.headers.add_header('Set-Cookie',cookie)
-                self.redirect('/userprofile/edit/'+user.username)
+
+                #ABR: check to see if the user has a profile
+                profile = UserThinDB.all().filter('username = ', user.username).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+                if profile:
+                    self.redirect('/home/'+user.username)
+                else:
+                    self.redirect('/userprofile/new/'+user.username)
             else:
                 self.response.out.write('password error!')
         else:
@@ -245,28 +249,33 @@ class AddCourseHandler(SLRequestHandler):
         pass
 
 class UserHomePageHandler(SLRequestHandler):
-    def get(self):
-        template = jinja_environment.get_template('home.html')
+    @login_required
+    def get(self, username):
+        template = jinja_environment.get_template('userhome.html')
         variables = {}
         self.response.out.write(template.render(variables))
+
 
 class CourseProfilePageHandler(SLRequestHandler):
     def get(self):
-        template = jinja_environment.get_template('coursehome.html')
+        template = jinja_environment.get_template('course.html')
         variables = {}
         self.response.out.write(template.render(variables))
+
 
 class ClassProfilePageHandler(SLRequestHandler):
     def get(self):
-        template = jinja_environment.get_template('classhome.html')
+        template = jinja_environment.get_template('class.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
+
 class KnowledgeCenterPageHandler(SLRequestHandler):
     def get(self):
-        template = jinja_environment.get_template('knowledge.html')
+        template = jinja_environment.get_template('discover.html')
         variables = {}
         self.response.out.write(template.render(variables))
+
 
 class LearningCenterPageHandler(SLRequestHandler):
     def get(self):
@@ -274,17 +283,46 @@ class LearningCenterPageHandler(SLRequestHandler):
         variables = {}
         self.response.out.write(template.render(variables))
 
+
 class ProjectCenterPageHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('learn.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
+class NewCourseProfilePageHandler(SLRequestHandler):
+    @login_required
+    def get(self):
+        template = jinja_environment.get_template('newcourseprofile.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+    @login_required
+    def post(self):
+        #course = self.course
+        course_name = self.request.get('course_name')
+        course_url = self.request.get('course_url')
+        created_by = self.user.username
+        courseinfo = {'course_name': course_name, 'course_url': course_url}
+        course = CourseThinDB.all().filter('coursename = ', course_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if course:
+            course.str_value = json.dumps(courseinfo)
+            course.put()
+        else:
+            course = CourseThinDB(coursename=course_name, asset='profile',asset_key='info', str_value=json.dumps(courseinfo), int_value=0)
+            course.put()
+        self.redirect('/course/'+course_name)
+
+
+class ShowCoursePageHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('courseindex.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
 
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
-                               ('/betasignup',BetaSignUpHandler),
                                ('/innovationintheenterprise', PodcastHandler),
-                               ('/userprofile/edit/(?P<username>.*)', UserProfileEditHandler),
+                               ('/userprofile/new/(?P<username>.*)', UserProfileNewHandler),
                                ('/userprofile/(?P<username>.*)', UserProfileHandler),
                                ('/teamprofile/(?P<team>.*)', TeamProfileHandler),
                                ('/projectprofile/(?P<project>.*)', ProjectProfileHandler),
@@ -295,11 +333,13 @@ app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/get_user_feed/(?P<username>.*)', GetUserFeedHandler),
                                ('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),
                                ('/add_a_course', AddCourseHandler),
-                               ('/home', UserHomePageHandler),
-                               ('/courseprofile', CourseProfilePageHandler),
-                               ('/classprofile', ClassProfilePageHandler),
-                               ('/knowledge', KnowledgeCenterPageHandler),
+                               ('/home/(?P<username>.*)', UserHomePageHandler),
+                               ('/course', CourseProfilePageHandler),
+                               ('/class', ClassProfilePageHandler),
+                               ('/discover', KnowledgeCenterPageHandler),
                                ('/learn', LearningCenterPageHandler),
-                               ('/project', ProjectCenterPageHandler)
+                               ('/project', ProjectCenterPageHandler),
+                                ('/course/new', NewCourseProfilePageHandler),
+                                ('/course/(?P<coursename>.*)', ShowCoursePageHandler)
                                ],
                               debug=True)

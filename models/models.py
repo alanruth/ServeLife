@@ -32,6 +32,14 @@ class ProjectThinDB(db.Model):
     int_value     = db.IntegerProperty(required= False)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
+class CourseThinDB(db.Model):
+    coursename    = db.StringProperty(required = True)
+    asset         = db.StringProperty(required = True)
+    asset_key     = db.StringProperty(required = True)
+    str_value     = db.StringProperty(required = False)
+    int_value     = db.IntegerProperty(required= False)
+    created       = db.DateTimeProperty(required = True,auto_now_add = True)
+    updated       = db.DateTimeProperty(required = True,auto_now = True)
 
 """
 class Member(db.Model):

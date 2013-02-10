@@ -1,1 +1,35 @@
-example learning home page
+{% extends "base.html" %}
+
+{% block title %}Learn Home Page {% endblock title %}
+
+{% block description %}Learn mashes up all the learning activities for ServeLife member.{% endblock description %}
+
+{% block submenu %}
+    <div class="container">
+        <h2>{{ username }}'s Learn Home</h2>
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a href="#" alt="Hub">Hub</a></li>
+            <li><a href="#" alt="Courses">Courses</a></li>
+            <li><a href="#" alt="Classes">Classes</a></li>
+            <li><a href="#" alt="Study Groups">Study Groups</a></li>
+            <li><a href="#" alt="Labs">Learning Labs</a></li>
+        </ul>
+    </div>
+{% endblock submenu %}
+
+{% block page %}
+    <div class="container">
+        <h1>This is Learn's Homebase</h1>
+        <a href="/course/new" alt="Add New Course">Add New Course</a>
+        <p>This page will serve as the homebase (mashup) for all courses the person is following. Need to figure out
+            how to differentiate between a course and a specific offering/class.</p>
+        <p>This also brings together the activities from the classes, study groups and learning projects the person is
+        part of.</p>
+        <ul>
+            <li>Ability to create a new course</li>
+            <li>Listing of courses followed with activity stats - take concept from mockup of profile page</li>
+            <li>Listing of recent courses created.</li>
+            <li>listing of suggested courses based upon relevancy to topics, courses followed.</li>
+        </ul>
+    </div>
+{% endblock page %}

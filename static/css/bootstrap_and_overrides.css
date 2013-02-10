@@ -2202,3 +2202,61 @@ width: 100%;
 #betasignup {
     margin-right: 50px;
 }
+
+/* Submenu */
+
+/*.submenu a {
+    color: #333333;
+}
+
+.submenu a:hover {
+    text-decoration: none;
+}
+
+.submenu ul{
+    float: right;
+    padding-top: 5px;
+}
+
+.submenu li {
+    display: inline;
+    text-align: right;
+    padding-left: 30px;
+    font-size: 1.2em;
+}
+
+.submenu .nav-pills li a{
+    padding-bottom: 5px !important;
+    padding-top: 5px !important;
+}
+
+.submenu .nav-pills li a:hover{
+    font-weight: bold;
+    background-color: #CCCCCC;
+}
+.submenu li a {
+    display: inline;
+    text-decoration: none;
+    color: #666666;
+}
+
+.submenu li a {
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    padding: 0px 20px;
+}
+
+.submenu li a:hover {
+    background-color: #888888 !important;
+    color: #ffffff;
+    -moz-box-shadow: inset 0px -2px 0px 0px #7b7b7b !important;
+    -webkit-box-shadow: inset 0px -2px 0px 0px #7b7b7b !important;
+    box-shadow: inset 0px -2px 0px 0px #7b7b7b !important;
+}
+
+
+.submenu {
+    padding-top: 25px;
+}
+
+*/

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Class Profile {% endblock title %}
+
+{% block description %}Enables user to edit a class profile.{% endblock description %}
+
+{% block page %}
+    <div id="main" role="main">
+        <div class="container">
+            <div class="content">
+                <div class="row">
+                    <div class="span12">
+                        <div class="container">
+
+                            <h3>Create a New Course.</h3>
+
+                            <p>A course is a learning opportunity provided by both traditional and online education providers.
+                                To create a course, please provide the following information.
+                            </p>
+
+                            <div class="form">
+                                <form accept-charset="UTF-8" action="/course/new" method="post">
+
+                                    <div class="row">
+                                        <div class="span5">
+                                            <legend>Class Information</legend>
+
+                                            <div class="row">
+                                                <div class="span3">
+                                                    <label for="class_name">Name</label>
+                                                    <input class="span3" id="class_name" name="class_name" size="30" type="text" value="{{ class_name }}" autofocus required=""/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="span3">
+                                                    <label for="course_url">Link to Course Online</label>
+                                                    <input class="span3" id="course_url" name="course_url" size="30" type="url" value="{{ course_url }}" required=""/>
+                                                </div>
+                                            </div>
+                                            <div class="row"></div>
+                                            <div class="span3">
+                                                <input class="btn btn-large btn-primary span3" name="commit" type="submit"
+                                                       value="Create Profile"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- end of .container -->
+{% endblock page %}

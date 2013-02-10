@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ username }}'s Profile{% endblock title %}
+
+{% block description %}"{{ username }}'s ServeLife User Profile uniquely identifies them within the ServeLife
+  ecosystem."{% endblock description %}
+
+{% block submenu %}
+        <div class="container">
+            <h2>{{ username }}'s ServeLife Home</h2>
+            <ul class="nav nav-pills pull-right">
+                <li class="active"><a href="#" alt="Hub">Hub</a></li>
+                <li><a href="#" alt="Contributions">Contributions</a></li>
+                <li><a href="#" alt="Achievements">Achievements</a></li>
+                <li><a href="#" alt="Efforts">Efforts</a></li>
+                <li><a href="#" alt="Tribe">Tribe</a></li>
+            </ul>
+        </div>
+{% endblock submenu %}
+
+{% block page %}
+    <div class="container">
+        <h1>This is a User's Homebase</h1>
+        <p>This page will serve as the homebase (mashup) for all topics, classes, projects, teams and fellow members the user is following or members of. Serves as a jumping off
+            point into the details of each.</p>
+        <p>This is where the user lands after logging in. Thus we need to bring together the experience here.</p>
+        <ul>
+            <li>Show/link to most popular articles added within ecosystem</li>
+        </ul>
+    </div>
+{% endblock page %}
