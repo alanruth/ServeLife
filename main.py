@@ -14,6 +14,11 @@ domain = 'http://learnmastermentor.appspot.com'
 
 jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'views')))
 
+#utility function to get gravatar image url
+def get_gravatar_url(size, email):
+    gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
+    gravatar_url += urllib.urlencode({'d':'monsterid', 's':str(size)})
+    return gravatar_url
 
 #decorator for protecting pages
 def login_required(function):
