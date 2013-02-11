@@ -1,23 +1,67 @@
 from google.appengine.ext import db
 
+
 class User(db.Model):
-    username      = db.StringProperty(required = True)
+    user_name      = db.StringProperty(required = True)
     password_hash = db.StringProperty(required = True)
     email         = db.StringProperty(required = True)
     activated     = db.StringProperty(required = True)
     activation_key= db.StringProperty(required = True)
     created       = db.DateTimeProperty(required = True,auto_now_add = True)
 
+
 class UserThinDB(db.Model):
-    username      = db.StringProperty(required = True)
+    user_name      = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
     asset_key     = db.StringProperty(required = True)
     str_value     = db.StringProperty(required = False)
-    int_value     = db.IntegerProperty(required= False)
+    int_value     = db.IntegerProperty(required = False)
+    created       = db.DateTimeProperty(required=True,auto_now_add=True)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
+
+class CourseThinDB(db.Model):
+    course_name    = db.StringProperty(required=True)
+    asset         = db.StringProperty(required=True)
+    asset_key     = db.StringProperty(required=True)
+    str_value     = db.StringProperty(required=False)
+    int_value     = db.IntegerProperty(required=False)
+    created       = db.DateTimeProperty(required=True, auto_now_add=True)
+    created_by      = db.ReferenceProperty(User, required=True)
+    updated       = db.DateTimeProperty(required=True, auto_now=True)
+
+
+class TopicThinDB(db.Model):
+    topic_name    = db.StringProperty(required=True)
+    asset         = db.StringProperty(required=True)
+    asset_key     = db.StringProperty(required=True)
+    str_value     = db.StringProperty(required=False)
+    int_value     = db.IntegerProperty(required=False)
+    liked_count   = db.IntegerProperty(required=False)
+    followed_count = db.IntegerProperty(required=False)
+    created       = db.DateTimeProperty(required=True, auto_now_add=True)
+    created_by      = db.ReferenceProperty(User, required=True)
+    updated       = db.DateTimeProperty(required=True, auto_now=True)
+
+
+class FollowerIndex(db.Model):
+    followers       = db.StringListProperty()
+
+
+class LikeIndex(db.Model):
+    likers          = db.StringListProperty()
+
+
+class FollowingIndex(db.Model):
+    following       = db.StringListProperty()
+
+
+class LikedIndex(db.Model):
+    liked           = db.StringListProperty()
+
+
 class TeamThinDB(db.Model):
-    teamname      = db.StringProperty(required = True)
+    team_name      = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
     asset_key     = db.StringProperty(required = True)
     str_value     = db.StringProperty(required = False)
@@ -25,20 +69,11 @@ class TeamThinDB(db.Model):
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
 class ProjectThinDB(db.Model):
-    projectname   = db.StringProperty(required = True)
+    project_name   = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
     asset_key     = db.StringProperty(required = True)
     str_value     = db.StringProperty(required = False)
     int_value     = db.IntegerProperty(required= False)
-    updated       = db.DateTimeProperty(required = True,auto_now = True)
-
-class CourseThinDB(db.Model):
-    coursename    = db.StringProperty(required = True)
-    asset         = db.StringProperty(required = True)
-    asset_key     = db.StringProperty(required = True)
-    str_value     = db.StringProperty(required = False)
-    int_value     = db.IntegerProperty(required= False)
-    created       = db.DateTimeProperty(required = True,auto_now_add = True)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
 """
