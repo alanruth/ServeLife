@@ -113,13 +113,50 @@ class UserProfileNewHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
-class InternalUserProfileHandler(SLRequestHandler):
+class UserInternalProfileHandler(SLRequestHandler):
     @login_required
     def get(self, username):
         profile = UserThinDB.all().filter('user_name = ', username).filter('asset =','profile').filter('asset_key =','info').get()
         if profile:
             variables = json.loads(profile.str_value)
             template = jinja_environment.get_template('userinternalindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such user profile exists!')
+
+
+class UserExternalProfileHandler(SLRequestHandler):
+    def get(self, user_name):
+        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if profile:
+            variables = json.loads(profile.str_value)
+            template = jinja_environment.get_template('userexternalindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such user profile exists!')
+
+
+class UserPrivateProfileHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        #Need check that user making request is the same as the user_name - if not redirect to their profile page
+        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if profile:
+            variables = json.loads(profile.str_value)
+            template = jinja_environment.get_template('userprivateindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such user profile exists!')
+
+
+class UserEditProfileHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        #Need check that user making request is the same as the user_name - if not redirect to their profile page
+        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if profile:
+            variables = json.loads(profile.str_value)
+            template = jinja_environment.get_template('userprofileedit.html')
             self.response.out.write(template.render(variables))
         else:
             self.response.out.write('no such user profile exists!')
@@ -137,7 +174,8 @@ class InternalUserProfileHandler(SLRequestHandler):
             twitter_handle = self.request.get('twitter_handle')
             skype_id = self.request.get('skype_id')
             blog_url = self.request.get('blog_url')
-            profileinfo = {'first_name': first_name, 'last_name': last_name, 'country': country, 'city': city, 'linkedin_url': linkedin_url, 'facebook_url': facebook_url, 'twitter_handle': twitter_handle, 'skype_id': skype_id, 'blog_url': blog_url}
+            description = self.request.get('description')
+            profileinfo = {'first_name': first_name, 'last_name': last_name, 'country': country, 'city': city, 'linkedin_url': linkedin_url, 'facebook_url': facebook_url, 'twitter_handle': twitter_handle, 'skype_id': skype_id, 'blog_url': blog_url, 'description': description}
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
@@ -145,35 +183,10 @@ class InternalUserProfileHandler(SLRequestHandler):
             else:
                 profile = UserThinDB(user_name=user.user_name, asset='profile',asset_key='info', str_value=json.dumps(profileinfo), int_value=0)
                 profile.put()
-            self.redirect('/home/'+user.user_name)
+            self.redirect('/user/profile/'+user.user_name)
 
         else:
             self.redirect('/signin')
-
-
-class ExternalUserProfileHandler(SLRequestHandler):
-    def get(self, user_name):
-        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if profile:
-            variables = json.loads(profile.str_value)
-            template = jinja_environment.get_template('userexternalindex.html')
-            self.response.out.write(template.render(variables))
-        else:
-            self.response.out.write('no such user profile exists!')
-
-
-class PrivateUserProfileHandler(SLRequestHandler):
-    @login_required
-    def get(self, user_name):
-        #Need check that user making request is the same as the user_name - if not redirect to their profile page
-        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if profile:
-            variables = json.loads(profile.str_value)
-            template = jinja_environment.get_template('userprivateindex.html')
-            self.response.out.write(template.render(variables))
-        else:
-            self.response.out.write('no such user profile exists!')
-
 
 class SignUpHandler(SLRequestHandler):
     def get(self):
@@ -411,9 +424,11 @@ class ShowTopicHandler(SLRequestHandler):
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/innovationintheenterprise', PodcastHandler),
                                ('/userprofile/new/(?P<username>.*)', UserProfileNewHandler),
-                               ('/profiles/(?P<username>.*)', InternalUserProfileHandler),
-                               ('/members/(?P<user_name>.*)', ExternalUserProfileHandler),
-                               ('/user/profile/(?P<user_name>.*)', PrivateUserProfileHandler),
+                               ('/profile/(?P<username>.*)', UserInternalProfileHandler),
+                               ('/member/(?P<user_name>.*)', UserExternalProfileHandler),
+                               ('/user/profile/edit/(?P<user_name>.*)', UserEditProfileHandler),
+                               ('/user/profile/(?P<user_name>.*)', UserPrivateProfileHandler),
+                               #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                #('/teamprofile/(?P<team>.*)', TeamProfileHandler),
                                #('/projectprofile/(?P<project>.*)', ProjectProfileHandler),
                                ('/signup', SignUpHandler),
