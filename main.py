@@ -104,7 +104,17 @@ class UserProfileNewHandler(SLRequestHandler):
             twitter_handle = self.request.get('twitter_handle')
             skype_id = self.request.get('skype_id')
             blog_url = self.request.get('blog_url')
-            profileinfo = {'first_name': first_name, 'last_name': last_name, 'country': country, 'city': city, 'linkedin_url': linkedin_url, 'facebook_url': facebook_url, 'twitter_handle': twitter_handle, 'skype_id': skype_id, 'blog_url': blog_url}
+            gravatar_url = get_gravatar_url(160,user.email)
+            profileinfo = {'first_name': first_name,
+                           'last_name': last_name,
+                           'gravatar_url':gravatar_url,
+                           'country': country,
+                           'city': city,
+                           'linkedin_url': linkedin_url,
+                           'facebook_url': facebook_url,
+                           'twitter_handle': twitter_handle,
+                           'skype_id': skype_id,
+                           'blog_url': blog_url}
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
