@@ -16,7 +16,7 @@ jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystem
 
 #utility function to get gravatar image url
 def get_gravatar_url(size, email):
-    default = "http://www.servelife.com/static/img/defaultavatar.png"
+    default = domain + "/static/img/defaultavatar.png"
     gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
     gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
     return gravatar_url
@@ -107,10 +107,8 @@ class UserProfileNewHandler(SLRequestHandler):
             twitter_handle = self.request.get('twitter_handle')
             skype_id = self.request.get('skype_id')
             blog_url = self.request.get('blog_url')
-            gravatar_url = get_gravatar_url(160,user.email)
             profileinfo = {'first_name': first_name,
                            'last_name': last_name,
-                           'gravatar_url':gravatar_url,
                            'country': country,
                            'city': city,
                            'linkedin_url': linkedin_url,
@@ -157,27 +155,31 @@ class UserExternalProfileHandler(SLRequestHandler):
 class UserPrivateProfileHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
-        #Need check that user making request is the same as the user_name - if not redirect to their profile page
-        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if profile:
-            variables = json.loads(profile.str_value)
-            template = jinja_environment.get_template('userprivateindex.html')
-            self.response.out.write(template.render(variables))
-        else:
-            self.response.out.write('no such user profile exists!')
+        if self.is_logged_in():
+            user = self.user
+            #Need check that user making request is the same as the user_name - if not redirect to their profile page
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
+            if profile:
+                variables = json.loads(profile.str_value)
+                template = jinja_environment.get_template('userprivateindex.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user profile exists!')
 
 
 class UserEditProfileHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
-        #Need check that user making request is the same as the user_name - if not redirect to their profile page
-        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if profile:
-            variables = json.loads(profile.str_value)
-            template = jinja_environment.get_template('userprofileedit.html')
-            self.response.out.write(template.render(variables))
-        else:
-            self.response.out.write('no such user profile exists!')
+        if self.is_logged_in():
+            user = self.user
+            #Need check that user making request is the same as the user_name - if not redirect to their profile page
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
+            if profile:
+                variables = json.loads(profile.str_value)
+                template = jinja_environment.get_template('userprofileedit.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user profile exists!')
 
     @login_required
     def post(self, username):
@@ -193,7 +195,17 @@ class UserEditProfileHandler(SLRequestHandler):
             skype_id = self.request.get('skype_id')
             blog_url = self.request.get('blog_url')
             description = self.request.get('description')
-            profileinfo = {'first_name': first_name, 'last_name': last_name, 'country': country, 'city': city, 'linkedin_url': linkedin_url, 'facebook_url': facebook_url, 'twitter_handle': twitter_handle, 'skype_id': skype_id, 'blog_url': blog_url, 'description': description}
+            profileinfo = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'country': country,
+                'city': city,
+                'linkedin_url': linkedin_url,
+                'facebook_url': facebook_url,
+                'twitter_handle': twitter_handle,
+                'skype_id': skype_id,
+                'blog_url': blog_url,
+                'description': description}
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
@@ -301,10 +313,13 @@ class LogOutHandler(SLRequestHandler):
 
 class UserHomePageHandler(SLRequestHandler):
     @login_required
-    def get(self, username):
-        template = jinja_environment.get_template('userhome.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            #Need to modify to pull the user
+            template = jinja_environment.get_template('userhome.html')
+            variables = {}
+            self.response.out.write(template.render(variables))
 
 
 class KnowledgeCenterPageHandler(SLRequestHandler):
@@ -456,7 +471,7 @@ app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                #('/get_user_feed/(?P<username>.*)', GetUserFeedHandler),
                                #('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),
                                #('/add_a_course', AddCourseHandler),
-                               ('/home/(?P<username>.*)', UserHomePageHandler),
+                               ('/home/(?P<user_name>.*)', UserHomePageHandler),
                                #('/course', CourseProfilePageHandler),
                                #('/class', ClassProfilePageHandler),
                                ('/discover', KnowledgeCenterPageHandler),

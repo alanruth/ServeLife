@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 <!-- NEED TO PULL MEMBER NAME FROM DB -->
-{% block title %}Insert Member Name{% endblock title %}
+{% block title %}{{ user_profile.user_name }}{% endblock title %}
 
 <!-- NEED TO PULL MEMBER HEADLINE FROM DB -->
-{% block description %}"ServeLife Member - [INSERT NAME]: [INSERT HEADLINE FROM PROFILE]"{% endblock description %}
+{% block description %}"ServeLife Member - {{ user_profile.user_name }}: [INSERT HEADLINE FROM PROFILE]"{% endblock description %}
 
 <!-- NAVBAR SHOULD BE DETERMINED IN BASE -->
 {% block navbar %}
@@ -50,7 +50,7 @@
       <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
 
 
-        <img alt="{{ user_name }}" src="{{ 180|get_gravatar_url('alanrth@live.com') }}" class="thumbnail img-polaroid member-pic" />
+        <img alt="{{ user_name }}" src="{{ 180|get_gravatar_url("alanruth@live.com")}}" class="thumbnail img-polaroid member-pic" />
 
       <!-- <img alt="Alan Ruth" src="/static/img/alan180.png" class="thumbnail img-polaroid member-pic" /> -->
     </div>
