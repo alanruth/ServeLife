@@ -16,9 +16,12 @@ jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystem
 
 #utility function to get gravatar image url
 def get_gravatar_url(size, email):
+    default = "http://www.servelife.com/static/img/defaultavatar.png"
     gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
-    gravatar_url += urllib.urlencode({'d':'monsterid', 's':str(size)})
+    gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
     return gravatar_url
+
+jinja_environment.filters['get_gravatar_url'] = get_gravatar_url
 
 #decorator for protecting pages
 def login_required(function):
