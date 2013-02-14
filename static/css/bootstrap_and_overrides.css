@@ -2203,6 +2203,10 @@ width: 100%;
     margin-right: 50px;
 }
 
+.follow-button {
+    margin-right: 10px;
+}
+
 /* Submenu */
 
 /*.submenu a {
