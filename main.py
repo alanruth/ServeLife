@@ -421,8 +421,8 @@ class FollowHandler(SLRequestHandler):
                 follow_index = FollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
                 follow_index.put()
             self.redirect('/home/'+followed)
-        #else:
-        #    self.redirect('/signin')
+        else:
+            self.redirect('/signin')
 
 #ABR not used yet - moved to clean up
 # class TeamProfileHandler(SLRequestHandler):
