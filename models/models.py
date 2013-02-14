@@ -45,19 +45,19 @@ class TopicThinDB(db.Model):
 
 
 class FollowerIndex(db.Model):
-    followers       = db.StringListProperty()
+    followers       = db.ListProperty(int)
 
 
 class LikeIndex(db.Model):
-    likers          = db.StringListProperty()
+    likers_id          = db.ListProperty(int)
 
 
 class FollowingIndex(db.Model):
-    following       = db.StringListProperty()
+    following_id       = db.ListProperty(int)
 
 
 class LikedIndex(db.Model):
-    liked           = db.StringListProperty()
+    liked_id           = db.ListProperty(int)
 
 
 class TeamThinDB(db.Model):

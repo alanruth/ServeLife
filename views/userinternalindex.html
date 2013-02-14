@@ -12,10 +12,15 @@
         <div class="span2">
             <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
             <img alt="{{ user_name }}" src="{{ 180|get_gravatar_url('alanruth@live.com') }}" class="thumbnail img-polaroid member-pic" />
+            <!-- NEED USER NAME TO COME IN VARIABLES -->
+            <form accept-charset="UTF-8" action="/follow/alan" method="post">
+                <input class="btn btn-large btn-primary span2" name="commit" type="submit" value="Follow"/>
+            </form>
         </div>
         <div class="span5">
             <!-- INSERT MEMBER CREATE DATE -->
             <span class="pull-right"><strong>Member since</strong> [MM/YYYY]</span>
+
             <!-- INSERT MEMBER NAME FROM PROFILE -->
             <h2>{{first_name}} {{ last_name }}</h2>
             <!-- INSERT MEMBER LEVEL FROM PROFILE -->

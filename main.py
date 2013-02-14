@@ -131,8 +131,8 @@ class UserProfileNewHandler(SLRequestHandler):
 
 class UserInternalProfileHandler(SLRequestHandler):
     @login_required
-    def get(self, username):
-        profile = UserThinDB.all().filter('user_name = ', username).filter('asset =','profile').filter('asset_key =','info').get()
+    def get(self, user_name):
+        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
         if profile:
             variables = json.loads(profile.str_value)
             template = jinja_environment.get_template('userinternalindex.html')
@@ -218,8 +218,12 @@ class UserEditProfileHandler(SLRequestHandler):
         else:
             self.redirect('/signin')
 
+
 class SignUpHandler(SLRequestHandler):
     def get(self):
+        if self.is_logged_in():
+            user = self.user
+            self.redirect('/home/'+user.user_name)
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
@@ -274,6 +278,9 @@ class ActivationHandler(SLRequestHandler):
 
 class SignInHandler(SLRequestHandler):
     def get(self):
+        if self.is_logged_in():
+            user = self.user
+            self.redirect('/home/'+user.user_name)
         template = jinja_environment.get_template('signin.html')
         variables = {}
         self.response.out.write(template.render(variables))
@@ -331,7 +338,7 @@ class KnowledgeCenterPageHandler(SLRequestHandler):
 
 class LearningCenterPageHandler(SLRequestHandler):
     def get(self):
-        template = jinja_environment.get_template('learn.html')
+        template = jinja_environment.get_template('learnprivateindex.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
@@ -341,7 +348,7 @@ class NewCourseProfileHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('newcourseprofile.html')
         user_name = self.user.user_name
-        variables = {user_name}
+        variables = {}
         self.response.out.write(template.render(variables))
 
     @login_required
@@ -372,7 +379,7 @@ class NewTopicProfileHandler(SLRequestHandler):
     def get(self):
         template = jinja_environment.get_template('newcourseprofile.html')
         user_name = self.user.user_name
-        variables = {user_name}
+        variables = {}
         self.response.out.write(template.render(variables))
 
     @login_required
@@ -398,6 +405,25 @@ class ShowTopicHandler(SLRequestHandler):
         self.response.out.write(template.render(variables))
 
 
+class FollowHandler(SLRequestHandler):
+
+    @login_required
+    def post(self, followed):
+        if self.is_logged_in():
+            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            user_followed = UserThinDB.all().filter('user_name = ', followed).get()
+            follow_index = FollowerIndex.all().filter('parent = ', user_followed).get()
+            #self.response.out.write(user_follower.key().id())
+            if follow_index:
+                follow_index = FollowerIndex.followers.append(user_follower.key().id())
+                follow_index.put()
+            else:
+                follow_index = FollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
+                follow_index.put()
+            self.redirect('/home/'+followed)
+        #else:
+        #    self.redirect('/signin')
+
 #ABR not used yet - moved to clean up
 # class TeamProfileHandler(SLRequestHandler):
 #     def get(self):
@@ -415,7 +441,7 @@ class ShowTopicHandler(SLRequestHandler):
 #
 # class ProjectCenterPageHandler(SLRequestHandler):
 #     def get(self):
-#         template = jinja_environment.get_template('learn.html')
+#         template = jinja_environment.get_template('learnprivateindex.html')
 #         variables = {}
 #         self.response.out.write(template.render(variables))
 #
@@ -457,7 +483,7 @@ class ShowTopicHandler(SLRequestHandler):
 app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/innovationintheenterprise', PodcastHandler),
                                ('/userprofile/new/(?P<username>.*)', UserProfileNewHandler),
-                               ('/profile/(?P<username>.*)', UserInternalProfileHandler),
+                               ('/profile/(?P<user_name>.*)', UserInternalProfileHandler),
                                ('/member/(?P<user_name>.*)', UserExternalProfileHandler),
                                ('/user/profile/edit/(?P<user_name>.*)', UserEditProfileHandler),
                                ('/user/profile/(?P<user_name>.*)', UserPrivateProfileHandler),
@@ -478,6 +504,7 @@ app = webapp2.WSGIApplication([('/', LandingPageHandler),
                                ('/learn', LearningCenterPageHandler),
                                #('/project', ProjectCenterPageHandler),
                                 ('/course/new', NewCourseProfileHandler),
-                                ('/course/(?P<course_name>.*)', ShowCourseHandler)
+                                ('/course/(?P<course_name>.*)', ShowCourseHandler),
+                                ('/follow/(?P<followed>.*)', FollowHandler)
                                ],
                               debug=True)
