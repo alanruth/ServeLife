@@ -16,8 +16,10 @@ class UserThinDB(db.Model):
     asset_key     = db.StringProperty(required = True)
     str_value     = db.StringProperty(required = False)
     int_value     = db.IntegerProperty(required = False)
+    follower_count = db.IntegerProperty(required = False)
     created       = db.DateTimeProperty(required=True,auto_now_add=True)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
+
 
 
 class CourseThinDB(db.Model):

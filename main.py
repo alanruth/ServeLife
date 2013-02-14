@@ -413,14 +413,18 @@ class FollowHandler(SLRequestHandler):
             user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             user_followed = UserThinDB.all().filter('user_name = ', followed).get()
             follow_index = FollowerIndex.all().filter('parent = ', user_followed).get()
-            #self.response.out.write(user_follower.key().id())
+            #self.response.out.write(user_followed.follower_count)
             if follow_index:
                 follow_index = FollowerIndex.followers.append(user_follower.key().id())
                 follow_index.put()
+            #    user_followed.follower_count += 1
+            #    user_followed.put()
             else:
                 follow_index = FollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
                 follow_index.put()
-            self.redirect('/home/'+followed)
+            #    user_followed.follower_count += 1
+            #    user_followed.put()
+            #self.redirect('/home/'+followed)
         else:
             self.redirect('/signin')
 
