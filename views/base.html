@@ -30,42 +30,39 @@
 <body>
 
 {% block navbar %}
+    <!-- PUBLIC NAVBAR - USER NOT SIGNED IN -->
     <header class="navbar navbar-fixed-top">
-          <nav class="navbar-inner">
-              <div class="container">
-                  <!-- begins navbar -->
-                  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                      <span class="icon-bar"></span>
-                      <span class="icon-bar"></span>
-                      <span class="icon-bar"></span>
-                  </a>
-                  <a href="/" class="brand scroller" data_section="body">
-                      <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png" />
-                  </a>
-                  <div class="nav-collapse collapse">
-                      <ul class="nav pull-right">
-                          <li><a href="/home/{{ username }}" alt="Home">Home</a></li>
-                          <li><a href="/discover" alt="Discover">Discover</a></li>
-                          <li><a href="/learn" alt="Learn">Learn</a></li>
-                          <li><a href="#" alt="Build">Build</a></li>
-                          <li><a href="#" alt="Work">Work</a></li>
-                          <li><a href="#" alt="Community">Community</a></li>
-                          <li class="dropdown"><a href="#" class="btn btn-small btn-header dropdown-toggle" data-toggle="dropdown">{{ username }}<b class="caret"></b></a>
-                              <ul class="dropdown-menu">
-                                  <li><a href="/user/profile/edit/{{ user_name }}">Profile</a></li>
-                                  <li><a href="#">Account</a></li>
-                                  <li class="divider"></li>
-                                  <li><a href="#">Support</a></li>
-                                  <li class="divider"></li>
-                                  <li><a href="/logout">Log Out</a></li>
-                              </ul>
-                          </li>
-                      </ul>
-                  </div>
-              </div>
-          </nav>
-      </header>
-      <!-- ends navbar -->
+        <nav class="navbar-inner">
+            <div class="container">
+                <!-- begins navbar -->
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <a href="/" class="brand scroller" data_section="body">
+                    <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png"/>
+                </a>
+
+                <div class="nav-collapse collapse">
+                    <ul class="nav pull-right">
+                        <li><a href="#" class="scroller" data-section="#features">Benefits</a></li>
+                        <li><a href="#" class="scroller" data-section="#pricing">Pricing</a></li>
+                        <li><a href="#" class="scroller" data-section="#about">About</a></li>
+                        <li><a href="/innovationintheenterprise">Podcasts</a></li>
+                        <!--<li><a href="#">Blog</a></li>-->
+                        <li>
+                            <a href="/signup" class="btn-header">Sign up</a>
+                        </li>
+                        <li>
+                            <a href="/signin" class="btn-header">Login</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- ends public navbar -->
   {% endblock navbar %}
 
   {% block submenu %}{% endblock submenu %}
