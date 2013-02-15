@@ -1,37 +1,34 @@
 {% extends "base.html" %}
 
 <!-- NEED TO PULL MEMBER NAME FROM DB -->
-{% block title %}{{ user_profile.user_name }}{% endblock title %}
+{% block title %}{{ first_name }} {{ last_name }}{% endblock title %}
 
 <!-- NEED TO PULL MEMBER HEADLINE FROM DB -->
-{% block description %}"ServeLife Member - {{ user_profile.user_name }}: [INSERT HEADLINE FROM PROFILE]"{% endblock description %}
+{% block description %}"{{ first_name }} {{ last_name }}'s ServeLife Member Profile: {{ description }}"{% endblock description %}
 
 {% block page %}
 <div class="container">
   <div class="row-fluid header-main">
     <div class="span2">
       <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
-
-
-        <img alt="{{ user_name }}" src="{{ 180|get_gravatar_url("alanruth@live.com")}}" class="thumbnail img-polaroid member-pic" />
-
-      <!-- <img alt="Alan Ruth" src="/static/img/alan180.png" class="thumbnail img-polaroid member-pic" /> -->
+      <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
+        <img alt="{{ user_name }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
     </div>
     <div class="span5">
       <!-- INSERT MEMBER CREATE DATE -->
-      <span class="pull-right"><strong>Member since</strong> [MM/YYYY]</span>
+      <span class="pull-right"><strong>Member since: </strong>{{ userthin.created.strftime('%m/%Y') }}</span>
       <!-- INSERT MEMBER NAME FROM PROFILE -->
       <h2>{{first_name}} {{ last_name }}</h2>
       <!-- INSERT MEMBER LEVEL FROM PROFILE -->
       <h4>{{title}}</h4>
       <!-- INSERT MEMBER HEADLINE FROM PROFILE - WE SHOULD LIMIT LENGTH OF HEADLINE -->
-      <p>{{about}} </p>
+      <p>{{description}} </p>
     </div>
     <div class="span5">
       <div class="row-fluid">
         <div class="profile-details span3 offset1">
           <img alt="Followers" src="/static/img/group2x.png" />
-          <span class="notification followers">800</span>
+          <span class="notification followers">{{ userthin.follower_count }}</span>
           <p>Followers</p>
         </div>
         <div class="profile-details span3 offset1 likes">
@@ -216,7 +213,7 @@
     <h2 class="section_header">
       <hr class="left visible-desktop">
       <!-- Enter Member First Name -->
-      <span>Alan's Recent Projects</span>
+      <span>{{ first_name }}'s Recent Projects</span>
       <hr class="right visible-desktop">
     </h2>
 
@@ -314,7 +311,7 @@
     <h2 class="section_header">
       <hr class="left visible-desktop">
       <!-- Enter Member First Name -->
-      <span>Alan's Most Impactful Contributions</span>
+      <span>{{ first_name }}'s Most Impactful Contributions</span>
       <hr class="right visible-desktop">
     </h2>
     

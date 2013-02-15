@@ -1,6 +1,6 @@
 {% extends "secure.html" %}
 
-{% block title %}Edit Your ServeLife User Profile{% endblock title %}
+{% block title %}{{ userthin.user_name }} : Edit Your ServeLife User Profile{% endblock title %}
 
 {% block description %}"Keeping your ServeLife profile up-to-date keeps your information fresh within the ecosystem."{% endblock description %}
 
@@ -22,7 +22,7 @@
                 <div class="span12">
                     <div class="container">
 
-                        <h3>{{ user_name }}</h3>
+                        <h3>{{ userthin.user_name }}</h3>
 
                         <p>Your ServeLife profile uniquely identifies you within the ServeLife ecosystem. Your profile information is visible to
                             everyone both within the ServeLife ecosystem and visitors to your public-facing ServeLife profile page. Your contact
@@ -31,7 +31,7 @@
                         </p>
 
                         <div class="form">
-                            <form accept-charset="UTF-8" action="/user/profile/edit/{{ username }}" method="post">
+                            <form accept-charset="UTF-8" action="/user/profile/edit/{{ userthin.user_name }}" method="post">
 
                                 <div class="row">
                                     <div class="span6">
@@ -338,12 +338,6 @@
                                                 <input class="span2" id="user_skype" name="skype_id" size="30" type="text" value='{{ skype_id }}'/>
                                             </div>
                                         </div>
-                                        <!--<div class="row">
-                                            <div class="span4">
-                                                <label for="user_blog">Personal blog</label>
-                                                <input class="span4" id="user_blog" name="blog_url" size="30" type="url" value="{{ blog_url }}"/>
-                                            </div>
-                                        </div> -->
                                     </div>
 
                                 </div>

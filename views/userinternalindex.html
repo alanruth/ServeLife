@@ -1,24 +1,24 @@
 {% extends "secure.html" %}
 
 <!-- NEED TO PULL MEMBER NAME FROM DB -->
-{% block title %}Insert Member Name{% endblock title %}
+{% block title %}{{ first_name }} {{ last_name }}'s ServeLife Profile{% endblock title %}
 
 <!-- NEED TO PULL MEMBER HEADLINE FROM DB -->
-{% block description %}"ServeLife Member - [INSERT NAME]: [INSERT HEADLINE FROM PROFILE]"{% endblock description %}
+{% block description %}"{{ first_name }} {{ last_name }} : ServeLife Member - {{ description }}"{% endblock description %}
 
 {% block page %}
     <div class="container">
     <div class="row-fluid header-main">
         <div class="span2">
             <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
-            <img alt="{{ user_name }}" src="{{ 180|get_gravatar_url('alanruth@live.com') }}" class="thumbnail img-polaroid member-pic" />
+            <img alt="{{ userthin.user_name }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
 
         </div>
         <div class="span5">
             <!-- INSERT MEMBER CREATE DATE -->
-            <span class="pull-right"><strong>Member since</strong> [MM/YYYY]</span>
+            <span class="pull-right"><strong>Member since: </strong>{{ userthin.created.strftime('%m/%Y') }}</span>
             <!-- NEED USER NAME TO COME IN VARIABLES -->
-            <span class="pull-right follow-button"><form accept-charset="UTF-8" action="/follow/alan" method="post" class="span2">
+            <span class="pull-right follow-button"><form accept-charset="UTF-8" action="/follow/{{ userthin.user_name }}" method="post" class="span2">
                 <input class="btn btn-mini btn-primary" name="commit" type="submit" value="Follow"/>
             </form></span>
 
@@ -27,13 +27,13 @@
             <!-- INSERT MEMBER LEVEL FROM PROFILE -->
             <h4>INSERT MEMBER LEVEL</h4>
             <!-- INSERT MEMBER HEADLINE FROM PROFILE - WE SHOULD LIMIT LENGTH OF HEADLINE -->
-            <p>INSERT DESCRIPTION</p>
+            <p>{{ description }}</p>
         </div>
         <div class="span5">
             <div class="row-fluid">
                 <div class="profile-details span3 offset1">
                     <img alt="Followers" src="/static/img/group2x.png" />
-                    <span class="notification followers">800</span>
+                    <span class="notification followers">{{ userthin.follower_count }}</span>
                     <p>Followers</p>
                 </div>
                 <div class="profile-details span3 offset1 likes">

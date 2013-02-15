@@ -41,6 +41,7 @@ def user_follow(user_followed, user_follower):
     user_followed.put()
     user_follower.follow_count += 1
     user_follower.put()
+
     return True
 
 
@@ -49,6 +50,7 @@ def user_unfollow(user_unfollowed, user_follower):
     user_unfollowed.put()
     user_follower.follow_count -= 1
     user_follower.put()
+
     return True
 
 
@@ -106,6 +108,7 @@ class UserProfileNewHandler(SLRequestHandler):
             """
 
             variables = json.loads(profileinfo)
+            variables['userthin'] = profile
             template = jinja_environment.get_template('newuserprofile.html')
             self.response.out.write(template.render(variables))
         else:
@@ -123,7 +126,7 @@ class UserProfileNewHandler(SLRequestHandler):
             facebook_url = self.request.get('facebook_url')
             twitter_handle = self.request.get('twitter_handle')
             skype_id = self.request.get('skype_id')
-            blog_url = self.request.get('blog_url')
+            gravatar_url = get_gravatar_url(180, user.email)
             profileinfo = {'first_name': first_name,
                            'last_name': last_name,
                            'country': country,
@@ -132,7 +135,7 @@ class UserProfileNewHandler(SLRequestHandler):
                            'facebook_url': facebook_url,
                            'twitter_handle': twitter_handle,
                            'skype_id': skype_id,
-                           'blog_url': blog_url}
+                           'gravatar_url': gravatar_url}
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
@@ -149,13 +152,19 @@ class UserProfileNewHandler(SLRequestHandler):
 class UserInternalProfileHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
-        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if profile:
-            variables = json.loads(profile.str_value)
-            template = jinja_environment.get_template('userinternalindex.html')
-            self.response.out.write(template.render(variables))
+        if self.is_logged_in():
+            profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
+            if profile:
+                variables = json.loads(profile.str_value)
+                variables['userthin'] = profile
+                variables['user_email'] = self.user.email
+                template = jinja_environment.get_template('userinternalindex.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user profile exists!')
+
         else:
-            self.response.out.write('no such user profile exists!')
+            self.redirect('/signin')
 
 
 class UserExternalProfileHandler(SLRequestHandler):
@@ -163,6 +172,7 @@ class UserExternalProfileHandler(SLRequestHandler):
         profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
         if profile:
             variables = json.loads(profile.str_value)
+            variables['userthin'] = profile
             template = jinja_environment.get_template('userexternalindex.html')
             self.response.out.write(template.render(variables))
         else:
@@ -193,10 +203,16 @@ class UserEditProfileHandler(SLRequestHandler):
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 variables = json.loads(profile.str_value)
+                variables['userthin'] = profile
+                variables['user_email'] = self.user.email
                 template = jinja_environment.get_template('userprofileedit.html')
                 self.response.out.write(template.render(variables))
             else:
                 self.response.out.write('no such user profile exists!')
+
+        else:
+            self.redirect('/signin')
+
 
     @login_required
     def post(self, user_name):
@@ -211,6 +227,7 @@ class UserEditProfileHandler(SLRequestHandler):
             twitter_handle = self.request.get('twitter_handle')
             skype_id = self.request.get('skype_id')
             description = self.request.get('description')
+            gravatar_url = get_gravatar_url(180, user.email)
             profileinfo = {
                 'first_name': first_name,
                 'last_name': last_name,
@@ -220,7 +237,8 @@ class UserEditProfileHandler(SLRequestHandler):
                 'facebook_url': facebook_url,
                 'twitter_handle': twitter_handle,
                 'skype_id': skype_id,
-                'description': description}
+                'description': description,
+                'gravatar_url': gravatar_url}
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
@@ -340,7 +358,8 @@ class UserHomePageHandler(SLRequestHandler):
             user = self.user
             #Need to modify to pull the user
             template = jinja_environment.get_template('userhome.html')
-            variables = {}
+            variables = {'user': user}
+            variables['user_email'] = user.email
             self.response.out.write(template.render(variables))
 
 
