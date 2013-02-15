@@ -35,6 +35,23 @@ def login_required(function):
     return _f
 
 
+#function to increment follower & follow counts for a user (how many people follow the user and how many they follow)
+def user_follow(user_followed, user_follower):
+    user_followed.follower_count += 1
+    user_followed.put()
+    user_follower.follow_count += 1
+    user_follower.put()
+    return True
+
+
+def user_unfollow(user_unfollowed, user_follower):
+    user_unfollowed.follower_count -= 1
+    user_unfollowed.put()
+    user_follower.follow_count -= 1
+    user_follower.put()
+    return True
+
+
 class SLRequestHandler(webapp2.RequestHandler):
     user = None
 
@@ -182,7 +199,7 @@ class UserEditProfileHandler(SLRequestHandler):
                 self.response.out.write('no such user profile exists!')
 
     @login_required
-    def post(self, username):
+    def post(self, user_name):
         if self.is_logged_in():
             user = self.user
             first_name = self.request.get('first_name')
@@ -193,7 +210,6 @@ class UserEditProfileHandler(SLRequestHandler):
             facebook_url = self.request.get('facebook_url')
             twitter_handle = self.request.get('twitter_handle')
             skype_id = self.request.get('skype_id')
-            blog_url = self.request.get('blog_url')
             description = self.request.get('description')
             profileinfo = {
                 'first_name': first_name,
@@ -204,7 +220,6 @@ class UserEditProfileHandler(SLRequestHandler):
                 'facebook_url': facebook_url,
                 'twitter_handle': twitter_handle,
                 'skype_id': skype_id,
-                'blog_url': blog_url,
                 'description': description}
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
@@ -410,21 +425,22 @@ class FollowHandler(SLRequestHandler):
     @login_required
     def post(self, followed):
         if self.is_logged_in():
+            #user that is following another user is the follower
             user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            #user that is being followed is the followed
             user_followed = UserThinDB.all().filter('user_name = ', followed).get()
             follow_index = FollowerIndex.all().filter('parent = ', user_followed).get()
-            #self.response.out.write(user_followed.follower_count)
             if follow_index:
                 follow_index = FollowerIndex.followers.append(user_follower.key().id())
                 follow_index.put()
-            #    user_followed.follower_count += 1
-            #    user_followed.put()
             else:
                 follow_index = FollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
                 follow_index.put()
-            #    user_followed.follower_count += 1
-            #    user_followed.put()
-            #self.redirect('/home/'+followed)
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            user_follow(user_followed, user_follower)
+            self.redirect('/home/'+followed)
         else:
             self.redirect('/signin')
 
