@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic_name }}{% endblock title %}
+
+{% block description %}{{ topic_description }}{% endblock description %}
+
+{% block page %}
+<div class="container">
+    <div class="row-fluid header-main">
+        <div class="span2">
+            <!-- INSERT PICTURE FROM PROFILE -->
+            <img alt="{{ topic_name }}" src="/static/img/topicdefault.png" class="thumbnail img-polaroid member-pic" />
+
+        </div>
+        <div class="span5">
+            <span class="pull-right"><strong>Created: </strong>{{ topic.created.strftime('%m/%d/%Y') }}</span>
+            <h2>{{topic_name }}</h2>
+            <!-- <h4>INSERT TOPIC LEVEL</h4> -->
+            <p>{{ topic_description }}</p>
+        </div>
+        <div class="span5">
+            <div class="row-fluid">
+                <div class="profile-details span3 offset1">
+                    <img alt="Followers" src="/static/img/group2x.png" />
+                    <span class="notification followers">{{ topic.follower_count }}</span>
+                    <p>Followers</p>
+                </div>
+                <div class="profile-details span3 offset1 articles">
+                    <img alt="Articles" src="/static/img/notes2x.png" />
+                    <span class="notification">800</span>
+                    <p>Articles</p>
+                </div>
+                <div class="profile-details span3 offset1 riffs">
+                    <img alt="Experiments" src="/static/img/magic2x.png" />
+                    <span class="notification">800</span>
+                    <p>Experiments</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock page %}

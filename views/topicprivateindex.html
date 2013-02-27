@@ -1,0 +1,32 @@
+{% extends "secure.html" %}
+
+{% block title %}{{ user_name }}'s Topics Page{% endblock title %}
+
+{% block description %}Discover is where ServeLife members can find knowledge on various topics within the ecosystem.{% endblock description %}
+
+{% block submenu %}
+    <div class="container">
+        <h2>{{ user_name }}'s Topics Home</h2>
+        <ul class="nav nav-pills pull-right">
+            <li><a href="/discover/hub" alt="Hub">Hub</a></li>
+            <li class="active"><a href="/discover/topics" alt="Topics">Topics</a></li>
+            <li><a href="#" alt="Articles">Articles</a></li>
+            <li><a href="#" alt="Questions">Q & A</a></li>
+            <li><a href="#" alt="Collaborations">Collaborations</a></li>
+            <li><a href="#" alt="Experiments">Experiments</a></li>
+        </ul>
+    </div>
+{% endblock submenu %}
+
+{% block page %}
+    <div class="container">
+        <h1>This is {{ user_name }}'s Topics Homebase</h1>
+        <!--<a href="/discover/topic/new" alt="Add New Topic">Add New Topic</a> -->
+        <p>This page will serve as the homebase (mashup) for all topics the person is following.</p>
+        <ul>
+            {% for topic in topics %}
+            <li>{{ topic.topic_name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock page %}

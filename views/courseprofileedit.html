@@ -12,25 +12,19 @@
                     <div class="span12">
                         <div class="container">
 
-                            <h3>Create a New Course.</h3>
+                            <h3>Course: {{ course_name }}</h3>
 
                             <p>A course is a learning opportunity provided by both traditional and online education providers.
                                 To create a course, please provide the following information.
                             </p>
 
                             <div class="form">
-                                <form accept-charset="UTF-8" action="/course/new" method="post">
+                                <form accept-charset="UTF-8" action="/course/edit/{{ course_name }}" method="post">
 
                                     <div class="row">
                                         <div class="span5">
-                                            <legend>Class Information</legend>
+                                            <legend>Course Information</legend>
 
-                                            <div class="row">
-                                                <div class="span3">
-                                                    <label for="class_name">Name</label>
-                                                    <input class="span3" id="class_name" name="course_name" size="30" type="text" value="{{ course_name }}" autofocus required=""/>
-                                                </div>
-                                            </div>
                                             <div class="row">
                                                 <div class="span3">
                                                     <label for="course_url">Link to Course Online</label>
@@ -45,17 +39,14 @@
                                             </div>
                                             <div class="row">
                                                 <div class="span3">
-                                                    <label for="course_tags">Tags</label>
-                                                    <textarea rows="4" class="span3" id="course_tags" name="course_tags"
-                                                              placeholder="Provide keywords (separated by a comma) that best describe the course.">{{ course_tags }}</textarea>
+                                                    <label><input class="span3" id="course_free" name="course_free" type="checkbox" value="{{ course_free }}" required=""/>Free Course</label>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="span3">
-                                                    <label class="checkbox">
-                                                        <input id="course_free" name="course_free" type="checkbox" value="{{ course_free }}">
-                                                        Free Course
-                                                    </label>
+                                                    <label for="course_tags">Tags</label>
+                                                    <textarea rows="4" class="span3" id="course_tags" name="course_tags"
+                                                              placeholder="Provide keywords (separated by a comma) that best describe the course.">{{ course_tags }}</textarea>
                                                 </div>
                                             </div>
                                             <div class="row"></div>
@@ -73,5 +64,5 @@
             </div>
         </div>
     </div>
-<!-- end of .container -->
+    <!-- end of .container -->
 {% endblock page %}

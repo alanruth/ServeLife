@@ -8,6 +8,7 @@ from google.appengine.api import mail
 from models.models import *
 import json
 import urllib, hashlib
+import logging
 
 #'http://localhost:8080'
 domain = 'http://learnmastermentor.appspot.com'
@@ -54,6 +55,25 @@ def user_unfollow(user_unfollowed, user_follower):
     return True
 
 
+#function to increment follower & follow counts for a user (how many people follow the user and how many they follow)
+def topic_follow(topic_followed, user_follower):
+    topic_followed.follower_count += 1
+    topic_followed.put()
+    user_follower.topics_followed += 1
+    user_follower.put()
+
+    return True
+
+
+def course_follow(course_followed, user_follower):
+    course_followed.follower_count += 1
+    course_followed.put()
+    user_follower.courses_followed += 1
+    user_follower.put()
+
+    return True
+
+
 class SLRequestHandler(webapp2.RequestHandler):
     user = None
 
@@ -90,12 +110,11 @@ class PodcastHandler(SLRequestHandler):
 class UserProfileNewHandler(SLRequestHandler):
 
     @login_required
-    def get(self, username):
+    def get(self, user_name):
         if self.is_logged_in():
             user = self.user
             #profileinfo is a json string with keys name, title and about
-            profile = UserThinDB.all().filter('username = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            # print profile.str_value
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
             profileinfo='{}'
             if profile:
                 profileinfo=profile.str_value
@@ -115,7 +134,7 @@ class UserProfileNewHandler(SLRequestHandler):
             self.redirect('/signin')
 
     @login_required
-    def post(self, username):
+    def post(self, user_name):
         if self.is_logged_in():
             user = self.user
             first_name = self.request.get('first_name')
@@ -176,7 +195,30 @@ class UserExternalProfileHandler(SLRequestHandler):
             template = jinja_environment.get_template('userexternalindex.html')
             self.response.out.write(template.render(variables))
         else:
-            self.response.out.write('no such user profile exists!')
+            self.response.out.write('no such ServeLife member exists within the ecosystem!')
+
+
+class TopicExternalProfileHandler(SLRequestHandler):
+    def get(self, topic_name):
+        topic = TopicThinDB.all().filter('topic_name = ', topic_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if topic:
+            variables = json.loads(topic.str_value)
+            variables['topic'] = topic
+            template = jinja_environment.get_template('topicexternalindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such topic exists within the ServeLife ecosystem!')
+
+
+class ProjectExternalProfileHandler(SLRequestHandler):
+    def get(self, project_name):
+        project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if project:
+            variables = json.loads(project.str_value)
+            template = jinja_environment.get_template('projectexternalindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such project exists within the ServeLife ecosystem!')
 
 
 class UserPrivateProfileHandler(SLRequestHandler):
@@ -184,7 +226,6 @@ class UserPrivateProfileHandler(SLRequestHandler):
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
-            #Need check that user making request is the same as the user_name - if not redirect to their profile page
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 variables = json.loads(profile.str_value)
@@ -194,12 +235,11 @@ class UserPrivateProfileHandler(SLRequestHandler):
                 self.response.out.write('no such user profile exists!')
 
 
-class UserEditProfileHandler(SLRequestHandler):
+class UserProfileEditHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
-            #Need check that user making request is the same as the user_name - if not redirect to their profile page
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 variables = json.loads(profile.str_value)
@@ -246,7 +286,41 @@ class UserEditProfileHandler(SLRequestHandler):
             else:
                 profile = UserThinDB(user_name=user.user_name, asset='profile',asset_key='info', str_value=json.dumps(profileinfo), int_value=0)
                 profile.put()
-            self.redirect('/user/profile/'+user.user_name)
+            self.redirect('/profile/user/' + user.user_name)
+
+        else:
+            self.redirect('/signin')
+
+
+class UserAccountEditHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            account = User.all().filter('user_name = ', user.user_name).get()
+            if account:
+                variables = {'user_name': user.user_name, 'user_email': user.email}
+                template = jinja_environment.get_template('useraccountedit.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user account exists!')
+
+        else:
+            self.redirect('/signin')
+
+
+class UserSubscriptionEditHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            account = User.all().filter('user_name = ', user.user_name).get()
+            if account:
+                variables = {'user_name': user.user_name, 'user_email': user.email}
+                template = jinja_environment.get_template('usersubscriptionedit.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user subscription exists!')
 
         else:
             self.redirect('/signin')
@@ -313,7 +387,7 @@ class SignInHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
-            self.redirect('/home/'+user.user_name)
+            self.redirect('/home/hub/'+user.user_name)
         template = jinja_environment.get_template('signin.html')
         variables = {}
         self.response.out.write(template.render(variables))
@@ -336,9 +410,9 @@ class SignInHandler(SLRequestHandler):
                 #ABR: check to see if the user has a profile
                 profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
                 if profile:
-                    self.redirect('/home/'+user.user_name)
+                    self.redirect('/home/hub/'+user.user_name)
                 else:
-                    self.redirect('/userprofile/new/'+user.user_name)
+                    self.redirect('/profile/new/' + user.user_name)
             else:
                 self.response.out.write('password error!')
         else:
@@ -356,91 +430,199 @@ class UserHomePageHandler(SLRequestHandler):
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
-            #Need to modify to pull the user
             template = jinja_environment.get_template('userhome.html')
-            variables = {'user': user}
-            variables['user_email'] = user.email
+            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email}
             self.response.out.write(template.render(variables))
 
 
-class KnowledgeCenterPageHandler(SLRequestHandler):
+class DiscoverHubIndexHandler(SLRequestHandler):
+    @login_required
     def get(self):
-        template = jinja_environment.get_template('discover.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+        if self.is_logged_in():
+            user = self.user
+            template = jinja_environment.get_template('discover.html')
+            variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
 
 
 class LearningCenterPageHandler(SLRequestHandler):
-    def get(self):
-        template = jinja_environment.get_template('learnprivateindex.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            template = jinja_environment.get_template('learnprivateindex.html')
+            variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
 
 
 class NewCourseProfileHandler(SLRequestHandler):
     @login_required
     def get(self):
-        template = jinja_environment.get_template('newcourseprofile.html')
-        user_name = self.user.user_name
-        variables = {}
-        self.response.out.write(template.render(variables))
+        if self.is_logged_in():
+            variables = {'user_email': self.user.email}
+            template = jinja_environment.get_template('newcourseprofile.html')
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
 
     @login_required
     def post(self):
         user = self.user
         course_name = self.request.get('course_name')
         course_url = self.request.get('course_url')
-        courseinfo = {'course_name': course_name, 'course_url': course_url}
-        course = CourseThinDB.all().filter('course_name = ', course_name).filter('asset =', 'profile').filter('asset_key =','info').get()
+        course_tags = self.request.get('course_tags').split(',')
+        course_organization = self.request.get('organization_name')
+        free = self.request.get('course_free')
+        courseinfo = {'course_name': course_name, 'course_url': course_url, 'course_organization': course_organization, 'course_free': free}
+        course = CourseThinDB.all().filter('course_name = ', course_name.lower()).filter('asset =', 'profile').filter('asset_key =','info').get()
         if course:
+            course.course_tags = course_tags
             course.str_value = json.dumps(courseinfo)
             course.put()
         else:
-            course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, created_by=user)
+            course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, created_by=user, course_tags=course_tags)
             course.put()
         self.redirect('/course/'+course_name)
 
 
-class ShowCourseHandler(SLRequestHandler):
+class CourseEditProfileHandler(SLRequestHandler):
+    @login_required
     def get(self, course_name):
-        template = jinja_environment.get_template('courseindex.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+        if self.is_logged_in():
+            course_name = course_name.lower()
+            course = CourseThinDB.all().filter('course_name = ', course_name).filter('asset =','profile').filter('asset_key =','info').get()
+            if course:
+                #self.response.out.write(course_name)
+                variables = json.loads(course.str_value)
+                tags = ", ".join(course.course_tags)
+                variables['course_tags'] = tags
+                variables['user_email'] = self.user.email
+                template = jinja_environment.get_template('courseprofileedit.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such course exists.')
+
+        else:
+            self.redirect('/signin')
+
+    @login_required
+    def post(self, course_name):
+        course_name = self.request.get('course_name').lower
+        course_url = self.request.get('course_url')
+        course_tags = self.request.get('course_tags').split(',')
+        course_organization = self.request.get('organization_name')
+        free = self.request.get('course_free')
+        courseinfo = {'course_name': course_name, 'course_url': course_url, 'course_organization': course_organization, 'course_free': free}
+        course = CourseThinDB.all().filter('course_name = ', course_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+        if course:
+            course.course_tags = course_tags
+            course.str_value = json.dumps(courseinfo)
+            course.put()
+        else:
+            course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, created_by=user, course_tags=course_tags)
+            course.put()
+        self.redirect('/course/'+course_name)
+
+
+class CourseInternalIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self, course_name):
+        if self.is_logged_in():
+            course = CourseThinDB.all().filter('course_name = ', course_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if course:
+                template = jinja_environment.get_template('courseinternalindex.html')
+                variables = json.loads(course.str_value)
+                variables['course'] = course
+                variables['user_email'] = self.user.email
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such course exists.')
+
+        else:
+            self.redirect('/signin')
+
+
+class TopicInternalIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self, topic_name):
+        if self.is_logged_in():
+            topic = TopicThinDB.all().filter('topic_name = ', topic_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if topic:
+                template = jinja_environment.get_template('topicinternalindex.html')
+                variables = json.loads(topic.str_value)
+                variables['topic'] = topic
+                variables['user_email'] = self.user.email
+                variables['user_name'] = self.user.user_name
+                self.response.out.write(template.render(variables))
+
+            else:
+                self.response.out.write('no such topic exists.')
+
+        else:
+            self.redirect('/signin')
+
+
+class DiscoverTopicIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self):
+        if self.is_logged_in():
+            user = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            topics = []
+            topics_followed = db.GqlQuery(
+                "SELECT __key__ FROM TopicFollowerIndex WHERE followers = :1", user.key().id())
+            topics.extend(db.get([k.parent() for k in topics_followed]))
+            template = jinja_environment.get_template('topicprivateindex.html')
+            variables = {'user_email': self.user.email, 'user_name': self.user.user_name, 'topics': topics}
+            self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
 
 
 class NewTopicProfileHandler(SLRequestHandler):
     @login_required
     def get(self):
-        template = jinja_environment.get_template('newcourseprofile.html')
-        user_name = self.user.user_name
-        variables = {}
-        self.response.out.write(template.render(variables))
+        if self.is_logged_in():
+            template = jinja_environment.get_template('topicnewprofile.html')
+            variables = {'user_email': self.user.email}
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
+
 
     @login_required
     def post(self):
-        user = self.user
-        course_name = self.request.get('course_name')
-        course_url = self.request.get('course_url')
-        courseinfo = {'course_name': course_name, 'course_url': course_url}
-        course = CourseThinDB.all().filter('course_name = ', course_name).filter('asset =', 'profile').filter('asset_key =','info').get()
-        if course:
-            course.str_value = json.dumps(courseinfo)
-            course.put()
+        if self.is_logged_in():
+            user = self.user
+            topic_name = self.request.get('topic_name')
+            topic_name_lc = topic_name.lower()
+            topic_description = self.request.get('topic_description')
+            parent_topic = self.request.get('parent_topic')
+            topicinfo = {'topic_name': topic_name, 'topic_description': topic_description}
+            topic = TopicThinDB.all().filter('topic_name = ', topic_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
+            if topic:
+                topic.created_by = user
+                topic.updater = user
+                topic.str_value = json.dumps(topicinfo)
+                topic.put()
+            else:
+                topic = TopicThinDB(topic_name=topic_name_lc, asset='profile', asset_key='info', str_value=json.dumps(topicinfo), int_value=0, created_by=user, updater=user)
+                topic.updater = user
+                topic.put()
+            self.redirect('/discover/topic/'+topic_name_lc)
+
         else:
-            course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, created_by=user)
-            course.put()
-        self.redirect('/course/'+course_name)
+            self.redirect('/signin')
 
 
-class ShowTopicHandler(SLRequestHandler):
-    def get(self, course_name):
-        template = jinja_environment.get_template('courseindex.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
-
-
-class FollowHandler(SLRequestHandler):
-
+class FollowUserHandler(SLRequestHandler):
     @login_required
     def post(self, followed):
         if self.is_logged_in():
@@ -448,20 +630,66 @@ class FollowHandler(SLRequestHandler):
             user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             #user that is being followed is the followed
             user_followed = UserThinDB.all().filter('user_name = ', followed).get()
-            follow_index = FollowerIndex.all().filter('parent = ', user_followed).get()
+            follow_index = UserFollowerIndex.all().filter('parent = ', user_followed).get()
             if follow_index:
-                follow_index = FollowerIndex.followers.append(user_follower.key().id())
+                follow_index = UserFollowerIndex.followers.append(user_follower.key().id())
                 follow_index.put()
             else:
-                follow_index = FollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
+                follow_index = UserFollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
                 follow_index.put()
 
             #Increment how many users follow a a certain user = follower count and
             #Increment how many users a certain user follows = follow count
             user_follow(user_followed, user_follower)
-            self.redirect('/home/'+followed)
+            self.redirect('/user/profile/' + followed)
         else:
             self.redirect('/signin')
+
+
+class FollowTopicHandler(SLRequestHandler):
+    @login_required
+    def post(self, topic):
+        if self.is_logged_in():
+            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            topic_followed = TopicThinDB.all().filter('topic_name = ', topic).get()
+            follow_index = TopicFollowerIndex.all().filter('parent = ', topic_followed).get()
+            if follow_index:
+                follow_index = TopicFollowerIndex.followers.append((follower.key().id()))
+                follow_index.put()
+            else:
+                follow_index = TopicFollowerIndex(key_name='index', parent=topic_followed, followers=[(follower.key().id())])
+                follow_index.put()
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            topic_follow(topic_followed, follower)
+            self.redirect('/discover/topic/'+topic)
+        else:
+            self.redirect('/signin')
+
+
+class FollowCourseHandler(SLRequestHandler):
+    @login_required
+    def post(self, course_name):
+        if self.is_logged_in():
+            #user that is following course
+            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            course_followed = CourseThinDB.all().filter('course_name = ', course_name).get()
+            follow_index = CourseFollowerIndex.all().filter('parent = ', course_followed).get()
+            if follow_index:
+                follow_index = CourseFollowerIndex.followers.append(user_follower.key().id())
+                follow_index.put()
+            else:
+                follow_index = CourseFollowerIndex(key_name='index', parent=course_followed, followers=[(user_follower.key().id())])
+                follow_index.put()
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            user_follow(course_followed, user_follower)
+            self.redirect('/course/'+course_name)
+        else:
+            self.redirect('/signin')
+
 
 #ABR not used yet - moved to clean up
 # class TeamProfileHandler(SLRequestHandler):
@@ -519,31 +747,54 @@ class FollowHandler(SLRequestHandler):
 #         pass
 
 
-app = webapp2.WSGIApplication([('/', LandingPageHandler),
-                               ('/innovationintheenterprise', PodcastHandler),
-                               ('/userprofile/new/(?P<username>.*)', UserProfileNewHandler),
-                               ('/profile/(?P<user_name>.*)', UserInternalProfileHandler),
-                               ('/member/(?P<user_name>.*)', UserExternalProfileHandler),
-                               ('/user/profile/edit/(?P<user_name>.*)', UserEditProfileHandler),
-                               ('/user/profile/(?P<user_name>.*)', UserPrivateProfileHandler),
-                               #('/user/account/(?P<user_name>.*)', UserAccountHandler),
-                               #('/teamprofile/(?P<team>.*)', TeamProfileHandler),
-                               #('/projectprofile/(?P<project>.*)', ProjectProfileHandler),
-                               ('/signup', SignUpHandler),
-                               ('/account_activation', ActivationHandler),
-                               ('/signin', SignInHandler),
-                               ('/logout', LogOutHandler),
-                               #('/get_user_feed/(?P<username>.*)', GetUserFeedHandler),
-                               #('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),
-                               #('/add_a_course', AddCourseHandler),
-                               ('/home/(?P<user_name>.*)', UserHomePageHandler),
-                               #('/course', CourseProfilePageHandler),
-                               #('/class', ClassProfilePageHandler),
-                               ('/discover', KnowledgeCenterPageHandler),
-                               ('/learn', LearningCenterPageHandler),
-                               #('/project', ProjectCenterPageHandler),
-                                ('/course/new', NewCourseProfileHandler),
-                                ('/course/(?P<course_name>.*)', ShowCourseHandler),
-                                ('/follow/(?P<followed>.*)', FollowHandler)
-                               ],
+def handle_404(request, response, exception):
+    logging.exception(exception)
+    response.write('Oops! I could swear this page was here!')
+    response.set_status(404)
+
+
+app = webapp2.WSGIApplication([
+                                  (r'/', LandingPageHandler),
+                                  ('/innovationintheenterprise', PodcastHandler),
+                                  ('/member/profile/(?P<user_name>.*)', UserExternalProfileHandler),
+                                  ('/topic/profile/(?P<topic_name>.*)', TopicExternalProfileHandler),
+                                  ('/project/profile/(?P<project_name>.*)', ProjectExternalProfileHandler),
+                                  ('/signup', SignUpHandler),
+                                  ('/account_activation', ActivationHandler),
+                                  ('/signin', SignInHandler),
+                                  ('/logout', LogOutHandler),
+                                  ('/user/profile/new/(?P<username>.*)', UserProfileNewHandler),
+                                  ('/user/profile/(?P<user_name>.*)', UserProfileEditHandler),
+                                  ('/user/account/(?P<user_name>.*)', UserAccountEditHandler),
+                                  ('/user/subscription/(?P<user_name>.*)', UserSubscriptionEditHandler),
+                                  ('/profile/(?P<user_name>.*)', UserPrivateProfileHandler),
+                                  ('/user/profile/(?P<user_name>.*)', UserInternalProfileHandler),
+                                  ('/home/hub/(?P<user_name>.*)', UserHomePageHandler),
+                                  #('/home/contributions/(?P<user_name>.*)', UserContributionsPageHandler),
+                                  #('/home/achievements/(?P<user_name>.*)', UserAchievementsPageHandler),
+                                  #('/home/efforts/(?P<user_name>.*)', UserEffortsPageHandler),
+                                  #('/home/tribe/(?P<user_name>.*)', UserTribePageHandler),
+                                  ('/topic/new', NewTopicProfileHandler),
+                                  ('/discover/topic/(?P<topic_name>.*)', TopicInternalIndexHandler),
+                                  ('/discover/topics.*', DiscoverTopicIndexHandler),
+                                  ('/discover/hub.*', DiscoverHubIndexHandler),
+                                  ('/learn/hub/(?P<user_name>.*)', LearningCenterPageHandler),
+                                  ('/course/new', NewCourseProfileHandler),
+                                  ('/course/edit/(?P<course_name>.*)', CourseEditProfileHandler),
+                                  ('/course/(?P<course_name>.*)', CourseInternalIndexHandler),
+                                  ('/follow/(?P<followed>.*)', FollowUserHandler),
+                                  ('/followcourse/(?P<followed>.*)', FollowCourseHandler),
+                                  ('/followtopic/(?P<followed>.*)', FollowTopicHandler)
+                                  #('/project', ProjectCenterPageHandler),
+                                  #('/user/account/(?P<user_name>.*)', UserAccountHandler),
+                                  #('/teamprofile/(?P<team>.*)', TeamProfileHandler),
+                                  #('/projectprofile/(?P<project>.*)', ProjectProfileHandler),
+                                  #('/get_user_feed/(?P<username>.*)', GetUserFeedHandler),
+                                  #('/get_user_feed_by_topic/(?P<username>.*)/(?P<topic>.*)', GetUserTopicFeedHandler),
+                                  #('/add_a_course', AddCourseHandler),
+                                  #('/course', CourseProfilePageHandler),
+                                  #('/class', ClassProfilePageHandler),
+                              ],
                               debug=True)
+
+app.error_handlers[404] = handle_404

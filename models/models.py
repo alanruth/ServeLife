@@ -18,6 +18,8 @@ class UserThinDB(db.Model):
     int_value     = db.IntegerProperty(required = False)
     follower_count = db.IntegerProperty(required = False, default=0)
     follow_count = db.IntegerProperty(required=False, default=0)
+    topics_followed = db.IntegerProperty(required=False, default=0)
+    courses_followed = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True,auto_now_add=True)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
@@ -28,6 +30,8 @@ class CourseThinDB(db.Model):
     asset_key     = db.StringProperty(required=True)
     str_value     = db.StringProperty(required=False)
     int_value     = db.IntegerProperty(required=False)
+    follower_count = db.IntegerProperty(required=False, default=0)
+    course_tags   = db.StringListProperty()
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
     created_by      = db.ReferenceProperty(User, required=True)
     updated       = db.DateTimeProperty(required=True, auto_now=True)
@@ -39,14 +43,22 @@ class TopicThinDB(db.Model):
     asset_key     = db.StringProperty(required=True)
     str_value     = db.StringProperty(required=False)
     int_value     = db.IntegerProperty(required=False)
-    liked_count   = db.IntegerProperty(required=False)
-    followed_count = db.IntegerProperty(required=False)
+    follower_count = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    created_by      = db.ReferenceProperty(User, required=True)
+    created_by      = db.ReferenceProperty(User, required=True, collection_name='creator')
     updated       = db.DateTimeProperty(required=True, auto_now=True)
+    updater       = db.ReferenceProperty(User, required=True, collection_name='updater')
 
 
-class FollowerIndex(db.Model):
+class UserFollowerIndex(db.Model):
+    followers       = db.ListProperty(int)
+
+
+class TopicFollowerIndex(db.Model):
+    followers       = db.ListProperty(int)
+
+
+class CourseFollowerIndex(db.Model):
     followers       = db.ListProperty(int)
 
 
@@ -70,6 +82,7 @@ class TeamThinDB(db.Model):
     int_value     = db.IntegerProperty(required= False)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
 
+
 class ProjectThinDB(db.Model):
     project_name   = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
@@ -77,6 +90,8 @@ class ProjectThinDB(db.Model):
     str_value     = db.StringProperty(required = False)
     int_value     = db.IntegerProperty(required= False)
     updated       = db.DateTimeProperty(required = True,auto_now = True)
+
+
 
 """
 class Member(db.Model):

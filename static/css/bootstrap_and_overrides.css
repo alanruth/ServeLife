@@ -1796,7 +1796,9 @@ footer .copyright .copy p {
   margin-top: 14px;
 }
 
-
+.projects img {
+    margin-bottom: -4px;
+}
 
 .articles img {
   margin-bottom: -4px;
@@ -2258,9 +2260,8 @@ width: 100%;
     box-shadow: inset 0px -2px 0px 0px #7b7b7b !important;
 }
 
-
-.submenu {
-    padding-top: 25px;
+*/
+#submenu {
+    margin-top: -30px;
 }
 
-*/

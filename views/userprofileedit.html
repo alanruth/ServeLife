@@ -6,10 +6,11 @@
 
 {% block submenu %}
     <div class="container">
-        <h2>Edit Your ServeLife Profile</h2>
-        <ul class="nav nav-pills pull-right">
+        <h3>Update Your ServeLife Membership</h3>
+        <ul class="nav nav-pills pull-right" id="submenu">
             <li class="active"><a href="#" alt="Profile">Profile</a></li>
-            <li><a href="#" alt="Goals">Goals</a></li>
+            <li><a href="/user/account/{{ userthin.user_name }}">Account</a></li>
+            <li><a href="/user/subscription/{{ userthin.user_name }}">Subscription</a></li>
         </ul>
     </div>
 {% endblock submenu %}
@@ -18,11 +19,13 @@
 <div id="main" role="main">
     <div class="container">
         <div class="content">
+
             <div class="row">
                 <div class="span12">
                     <div class="container">
 
-                        <h3>{{ userthin.user_name }}</h3>
+                        <!-- <h3>{{ userthin.user_name }}</h3> -->
+
 
                         <p>Your ServeLife profile uniquely identifies you within the ServeLife ecosystem. Your profile information is visible to
                             everyone both within the ServeLife ecosystem and visitors to your public-facing ServeLife profile page. Your contact
@@ -31,7 +34,7 @@
                         </p>
 
                         <div class="form">
-                            <form accept-charset="UTF-8" action="/user/profile/edit/{{ userthin.user_name }}" method="post">
+                            <form accept-charset="UTF-8" action="/user/profile/{{ userthin.user_name }}" method="post">
 
                                 <div class="row">
                                     <div class="span6">
