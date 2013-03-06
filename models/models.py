@@ -1,5 +1,5 @@
 from google.appengine.ext import db
-
+from google.appengine.ext.db import polymodel
 
 class User(db.Model):
     user_name      = db.StringProperty(required = True)
@@ -11,17 +11,18 @@ class User(db.Model):
 
 
 class UserThinDB(db.Model):
-    user_name      = db.StringProperty(required = True)
-    asset         = db.StringProperty(required = True)
-    asset_key     = db.StringProperty(required = True)
-    str_value     = db.StringProperty(required = False)
-    int_value     = db.IntegerProperty(required = False)
-    follower_count = db.IntegerProperty(required = False, default=0)
+    user_name      = db.StringProperty(required=True)
+    asset         = db.StringProperty(required=True)
+    asset_key     = db.StringProperty(required=True)
+    str_value     = db.StringProperty(required=False)
+    int_value     = db.IntegerProperty(required=False)
+    follower_count = db.IntegerProperty(required=False, default=0)
     follow_count = db.IntegerProperty(required=False, default=0)
     topics_followed = db.IntegerProperty(required=False, default=0)
     courses_followed = db.IntegerProperty(required=False, default=0)
-    created       = db.DateTimeProperty(required=True,auto_now_add=True)
-    updated       = db.DateTimeProperty(required = True,auto_now = True)
+    created       = db.DateTimeProperty(required=True, auto_now_add=True)
+    updated       = db.DateTimeProperty(required=True, auto_now=True)
+    profile_pic     = db.BlobProperty(default=None)
 
 
 class CourseThinDB(db.Model):
@@ -48,6 +49,20 @@ class TopicThinDB(db.Model):
     created_by      = db.ReferenceProperty(User, required=True, collection_name='creator')
     updated       = db.DateTimeProperty(required=True, auto_now=True)
     updater       = db.ReferenceProperty(User, required=True, collection_name='updater')
+    profile_pic     = db.BlobProperty(default=None)
+
+
+class EventItem(polymodel.PolyModel):
+    object_type = db.StringProperty()
+    object_name = db.StringProperty()
+    created = db.DateTimeProperty(required=True, auto_now_add=True)
+
+
+class ArticleEvent(EventItem):
+    article_url = db.LinkProperty(required=True)
+    article_title = db.StringProperty()
+    article_image = db.LinkProperty()
+    creator = db.ReferenceProperty(UserThinDB, required=True)
 
 
 class UserFollowerIndex(db.Model):

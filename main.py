@@ -1,14 +1,19 @@
-import webapp2
-import jinja2
 import os
 import random
 import string
 import hmac
-from google.appengine.api import mail
-from models.models import *
 import json
-import urllib, hashlib
+import urllib
+import hashlib
 import logging
+
+
+import webapp2
+import jinja2
+from google.appengine.api import mail
+
+from models.models import *
+
 
 #'http://localhost:8080'
 domain = 'http://learnmastermentor.appspot.com'
@@ -162,7 +167,7 @@ class UserProfileNewHandler(SLRequestHandler):
             else:
                 profile = UserThinDB(user_name=user.user_name, asset='profile',asset_key='info', str_value=json.dumps(profileinfo), int_value=0)
                 profile.put()
-            self.redirect('/home/'+user.user_name)
+            self.redirect('/home/hub/' + user.user_name)
 
         else:
             self.redirect('/signin')
@@ -268,6 +273,7 @@ class UserProfileEditHandler(SLRequestHandler):
             skype_id = self.request.get('skype_id')
             description = self.request.get('description')
             gravatar_url = get_gravatar_url(180, user.email)
+             #avatar = images.resize(self.request.get('img'), 180, 180)
             profileinfo = {
                 'first_name': first_name,
                 'last_name': last_name,
@@ -282,9 +288,14 @@ class UserProfileEditHandler(SLRequestHandler):
             profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
             if profile:
                 profile.str_value = json.dumps(profileinfo)
+                #profile.profile_pic = avatar
                 profile.put()
             else:
-                profile = UserThinDB(user_name=user.user_name, asset='profile',asset_key='info', str_value=json.dumps(profileinfo), int_value=0)
+                profile = UserThinDB(user_name=user.user_name,
+                                     asset='profile',
+                                     asset_key='info',
+                                     str_value=json.dumps(profileinfo),
+                                     int_value=0)
                 profile.put()
             self.redirect('/profile/user/' + user.user_name)
 
@@ -412,7 +423,7 @@ class SignInHandler(SLRequestHandler):
                 if profile:
                     self.redirect('/home/hub/'+user.user_name)
                 else:
-                    self.redirect('/profile/new/' + user.user_name)
+                    self.redirect('/user/profile/new/' + user.user_name)
             else:
                 self.response.out.write('password error!')
         else:
