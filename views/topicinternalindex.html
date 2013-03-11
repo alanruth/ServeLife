@@ -12,7 +12,7 @@
         // follow a topic
         $.ajax({
 
-            url: "http://localhost:8095/followtopic/{{ topic.topic_name }}",
+            url: "../../followtopic/{{ topic.topic_name }}",
             async: true,
             type: "POST",
             success: function(response) {
