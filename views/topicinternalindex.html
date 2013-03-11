@@ -5,6 +5,29 @@
 {% block description %}{{ topic_description }}{% endblock description %}
 
 {% block page %}
+
+<script>
+    $(document).ready(function() {
+    $('#follow_topic').on('click', function(e) {
+        // follow a topic
+        $.ajax({
+
+            url: "http://localhost:8095/followtopic/{{ topic.topic_name }}",
+            async: true,
+            type: "POST",
+            success: function(response) {
+                $('#follow_topic').html('following');
+            },
+            error: function(response) {
+                $('#follow_topic').html('error!');
+            }
+        });
+    });
+        });
+
+</script>
+
+
 <div class="topic-header">
     <div class="main">
         <div class="container">
@@ -17,9 +40,8 @@
                     <div class="span5">
                         <span class="pull-right"><strong>Created: </strong>{{ topic.created.strftime('%m/%d/%Y') }}</span>
                         <div class="pull-right follow-button">
-                            <form accept-charset="UTF-8" action="/followtopic/{{ topic.topic_name }}" method="post" class="span2">
-                                <input class="btn btn-mini btn-primary" name="commit" type="submit" value="Follow"/>
-                            </form>
+                                <button id="follow_topic" class="btn btn-mini btn-primary">Follow</button>
+
                         </div>
                         <!-- INSERT TOPIC NAME FROM PROFILE -->
                         <h2>{{topic_name }}</h2>
