@@ -11,7 +11,9 @@ import logging
 import webapp2
 import jinja2
 from google.appengine.api import mail
-
+from google.appengine.api import search
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext import blobstore
 from models.models import *
 
 
@@ -19,6 +21,16 @@ from models.models import *
 domain = 'http://learnmastermentor.appspot.com'
 
 jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'views')))
+
+def create_topic(topic):
+    topic_info = json.loads(topic.str_value)
+    topic_description = topic_info.get('topic_description')
+    parent_topic = topic_info.get('parent_topic')
+    created_by = topic.created_by.user_name
+    return search.Document(doc_id=str(topic.key().id()),fields = [search.TextField(name='description',value=topic_description),
+                                                                 search.TextField(name='parent_topic', value=parent_topic),
+                                                                 search.TextField(name='created_by', value=created_by),])
+
 
 #utility function to get gravatar image url
 def get_gravatar_url(size, email):
@@ -79,6 +91,9 @@ def course_follow(course_followed, user_follower):
     return True
 
 
+
+
+
 class SLRequestHandler(webapp2.RequestHandler):
     user = None
 
@@ -97,6 +112,8 @@ class SLRequestHandler(webapp2.RequestHandler):
         else:
             return False
 
+class SLBSRequestHandler(SLRequestHandler, blobstore_handlers.BlobstoreUploadHandler):
+    pass
 
 class LandingPageHandler(SLRequestHandler):
     def get(self):
@@ -571,6 +588,7 @@ class TopicInternalIndexHandler(SLRequestHandler):
                 variables['topic'] = topic
                 variables['user_email'] = self.user.email
                 variables['user_name'] = self.user.user_name
+                variables['blob_key'] = json.loads(topic.str_value).get('blob_key')
                 self.response.out.write(template.render(variables))
 
             else:
@@ -596,17 +614,18 @@ class DiscoverTopicIndexHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
-class NewTopicProfileHandler(SLRequestHandler):
+class NewTopicProfileHandler(SLBSRequestHandler):
     @login_required
     def get(self):
         if self.is_logged_in():
+            upload_url = blobstore.create_upload_url('/topic/new')
+            #upload_url = blobstore.create_upload_url('/upload')
             template = jinja_environment.get_template('topicnewprofile.html')
-            variables = {'user_email': self.user.email}
+            variables = {'user_email': self.user.email,'upload_url':upload_url}
             self.response.out.write(template.render(variables))
 
         else:
             self.redirect('/signin')
-
 
     @login_required
     def post(self):
@@ -616,9 +635,13 @@ class NewTopicProfileHandler(SLRequestHandler):
             topic_name_lc = topic_name.lower()
             topic_description = self.request.get('topic_description')
             parent_topic = self.request.get('parent_topic')
-            topicinfo = {'topic_name': topic_name, 'topic_description': topic_description}
-            if self.request.get('img'):
-                profile_pic = images.resize(self.request.get('img'),)
+            upload_files = self.get_uploads('topic_image')
+            blob_info = upload_files[0]
+            topicinfo = {'topic_name': topic_name,
+                         'topic_description': topic_description,
+                         'parent_topic': parent_topic,
+                         'blob_key':str(blob_info.key()),
+                        }
             topic = TopicThinDB.all().filter('topic_name = ', topic_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
             if topic:
                 topic.created_by = user
@@ -629,7 +652,14 @@ class NewTopicProfileHandler(SLRequestHandler):
                 topic = TopicThinDB(topic_name=topic_name_lc, asset='profile', asset_key='info', str_value=json.dumps(topicinfo), int_value=0, created_by=user, updater=user)
                 topic.updater = user
                 topic.put()
-            self.redirect('/discover/topic/'+topic_name_lc)
+            doc = create_topic(topic)
+            _INDEX_NAME = 'topic'
+            try:
+                search.Index(name=_INDEX_NAME).put(doc)
+                self.redirect('/discover/topic/'+topic_name_lc)
+            except search.Error:
+                logging.exception('Add failed')
+
 
         else:
             self.redirect('/signin')
@@ -765,6 +795,25 @@ def handle_404(request, response, exception):
     response.write('Oops! I could swear this page was here!')
     response.set_status(404)
 
+class SearchHandler(webapp2.RequestHandler):
+    def get(self, index):
+        q = self.request.get('q')
+        _INDEX_NAME = index
+        try:
+            results = search.Index(name=_INDEX_NAME).search(q)
+            template = jinja_environment.get_template('results.html')
+            variables = {'results':results,'query':q}
+            self.response.out.write(template.render(variables))
+        except search.Error:
+            logging.exception('search failed')
+
+
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    def get(self, resource):
+        resource = str(urllib.unquote(resource))
+        blob_info = blobstore.BlobInfo.get(resource)
+        self.send_blob(blob_info)
+
 
 app = webapp2.WSGIApplication([
                                   (r'/', LandingPageHandler),
@@ -797,7 +846,9 @@ app = webapp2.WSGIApplication([
                                   ('/course/(?P<course_name>.*)', CourseInternalIndexHandler),
                                   ('/follow/(?P<followed>.*)', FollowUserHandler),
                                   ('/followcourse/(?P<followed>.*)', FollowCourseHandler),
-                                  ('/followtopic/(?P<followed>.*)', FollowTopicHandler)
+                                  ('/followtopic/(?P<followed>.*)', FollowTopicHandler),
+                                  ('/search/(?P<index>.*)', SearchHandler),
+                                  ('/serve/([^/]+)?', ServeHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),
