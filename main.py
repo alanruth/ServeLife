@@ -617,6 +617,8 @@ class NewTopicProfileHandler(SLRequestHandler):
             topic_description = self.request.get('topic_description')
             parent_topic = self.request.get('parent_topic')
             topicinfo = {'topic_name': topic_name, 'topic_description': topic_description}
+            if self.request.get('img'):
+                profile_pic = images.resize(self.request.get('img'),)
             topic = TopicThinDB.all().filter('topic_name = ', topic_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
             if topic:
                 topic.created_by = user
