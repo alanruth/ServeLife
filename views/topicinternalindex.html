@@ -35,7 +35,7 @@
                 <div class="row-fluid topic-main">
                     <div class="span2">
                         <!-- INSERT PICTURE FROM PROFILE -->
-                        <img alt="{{ topic_name }}" src="/static/img/{{ topic_name }}.jpg" class="thumbnail img-polaroid member-pic" />
+                        <img alt="{{ topic_name }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
                     </div>
                     <div class="span5">
                         <span class="pull-right"><strong>Created: </strong>{{ topic.created.strftime('%m/%d/%Y') }}</span>

@@ -12,7 +12,8 @@ import webapp2
 import jinja2
 from google.appengine.api import mail
 from google.appengine.api import search
-
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext import blobstore
 from models.models import *
 
 
@@ -90,6 +91,9 @@ def course_follow(course_followed, user_follower):
     return True
 
 
+
+
+
 class SLRequestHandler(webapp2.RequestHandler):
     user = None
 
@@ -108,6 +112,8 @@ class SLRequestHandler(webapp2.RequestHandler):
         else:
             return False
 
+class SLBSRequestHandler(SLRequestHandler, blobstore_handlers.BlobstoreUploadHandler):
+    pass
 
 class LandingPageHandler(SLRequestHandler):
     def get(self):
@@ -582,6 +588,7 @@ class TopicInternalIndexHandler(SLRequestHandler):
                 variables['topic'] = topic
                 variables['user_email'] = self.user.email
                 variables['user_name'] = self.user.user_name
+                variables['blob_key'] = json.loads(topic.str_value).get('blob_key')
                 self.response.out.write(template.render(variables))
 
             else:
@@ -607,17 +614,18 @@ class DiscoverTopicIndexHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
-class NewTopicProfileHandler(SLRequestHandler):
+class NewTopicProfileHandler(SLBSRequestHandler):
     @login_required
     def get(self):
         if self.is_logged_in():
+            upload_url = blobstore.create_upload_url('/topic/new')
+            #upload_url = blobstore.create_upload_url('/upload')
             template = jinja_environment.get_template('topicnewprofile.html')
-            variables = {'user_email': self.user.email}
+            variables = {'user_email': self.user.email,'upload_url':upload_url}
             self.response.out.write(template.render(variables))
 
         else:
             self.redirect('/signin')
-
 
     @login_required
     def post(self):
@@ -627,7 +635,13 @@ class NewTopicProfileHandler(SLRequestHandler):
             topic_name_lc = topic_name.lower()
             topic_description = self.request.get('topic_description')
             parent_topic = self.request.get('parent_topic')
-            topicinfo = {'topic_name': topic_name, 'topic_description': topic_description, 'parent_topic': parent_topic}
+            upload_files = self.get_uploads('topic_image')
+            blob_info = upload_files[0]
+            topicinfo = {'topic_name': topic_name,
+                         'topic_description': topic_description,
+                         'parent_topic': parent_topic,
+                         'blob_key':str(blob_info.key()),
+                        }
             topic = TopicThinDB.all().filter('topic_name = ', topic_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
             if topic:
                 topic.created_by = user
@@ -793,6 +807,14 @@ class SearchHandler(webapp2.RequestHandler):
         except search.Error:
             logging.exception('search failed')
 
+
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    def get(self, resource):
+        resource = str(urllib.unquote(resource))
+        blob_info = blobstore.BlobInfo.get(resource)
+        self.send_blob(blob_info)
+
+
 app = webapp2.WSGIApplication([
                                   (r'/', LandingPageHandler),
                                   ('/innovationintheenterprise', PodcastHandler),
@@ -825,7 +847,8 @@ app = webapp2.WSGIApplication([
                                   ('/follow/(?P<followed>.*)', FollowUserHandler),
                                   ('/followcourse/(?P<followed>.*)', FollowCourseHandler),
                                   ('/followtopic/(?P<followed>.*)', FollowTopicHandler),
-                                  ('/search/(?P<index>.*)', SearchHandler)
+                                  ('/search/(?P<index>.*)', SearchHandler),
+                                  ('/serve/([^/]+)?', ServeHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),

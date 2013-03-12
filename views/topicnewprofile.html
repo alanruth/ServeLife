@@ -16,7 +16,7 @@
 
                             <p>A topic is a category of knowledge within the ServeLife ecosystem. Topics can relate to one another through parent and child relationships.</p>
                             <div class="form">
-                                <form accept-charset="UTF-8" action="/topic/new" method="post">
+                                <form accept-charset="UTF-8" enctype="multipart/form-data" action="{{upload_url}}" method="post">
 
                                     <div class="row">
                                         <div class="span5">
@@ -39,6 +39,12 @@
                                                 <div class="span3">
                                                     <label for="parent_topic">Parent Topic</label>
                                                     <input class="span3" id="parent_topic" name="parent_topic" type="text" value="{{ parent_topic }}" />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="span3">
+                                                    <label for="parent_topic">Profile Image for this topic</label>
+                                                    <input class="span3" id="topic_image" name="topic_image" type="file" />
                                                 </div>
                                             </div>
                                             <div class="span3">
