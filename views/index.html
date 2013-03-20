@@ -90,8 +90,34 @@
 						          <p>
 						            Sign up today for early access. We seek qualified individuals willing to contribute their expertise
 						            towards the success of one of our pre-launch learning projects.
-						          </p>
-						          <a href="signup.html" class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</a>
+						          </p
+                                    <div class="form-inline">
+                                        <input type="text" id="myemail"> <button class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</button>
+                                    </div>
+
+                                    <script>
+                                        $(document).ready(function() {
+
+                                            $('#betasignup').on('click', function(e) {
+                                                // follow a topic
+                                                var subscription_email = $('#myemail').val();
+                                                //alert(subscription_email)
+                                                $.ajax({
+                                                    data:{'subscriber_email':subscription_email},
+                                                    url: "/email/email_subscription",
+                                                    async: true,
+                                                    type: "POST",
+                                                    success: function(response) {
+                                                        $('#betasignup').html('check your mail!');
+                                                    },
+                                                    error: function(response) {
+                                                        $('#betasignup').html('error!');
+                                                    }
+                                                });
+                                            });
+                                        });
+
+                                    </script>
 						        </div>
 						        <div class="span6 right">
 						          <div>
