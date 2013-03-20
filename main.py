@@ -729,16 +729,16 @@ class SubscriptionHandler(webapp2.RequestHandler):
                 email_template = jinja_environment.get_template('responsive-email-templates/basic.html')
                 salt = 'atwgwkjerfkjk2343454mf@$'
                 activation_key= hashlib.md5(subscriber_email.lower()+salt).hexdigest()
-                url='http://learnmastermentor.appspot.com/email/email_subscription_activate?email='+subscriber_email+'&key='+activation_key
-                variables = {'url':url}
+                url='http://learnmastermentor.appspot.com/email/email_subscription_activate?email='+ subscriber_email + '&key=' + activation_key
+                variables = {'url': url}
                 mail.send_mail(sender="ServeLife <alan@servelife.com>",
                                to=subscriber_email,
                                subject="Activate your Servelife subscription!",
                                body="no html version",
-                               html=email_template.render(variables))
+                               html=email_template.render({}))
                 self.response.out.write('ok')
             except:
-                self.response.out.write('email_subscription failed!')
+                self.response.out.write('sending mail failed!')
         elif method=='email_subscription_activate':
             #add to subscribers list
             email = self.request.get('email')
