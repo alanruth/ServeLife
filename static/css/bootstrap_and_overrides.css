@@ -269,7 +269,7 @@ body {
   position: relative;
 }
 #pricing .price_wrapper.regular header {
-  background: url('/static/img/chart1.png') 0 0 no-repeat;
+  background: url("/static/img/chart1.png") 0 0 no-repeat;
 }
 #pricing .price_wrapper.pro {
   width: 331px;
@@ -835,7 +835,7 @@ footer .copyright .copy p {
   /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); *//* IE6-9 */
   height: auto;
   padding-bottom: 50px;
-  border-bottom: 1px solid #d1d2d4;
+  /*border-bottom: 1px solid #d1d2d4;*/
   /*//box-shadow: 0px 3px 8px 0px #e7e7e7;*/
 }
 
@@ -846,6 +846,7 @@ footer .copyright .copy p {
 }
 #comingsoon .countdown .left h1 {
   margin-top: 0px;
+  font-size: 40px;
 }
 #comingsoon .countdown .left p {
   margin-top: 20px;
