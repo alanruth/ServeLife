@@ -726,19 +726,19 @@ class SubscriptionHandler(webapp2.RequestHandler):
         if method == 'email_subscription':
             try:
                 subscriber_email = self.request.get('subscriber_email')
-                email_template = jinja_environment.get_template('basic.html')
+                email_template = jinja_environment.get_template('responsive-email-templates/basic.html')
                 salt = 'atwgwkjerfkjk2343454mf@$'
-                activation_key= hashlib.md5(email.lower()+salt).hexdigest()
-                url='http://learnmastermentor.appspot.com/email_subscription_activate?activate?email='+email+'&key='+activation_key
-                variables = {'url':url, 'today':today}
-                mail.send_mail(sender="ServeLife <alan@servelife.com",
+                activation_key= hashlib.md5(subscriber_email.lower()+salt).hexdigest()
+                url='http://learnmastermentor.appspot.com/email/email_subscription_activate?email='+subscriber_email+'&key='+activation_key
+                variables = {'url':url}
+                mail.send_mail(sender="ServeLife <alan@servelife.com>",
                                to=subscriber_email,
-                               subject="Your subscription to ServeLife is one step away!",
+                               subject="Activate your Servelife subscription!",
                                body="no html version",
                                html=email_template.render(variables))
                 self.response.out.write('ok')
             except:
-                self.response.out.write('error')
+                self.response.out.write('email_subscription failed!')
         elif method=='email_subscription_activate':
             #add to subscribers list
             email = self.request.get('email')
@@ -749,66 +749,6 @@ class SubscriptionHandler(webapp2.RequestHandler):
                 self.response.write('ok')
             else:
                 self.response.write('error')
-
-
-
-
-
-
-#ABR not used yet - moved to clean up
-# class TeamProfileHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('teampublicprofile.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class ProjectProfileHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('projectpublicprofile.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class ProjectCenterPageHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('learnprivateindex.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class ClassProfilePageHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('class.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class CourseProfilePageHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('course.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# @login_required
-# class GetUserFeedHandler(SLRequestHandler):
-#     def get(self, username):
-#         user = 'mogambo'
-#         if self.is_logged_in():
-#             user = self.user
-#             self.response.out.write('feed from username: '+username+'. Logged in user is:'+user.username)
-#
-# class GetUserTopicFeedHandler(SLRequestHandler):
-#     @login_required
-#     def get(self, username, topic):
-#         self.response.out.write('feed from username: '+username+' on topic: '+topic)
-#
-# class AddCourseHandler(SLRequestHandler):
-#     @login_required
-#     def get(self):
-#         #add course form
-#         pass
 
 
 def handle_404(request, response, exception):
@@ -861,8 +801,7 @@ app = webapp2.WSGIApplication([
                                   ('/followcourse/(?P<followed>.*)', FollowCourseHandler),
                                   ('/followtopic/(?P<followed>.*)', FollowTopicHandler),
                                   ('/search/(?P<index>.*)', SearchHandler),
-                                  ('/email_subscription',SubscriptionHandler),
-                                  ('/email_subscription_sctivate',SubscriptionHandler),
+                                  ('/email/(?P<method>.*)',SubscriptionHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),

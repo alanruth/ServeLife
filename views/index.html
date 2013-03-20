@@ -5,6 +5,7 @@
 {% block description %}"Learn with purpose! ServeLife helps you acquire knowledge and put that knowledge to work building real world experience. Contribute. Collaborate. Be Discovered."{% endblock description %}
 
 {% block navbar %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <!-- PUBLIC NAVBAR - USER NOT SIGNED IN -->
   <header class="navbar navbar-fixed-top">
     <nav class="navbar-inner">
@@ -91,17 +92,20 @@
 						            Subscribe today for early access. We seek qualified individuals willing to contribute their expertise
 						            towards the success of one of our pre-launch learning projects.
 						          </p>
-                                    <form class="form-inline">
-						          <input type="text" name="email"> <button class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</button>
-                                    </form>
+                                    <div class="form-inline">
+						          <input type="text" id="myemail"> <button class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</button>
+                                    </div>
 
                                         <script>
                                         $(document).ready(function() {
+
                                             $('#betasignup').on('click', function(e) {
                                                 // follow a topic
+                                                var subscription_email = $('#myemail').val();
+                                                //alert(subscription_email)
                                                 $.ajax({
-
-                                                    url: "/email_subscription",
+                                                    data:{'subscriber_email':subscription_email},
+                                                    url: "/email/email_subscription",
                                                     async: true,
                                                     type: "POST",
                                                     success: function(response) {
