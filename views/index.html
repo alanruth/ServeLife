@@ -88,11 +88,35 @@
 						            and the world around them.
 						          </p>
 						          <p>
-						            Sign up today for early access. We seek qualified individuals willing to contribute their expertise
+						            Subscribe today for early access. We seek qualified individuals willing to contribute their expertise
 						            towards the success of one of our pre-launch learning projects.
 						          </p>
-						          <a href="signup.html" class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</a>
-						        </div>
+                                    <form class="form-inline">
+						          <input type="text" name="email"> <button class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</button>
+                                    </form>
+
+                                        <script>
+                                        $(document).ready(function() {
+                                            $('#betasignup').on('click', function(e) {
+                                                // follow a topic
+                                                $.ajax({
+
+                                                    url: "/email_subscription",
+                                                    async: true,
+                                                    type: "POST",
+                                                    success: function(response) {
+                                                        $('#betasignup').html('check your mail!');
+                                                    },
+                                                    error: function(response) {
+                                                        $('#betasignup').html('error!');
+                                                    }
+                                                });
+                                            });
+                                        });
+
+                                    </script>
+
+						         </div>
 						        <div class="span6 right">
 						          <div>
 						            <iframe width="560" height="315" src="http://www.youtube.com/embed/CRlSeZL1ylY?rel=0" frameborder="0" allowfullscreen></iframe>

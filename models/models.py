@@ -1,6 +1,9 @@
 from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 
+class Subscriber(db.Model):
+    email = db.StringProperty(required=True)
+
 class User(db.Model):
     user_name      = db.StringProperty(required = True)
     password_hash = db.StringProperty(required = True)

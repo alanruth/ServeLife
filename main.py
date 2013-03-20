@@ -720,6 +720,41 @@ class FollowCourseHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
+
+class SubscriptionHandler(webapp2.RequestHandler):
+    def post(self,method):
+        if method == 'email_subscription':
+            try:
+                subscriber_email = self.request.get('subscriber_email')
+                email_template = jinja_environment.get_template('basic.html')
+                salt = 'atwgwkjerfkjk2343454mf@$'
+                activation_key= hashlib.md5(email.lower()+salt).hexdigest()
+                url='http://learnmastermentor.appspot.com/email_subscription_activate?activate?email='+email+'&key='+activation_key
+                variables = {'url':url, 'today':today}
+                mail.send_mail(sender="ServeLife <alan@servelife.com",
+                               to=subscriber_email,
+                               subject="Your subscription to ServeLife is one step away!",
+                               body="no html version",
+                               html=email_template.render(variables))
+                self.response.out.write('ok')
+            except:
+                self.response.out.write('error')
+        elif method=='email_subscription_activate':
+            #add to subscribers list
+            email = self.request.get('email')
+            key = self.request.get('key')
+            salt = 'atwgwkjerfkjk2343454mf@$'
+            if hashlib.md5(email.lower()+salt).hexdigest() == key:
+                Subscriber(email = email).put()
+                self.response.write('ok')
+            else:
+                self.response.write('error')
+
+
+
+
+
+
 #ABR not used yet - moved to clean up
 # class TeamProfileHandler(SLRequestHandler):
 #     def get(self):
@@ -825,7 +860,9 @@ app = webapp2.WSGIApplication([
                                   ('/follow/(?P<followed>.*)', FollowUserHandler),
                                   ('/followcourse/(?P<followed>.*)', FollowCourseHandler),
                                   ('/followtopic/(?P<followed>.*)', FollowTopicHandler),
-                                  ('/search/(?P<index>.*)', SearchHandler)
+                                  ('/search/(?P<index>.*)', SearchHandler),
+                                  ('/email_subscription',SubscriptionHandler),
+                                  ('/email_subscription_sctivate',SubscriptionHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),
