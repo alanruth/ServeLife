@@ -1,8 +1,11 @@
 from google.appengine.ext import db
 from google.appengine.ext.db import polymodel
 
+
 class Subscriber(db.Model):
     email = db.StringProperty(required=True)
+    created = db.DateTimeProperty(required=True,auto_now_add=True)
+
 
 class User(db.Model):
     user_name      = db.StringProperty(required = True)
