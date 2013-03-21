@@ -5,418 +5,414 @@
 {% block description %}"Learn with purpose! ServeLife helps you acquire knowledge and put that knowledge to work building real world experience. Contribute. Collaborate. Be Discovered."{% endblock description %}
 
 {% block navbar %}
-  <!-- PUBLIC NAVBAR - USER NOT SIGNED IN -->
-  <header class="navbar navbar-fixed-top">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<!-- PUBLIC NAVBAR - USER NOT SIGNED IN -->
+<header class="navbar navbar-fixed-top">
     <nav class="navbar-inner">
-      <div class="container">
-        <!-- begins navbar -->
-        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </a>
-        <a href="/" class="brand scroller" data_section="body">
-          <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png"/>
-        </a>
+        <div class="container">
+            <!-- begins navbar -->
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a href="/" class="brand scroller" data_section="body">
+                <img alt="ServeLife" src="/static/img/ServeLifeLogo185x41_white.png"/>
+            </a>
 
-        <div class="nav-collapse collapse">
-          <ul class="nav pull-right">
-            <li><a href="#" class="scroller" data-section="#features">Benefits</a></li>
-            <li><a href="#" class="scroller" data-section="#pricing">Pricing</a></li>
-            <li><a href="#" class="scroller" data-section="#about">About</a></li>
-            <li><a href="/innovationintheenterprise">Podcasts</a></li>
-            <!--<li><a href="#">Blog</a></li>-->
-            <li>
-              <a href="/signup" class="btn-header">Sign up</a>
-            </li>
-            <li>
-              <a href="/signin" class="btn-header">Login</a>
-            </li>
-          </ul>
+            <div class="nav-collapse collapse">
+                <ul class="nav pull-right">
+                    <li><a href="#" class="scroller" data-section="#features">Benefits</a></li>
+                    <li><a href="#" class="scroller" data-section="#pricing">Pricing</a></li>
+                    <li><a href="#" class="scroller" data-section="#about">About</a></li>
+                    <li><a href="/innovationintheenterprise">Podcasts</a></li>
+                    <!--<li><a href="#">Blog</a></li>-->
+                    <li>
+                        <a href="/signup" class="btn-header">Sign up</a>
+                    </li>
+                    <li>
+                        <a href="/signin" class="btn-header">Login</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
     </nav>
-  </header>
-  <!-- ends public navbar -->
+</header>
+<!-- ends public navbar -->
 {% endblock navbar %}
 
 {% block page %}
-	<div id="main" role="main">
-  	<div class="container">
-    	<div class="content">
-      	<div class="row">
-        	<div class="span12">
-						<a href="#" class="scrolltop">
-						  <span>up</span>
-						</a>
-						<div id="fb-root"></div>
-						<script>(function(d, s, id) {
-						    var js, fjs = d.getElementsByTagName(s)[0];
-						    if (d.getElementById(id)) return;
-						    js = d.createElement(s); js.id = id;
-						    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-						    fjs.parentNode.insertBefore(js, fjs);
-						}(document, 'script', 'facebook-jssdk'));</script>
+<div id="main" role="main">
+<div class="container">
+<div class="content">
+<div class="row">
+<div class="span12">
+<a href="#" class="scrolltop">
+    <span>up</span>
+</a>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 
-						<!-- coming soon -->
-						<div id="comingsoon" class="comingsoon_page">
-						  <div class="container">
-						    <div class="countdown">
-						      <div class="row">
-						        <div class="span6 left">
-                                    <div class="social_header pull-right">
-                                        <!-- Place this tag where you want the +1 button to render. -->
-                                        <div class="g-plusone" data-size="medium"></div>
-                                        <div class="fb-like" data-href="http://www.servelife.com" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false"></div>
-                                        <a href="http://innovationintheenterprise.libsyn.com/rss"><img alt="rss" src="/static/img/rssfeed20.png" /></a>
-                                        <!--<span class="rss-feed-desc">Podcast RSS</span>-->
-                                    </div>
-                                    <!-- Place this tag after the last +1 button tag. -->
-                                    <script type="text/javascript">
-                                        (function() {
-                                            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-                                            po.src = 'https://apis.google.com/js/plusone.js';
-                                            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-                                        })();
-                                    </script>
+<!-- coming soon -->
+<div id="comingsoon" class="comingsoon_page">
+    <div class="container">
+        <div class="countdown">
+            <div class="row">
+                <div class="span6 left">
+                    <div class="social_header pull-right">
+                        <!-- Place this tag where you want the +1 button to render. -->
+                        <div class="g-plusone" data-size="medium"></div>
+                        <div class="fb-like" data-href="http://www.servelife.com" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false"></div>
+                        <a href="http://innovationintheenterprise.libsyn.com/rss"><img alt="rss" src="/static/img/rssfeed20.png" /></a>
+                        <!--<span class="rss-feed-desc">Podcast RSS</span>-->
+                    </div>
+                    <!-- Place this tag after the last +1 button tag. -->
+                    <script type="text/javascript">
+                        (function() {
+                            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+                            po.src = 'https://apis.google.com/js/plusone.js';
+                            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+                        })();
+                    </script>
 
-						          <h1>TRANSFORM KNOWLEDGE INTO EXPERIENCE BY DOING.</h1>
-                                  <ul>
-                                      <li>
-                                          Topics
-                                      </li>
-                                  </ul>
+                    <h1>Hi! We're ServeLife...</h1>
+                    <p>
+                        We are hard at work building a new and exciting platform that will enable you to build expertise
+                        on topics of your interest and then find opportunities to put that knowledge to work . Our ecosystem will facilitate knowledge discovery,
+                        encourage collaboration and foster a global community of initiators that seek to better themselves
+                        and the world around them.
+                    </p>
+                    <p>
+                        Subscribe today for early access. We seek qualified individuals willing to contribute their expertise
+                        towards the success of one of our pre-launch learning projects.
+                    </p>
+                    <div class="form-inline">
+                        <input type="text" id="myemail"> <button class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</button>
+                    </div>
 
-                                    <p>
-                                    We all learn best when we are hard at work building a new and exciting learning platform that will enable you to build expertise
-                                    and find opportunities to put that knowledge to work. Our ecosystem will facilitate knowledge discovery,
-						            encourage collaboration and foster a global community of initiators that seek to better themselves
-						            and the world around them.
-						          </p>
-						          <p>
-						            Sign up today for early access. We seek qualified individuals willing to contribute their expertise
-						            towards the success of one of our pre-launch learning projects.
-						          </p
-                                    <div class="form-inline">
-                                        <input type="text" id="myemail"> <button class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</button>
-                                    </div>
+                    <script>
+                        $(document).ready(function() {
 
-                                    <script>
-                                        $(document).ready(function() {
+                            $('#betasignup').on('click', function(e) {
+                                // follow a topic
+                                var subscription_email = $('#myemail').val();
+                                //alert(subscription_email)
+                                $.ajax({
+                                    data:{'subscriber_email':subscription_email},
+                                    url: "/email/email_subscription",
+                                    async: true,
+                                    type: "POST",
+                                    success: function(response) {
+                                        $('#betasignup').html('check your mail!');
+                                    },
+                                    error: function(response) {
+                                        $('#betasignup').html('error!');
+                                    }
+                                });
+                            });
+                        });
 
-                                            $('#betasignup').on('click', function(e) {
-                                                // follow a topic
-                                                var subscription_email = $('#myemail').val();
-                                                //alert(subscription_email)
-                                                $.ajax({
-                                                    data:{'subscriber_email':subscription_email},
-                                                    url: "/email/email_subscription",
-                                                    async: true,
-                                                    type: "POST",
-                                                    success: function(response) {
-                                                        $('#betasignup').html('check your mail!');
-                                                    },
-                                                    error: function(response) {
-                                                        $('#betasignup').html('error!');
-                                                    }
-                                                });
-                                            });
-                                        });
+                    </script>
 
-                                    </script>
-						        </div>
-						        <div class="span6 right">
-						          <div>
-						            <iframe width="560" height="315" src="http://www.youtube.com/embed/CRlSeZL1ylY?rel=0" frameborder="0" allowfullscreen></iframe>
-						          </div>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-						</div>
+                </div>
+                <div class="span6 right">
+                    <div>
+                        <iframe width="560" height="315" src="http://www.youtube.com/embed/CRlSeZL1ylY?rel=0" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-						<!-- Intro
-						<div id="intro">
-						  <div class="container">
-						    <p>Learning without mastery is a hobby. Mastery without mentoring is selfish. Combine the three and you have the
-						      essentials of a satisfied life. Join ServeLife today and begin the journey to the best version of yourself
-						      possible.</p>
-						  </div>
-						</div> -->
+<!-- Intro -->
+<div id="intro">
+    <div class="container">
+        <p>Learning without mastery is a hobby. Mastery without mentoring is selfish. Combine the three and you have the
+            essentials of a satisfied life. Join ServeLife today and begin the journey to the best version of yourself
+            possible.</p>
+    </div>
+</div>
 
-						<!-- features -->
-						<div id="features">
-						  <div class="container">
-						    <!-- header -->
-						    <!--<h2 class="section_header">
-						      <hr class="left visible-desktop">
-						      <span>Benefits</span>
-						      <hr class="right visible-desktop">
-						    </h2> -->
+<!-- features -->
+<div id="features">
+    <div class="container">
+        <!-- header -->
+        <h2 class="section_header">
+            <hr class="left visible-desktop">
+            <span>Benefits</span>
+            <hr class="right visible-desktop">
+        </h2>
 
-						    <!-- feature list -->
-						    <div class="row">
-						      <div class="span4 feature">
-						        <img alt="feature1" class="thumb" src="../static/img/wordcloud.png" />
-						        <h3>
-						          <img alt="Learn" src="../static/img/lightbulb.png" />
-						          Discover New Knowledge
-						        </h3>
+        <!-- feature list -->
+        <div class="row">
+            <div class="span4 feature">
+                <img alt="feature1" class="thumb" src="../static/img/wordcloud.png" />
+                <h3>
+                    <img alt="Learn" src="../static/img/lightbulb.png" />
+                    Discover New Knowledge
+                </h3>
 
-						        <p class="description">
-						          All content is generated by ServeLife members. Content is tagged, aggregated and curated to enable easy
-						          search and quick access to ServeLife's expanding body of knowledge. Follow topics of interest
-						          and we'll keep you up to date via live streams of relevant content.
-						        </p>
-						        <!--<a href="#" class="btn btn-default">more</a>-->
-						      </div>
-						      <div class="span4 feature">
-						        <img alt="feature2" class="thumb" src="../static/img/peopleglobe.png" />
-						        <h3>
-						          <img alt="Master" src="../static/img/group.png" />
-						          Collaborate to Learn
-						        </h3>
+                <p class="description">
+                    All content is generated by ServeLife members. Content is tagged, aggregated and curated to enable easy
+                    search and quick access to ServeLife's expanding body of knowledge. Follow topics of interest
+                    and we'll keep you up to date via live streams of relevant content.
+                </p>
+                <!--<a href="#" class="btn btn-default">more</a>-->
+            </div>
+            <div class="span4 feature">
+                <img alt="feature2" class="thumb" src="../static/img/peopleglobe.png" />
+                <h3>
+                    <img alt="Master" src="../static/img/group.png" />
+                    Collaborate to Learn
+                </h3>
 
-						        <p class="description">
-						          Join with others from around the world and work together to accomplish objectives and achieve project success.
-						          Learn from those who have the skills you seek. Contribute your knowledge and mentor others as they develop expertise.
-						          Better yourself while helping the world around you.
-						        </p>
-						        <!--<a href="#" class="btn btn-default">more</a>-->
-						      </div>
-						      <div class="span4 feature">
-						        <img alt="feature3" class="thumb" src="../static/img/profile.png" />
-						        <!--<img src="feature3.jpg" alt="feature3" class="thumb" />  -->
-						        <h3>
-						          <img alt="transform" src="../static/img/magic.png" />
-						          <!--<i class="i_movil"></i>-->
-						          Transform into Expertise
-						        </h3>
+                <p class="description">
+                    Join with others from around the world and work together to accomplish objectives and achieve project success.
+                    Learn from those who have the skills you seek. Contribute your knowledge and mentor others as they develop expertise.
+                    Better yourself while helping the world around you.
+                </p>
+                <!--<a href="#" class="btn btn-default">more</a>-->
+            </div>
+            <div class="span4 feature">
+                <img alt="feature3" class="thumb" src="../static/img/profile.png" />
+                <!--<img src="feature3.jpg" alt="feature3" class="thumb" />  -->
+                <h3>
+                    <img alt="transform" src="../static/img/magic.png" />
+                    <!--<i class="i_movil"></i>-->
+                    Transform into Expertise
+                </h3>
 
-						        <p class="description">
-						          Learn with a purpose and convert knowledge into real-world experience through active participation. All
-						          contributions and feedback gained drive your ServeLife reputation and influence rankings.
-						          So go ahead! Pick yourself. Take control of your destiny. Be discovered for your expertise.
+                <p class="description">
+                    Learn with a purpose and convert knowledge into real-world experience through active participation. All
+                    contributions and feedback gained drive your ServeLife reputation and influence rankings.
+                    So go ahead! Pick yourself. Take control of your destiny. Be discovered for your expertise.
 
-						        </p>
-						        <!--<a href="#" class="btn btn-default">more</a>-->
-						      </div>
-						    </div>
-						  </div>
-						</div>
+                </p>
+                <!--<a href="#" class="btn btn-default">more</a>-->
+            </div>
+        </div>
+    </div>
+</div>
 
-						<!-- starts pricing -->
-						<div id="pricing">
-						  <div class="container">
-						    <!-- header -->
-						    <h2 class="section_header">
-						      <hr class="left visible-desktop">
+<!-- starts pricing -->
+<div id="pricing">
+    <div class="container">
+        <!-- header -->
+        <h2 class="section_header">
+            <hr class="left visible-desktop">
 						                <span>
 						                    Pricing
 						                    <small><strong>
-						                      Free during beta period.
-						                    </strong></small>
+                                                Free during beta period.
+                                            </strong></small>
 						                </span>
-						      <hr class="right visible-desktop">
-						    </h2>
+            <hr class="right visible-desktop">
+        </h2>
 
-						    <!-- pricing charts -->
-						    <div class="row">
-						      <div class="span4">
-						        <div class="price_wrapper lite regular">
-						          <header>
-						            <span>Apprentice</span>
+        <!-- pricing charts -->
+        <div class="row">
+            <div class="span4">
+                <div class="price_wrapper lite regular">
+                    <header>
+                        <span>Apprentice</span>
 
-						            <div class="price">
-						              <span>$ 5</span>
-						              Per Month
-						            </div>
-						          </header>
-						          <section>
-						            <h3>Starter package includes:</h3>
-						            <ul class="perks">
-						              <li>
-						                <i class="i_shuffle"></i>
-						                Contribute on 1 ServeLife project
-						              </li>
-						              <li>
-						                <i class="i_bars"></i>
-						                Popular social site integrations
-						              </li>
-						              <li>
-						                <i class="i_loading"></i>
-						                Public ServeLife profile
-						              </li>
-						              <li>
-						                <i class="i_loading"></i>
-						                Full access to ecosystem
-						              </li>
-						            </ul>
-						            <a href="/requestors/new" class="btn">Join now</a>
-						          </section>
-						        </div>
-						      </div>
-						      <div class="span4">
-						        <div class="price_wrapper pro">
-						          <header>
-						            <span>Journeyman</span>
+                        <div class="price">
+                            <span>$ 5</span>
+                            Per Month
+                        </div>
+                    </header>
+                    <section>
+                        <h3>Starter package includes:</h3>
+                        <ul class="perks">
+                            <li>
+                                <i class="i_shuffle"></i>
+                                Contribute on 1 ServeLife project
+                            </li>
+                            <li>
+                                <i class="i_bars"></i>
+                                Popular social site integrations
+                            </li>
+                            <li>
+                                <i class="i_loading"></i>
+                                Public ServeLife profile
+                            </li>
+                            <li>
+                                <i class="i_loading"></i>
+                                Full access to ecosystem
+                            </li>
+                        </ul>
+                        <a href="/requestors/new" class="btn">Join now</a>
+                    </section>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="price_wrapper pro">
+                    <header>
+                        <span>Journeyman</span>
 
-						            <div class="price">
-						              <span>$ 9.99</span>
-						              Per Month
-						            </div>
-						          </header>
-						          <section>
-						            <h3><strong>Journeyman free during beta:</strong></h3>
-						            <ul class="perks">
-						              <li>
-						                <i class="i_loading"></i>
-						                Contribute on 3 ServeLife projects
-						              </li>
-						              <li>
-						                <i class="i_shuffle"></i>
-						                Ability to create ServeLife projects
-						              </li>
-						              <li>
-						                <i class="i_bars"></i>
-						                Popular social site integrations
-						              </li>
-						              <li>
-						                <i class="i_bookmark"></i>
-						                Public ServeLife profile
-						              </li>
-						              <li>
-						                <i class="i_bars"></i>
-						                Full access to ecosystem
-						              </li>
-						            </ul>
-						            <a href="/requestors/new" class="btn">Join now</a>
-						          </section>
-						        </div>
-						      </div>
-						      <div class="span4">
-						        <div class="price_wrapper standard regular">
-						          <header>
-						            <span>Craftsman</span>
+                        <div class="price">
+                            <span>$ 9.99</span>
+                            Per Month
+                        </div>
+                    </header>
+                    <section>
+                        <h3><strong>Journeyman free during beta:</strong></h3>
+                        <ul class="perks">
+                            <li>
+                                <i class="i_loading"></i>
+                                Contribute on 3 ServeLife projects
+                            </li>
+                            <li>
+                                <i class="i_shuffle"></i>
+                                Ability to create ServeLife projects
+                            </li>
+                            <li>
+                                <i class="i_bars"></i>
+                                Popular social site integrations
+                            </li>
+                            <li>
+                                <i class="i_bookmark"></i>
+                                Public ServeLife profile
+                            </li>
+                            <li>
+                                <i class="i_bars"></i>
+                                Full access to ecosystem
+                            </li>
+                        </ul>
+                        <a href="/requestors/new" class="btn">Join now</a>
+                    </section>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="price_wrapper standard regular">
+                    <header>
+                        <span>Craftsman</span>
 
-						            <div class="price">
-						              <span>$ 25</span>
-						              Per Month
-						            </div>
-						          </header>
-						          <section>
-						            <h3>Craftsman package includes:</h3>
-						            <ul class="perks">
-						              <li>
-						                <i class="i_loading"></i>
-						                Contribute on 5 ServeLife projects
-						              </li>
-						              <li>
-						                <i class="i_shuffle"></i>
-						                Ability to create ServeLife projects
-						              </li>
-						              <li>
-						                <i class="i_bars"></i>
-						                Popular social site integrations
-						              </li>
-						              <li>
-						                <i class="i_bookmark"></i>
-						                Public ServeLife profile
-						              </li>
-						              <li>
-						                <i class="i_bars"></i>
-						                Full access to ecosystem
-						              </li>
-						            </ul>
-						            <a href="/requestors/new" class="btn">Join now</a>
-						          </section>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-						</div>
-
-						<!-- starts About Us -->
-						<div id="about">
-						  <div class="container">
-						    <!-- Header -->
-						    <h2 class="section_header team">
-						      <hr class="left visible-desktop">
-						      <span>About Us</span>
-						      <hr class="right visible-desktop">
-						    </h2>
-
-						    <div class="row">
-						      <div class="span12 mission">
-						        <h3>Our mission isn't to change the world. Instead we endeavor to equip those who will.</h3>
-						        <div class="row">
-						        <div class="span6">
-						          <p>Tired of waiting on someone else to give us opportunities, we chose to take control of our destiny. We
-						          needed a better way to acquire knowledge, a catalyst to convert knowledge into real-world expertise and access to mentors
-						          and coaches to guide us along the way. Out of these needs, ServeLife was created.</p>
-						        </div>
-						        <div class="span6">
-						          <p>Our focus is to build a global community of initiators that seek to transform knowledge into expertise to
-						          better themselves and those around them. Our technologies and solutions target those who love to learn/try/discover
-						          and do/build/create.</p>
-						        </div>
-						      </div>
-						      </div>
-						    </div>
-						    <div class="row">
-						      <div class="span2 teammate">
-						        <img alt="Alan Ruth" src="../static/img/alan.png" />
-						      </div>
-						      <div class="span4 teammate">
-						        <h5>Alan Ruth</h5>
-
-						        <p>Founder</p>
-						        <hr>
-						      </div>
-
-						      <div class="span2 teammate">
-						        <img alt="Anubhav Sinha" src="../static/img/anubhav.png" />
-						      </div>
-						      <div class="span4 teammate">
-						          <h5>Anubhav Sinha</h5>
-
-						          <p>Co-founder</p>
-						          <hr>
-						      </div>
-						    </div>
-						    <div class="row">
-						      <div class="span6 teammate">
-						          <p class="description">
-						            Alan is ServeLife's founder and creator of the organization's vision. He leads the execution of
-						            the venture's business plan and realization of its technology applications. Alan brings over 17 years of
-						            diverse technology leadership within start-ups, consulting, corporate IT and high growth enterprises.
-						          </p>
-						        <div class="social">
-						          <a href="http://www.linkedin.com/in/alanruth"><img alt="LinkedIn" src="../static/img/linked_in.png" /></a>
-						          <a href="skype://alan.ruth"><img alt="skype" src="../static/img/skype.png" /></a>
-						          <a href="mail://alan@notionlabs.com"><img alt="email" src="../static/img/e-mail.png" /></a>
-						        </div>
-						      </div>
-						      <div class="span6 teammate">
-						        <p class="description">
-						          Anubhav is ServeLife's co-founder and technology leader. He leads the development of the venture's
-						          recommendation, influence algorithms in addition to applying machine learning to evaluate skill
-						          development. Anubhav is a programmer by profession with a strong background in web application engineering
-						          and machine learning.
-						        </p>
-
-						        <div class="social">
-						          <a href="http://www.linkedin.com/in/anubhavsinha27"><img alt="LinkedIn" src="../static/img/linked_in.png" /></a>
-						          <a href="skype://anubhavsinha.27"><img alt="skype" src="../static/img/skype.png" /></a>
-						          <a href="mail://anubhav@notionlabs.com"><img alt="email" src="../static/img/e-mail.png" /></a>
-						        </div>
-						      </div>
-						    </div>
-				      </div>
-				    </div>
-				  </div>
+                        <div class="price">
+                            <span>$ 25</span>
+                            Per Month
+                        </div>
+                    </header>
+                    <section>
+                        <h3>Craftsman package includes:</h3>
+                        <ul class="perks">
+                            <li>
+                                <i class="i_loading"></i>
+                                Contribute on 5 ServeLife projects
+                            </li>
+                            <li>
+                                <i class="i_shuffle"></i>
+                                Ability to create ServeLife projects
+                            </li>
+                            <li>
+                                <i class="i_bars"></i>
+                                Popular social site integrations
+                            </li>
+                            <li>
+                                <i class="i_bookmark"></i>
+                                Public ServeLife profile
+                            </li>
+                            <li>
+                                <i class="i_bars"></i>
+                                Full access to ecosystem
+                            </li>
+                        </ul>
+                        <a href="/requestors/new" class="btn">Join now</a>
+                    </section>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+
+<!-- starts About Us -->
+<div id="about">
+    <div class="container">
+        <!-- Header -->
+        <h2 class="section_header team">
+            <hr class="left visible-desktop">
+            <span>About Us</span>
+            <hr class="right visible-desktop">
+        </h2>
+
+        <div class="row">
+            <div class="span12 mission">
+                <h3>Our mission isn't to change the world. Instead we endeavor to equip those who will.</h3>
+                <div class="row">
+                    <div class="span6">
+                        <p>Tired of waiting on someone else to give us opportunities, we chose to take control of our destiny. We
+                            needed a better way to acquire knowledge, a catalyst to convert knowledge into real-world expertise and access to mentors
+                            and coaches to guide us along the way. Out of these needs, ServeLife was created.</p>
+                    </div>
+                    <div class="span6">
+                        <p>Our focus is to build a global community of initiators that seek to transform knowledge into expertise to
+                            better themselves and those around them. Our technologies and solutions target those who love to learn/try/discover
+                            and do/build/create.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="span2 teammate">
+                <img alt="Alan Ruth" src="../static/img/alan.png" />
+            </div>
+            <div class="span4 teammate">
+                <h5>Alan Ruth</h5>
+
+                <p>Founder</p>
+                <hr>
+            </div>
+
+            <div class="span2 teammate">
+                <img alt="Anubhav Sinha" src="../static/img/anubhav.png" />
+            </div>
+            <div class="span4 teammate">
+                <h5>Anubhav Sinha</h5>
+
+                <p>Co-founder</p>
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            <div class="span6 teammate">
+                <p class="description">
+                    Alan is ServeLife's founder and creator of the organization's vision. He leads the execution of
+                    the venture's business plan and realization of its technology applications. Alan brings over 17 years of
+                    diverse technology leadership within start-ups, consulting, corporate IT and high growth enterprises.
+                </p>
+                <div class="social">
+                    <a href="http://www.linkedin.com/in/alanruth"><img alt="LinkedIn" src="../static/img/linked_in.png" /></a>
+                    <a href="skype://alan.ruth"><img alt="skype" src="../static/img/skype.png" /></a>
+                    <a href="mail://alan@notionlabs.com"><img alt="email" src="../static/img/e-mail.png" /></a>
+                </div>
+            </div>
+            <div class="span6 teammate">
+                <p class="description">
+                    Anubhav is ServeLife's co-founder and technology leader. He leads the development of the venture's
+                    recommendation, influence algorithms in addition to applying machine learning to evaluate skill
+                    development. Anubhav is a programmer by profession with a strong background in web application engineering
+                    and machine learning.
+                </p>
+
+                <div class="social">
+                    <a href="http://www.linkedin.com/in/anubhavsinha27"><img alt="LinkedIn" src="../static/img/linked_in.png" /></a>
+                    <a href="skype://anubhavsinha.27"><img alt="skype" src="../static/img/skype.png" /></a>
+                    <a href="mail://anubhav@notionlabs.com"><img alt="email" src="../static/img/e-mail.png" /></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 {% endblock %}
