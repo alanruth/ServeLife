@@ -116,6 +116,12 @@
                                     }
                                 });
                             });
+
+                            $('#myemail').keypress(function(e) {
+                                if(e.which == 13){//Enter Key Pressed
+                                    $('#betasignup').click();//Trigger click
+                                }
+                            });
                         });
 
                     </script>

@@ -837,7 +837,7 @@ class SubscriptionHandler(webapp2.RequestHandler):
                 except:
                     self.response.out.write('mail config not working..')
             else:
-                self.response.out.write('email already exists..')
+                self.response.out.write('email already exists')
 
     def get(self,method):
 
