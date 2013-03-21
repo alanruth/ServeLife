@@ -30,6 +30,7 @@
 <body>
 
 {% block navbar %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <!-- PUBLIC NAVBAR - USER NOT SIGNED IN -->
     <header class="navbar navbar-fixed-top">
         <nav class="navbar-inner">
@@ -46,14 +47,14 @@
 
                 <div class="nav-collapse collapse">
                     <ul class="nav pull-right">
-                        <li><a href="#" class="scroller" data-section="#features">Benefits</a></li>
-                        <li><a href="#" class="scroller" data-section="#pricing">Pricing</a></li>
-                        <li><a href="#" class="scroller" data-section="#about">About</a></li>
+                        <li><a href="/#features" class="scroller" data-section="#features">Benefits</a></li>
+                        <li><a href="/#pricing" class="scroller" data-section="#pricing">Pricing</a></li>
+                        <li><a href="/#about" class="scroller" data-section="#about">About</a></li>
                         <li><a href="/innovationintheenterprise">Podcasts</a></li>
                         <!--<li><a href="#">Blog</a></li>-->
-                        <li>
+                        <!--<li>
                             <a href="/signup" class="btn-header">Sign up</a>
-                        </li>
+                        </li>-->
                         <li>
                             <a href="/signin" class="btn-header">Login</a>
                         </li>

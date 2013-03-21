@@ -819,17 +819,17 @@ class SubscriptionHandler(webapp2.RequestHandler):
             subscriber_email = str(self.request.get('subscriber_email'))
             subscriber_exists = Subscriber.all().filter('email =', subscriber_email).get()
             if not subscriber_exists:
-                email_template = jinja_environment.get_template('email.html')
+                email_template = jinja_environment.get_template('subscriber.html')
                 salt = 'atwgwkjerfkjk2343454mf@$'
                 activation_key= hashlib.md5(subscriber_email.lower()+salt).hexdigest()
                 url_enc = urllib.urlencode({'email':subscriber_email,'key':activation_key})
                 activation_link=domain + '/email/email_subscription_activate?'+url_enc
                 #variables = {'url': url}
                 try:
-                    mail.send_mail(sender="mailer@servelife.com",
+                    mail.send_mail(sender="alan@notionlabs.com",
                                    to=subscriber_email,
-                                   subject="Activate your Servelife account!",
-                                   body="no html version",
+                                   subject="Thank You For Signing Up for ServeLife!",
+                                   body="Welcome to ServeLife! ServeLife is a global team of life-long learners working hard to build a better way to effectively transform knowledge into expertise.",
                                    html=email_template.render({'activation_link':activation_link}))
                     self.response.out.write('ok')
                     new_subscriber = Subscriber(email=subscriber_email)
