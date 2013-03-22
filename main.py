@@ -843,7 +843,7 @@ class SubscriptionHandler(webapp2.RequestHandler):
                                    body="Welcome to ServeLife! ServeLife is a global team of life-long learners working hard to build a better way to effectively transform knowledge into expertise.",
                                    html=email_template.render({'activation_link':activation_link}))
                     self.response.out.write('ok')
-                    new_subscriber = Subscriber(email=subscriber_email)
+                    new_subscriber = Subscriber(email=subscriber_email, verified=False)
                     new_subscriber.put()
                 except:
                     self.response.out.write('something went wrong..we will fix this error!')
@@ -858,7 +858,9 @@ class SubscriptionHandler(webapp2.RequestHandler):
             key = self.request.get('key')
             salt = 'atwgwkjerfkjk2343454mf@$'
             if hashlib.md5(email.lower()+salt).hexdigest() == key:
-                Subscriber(email = email).put()
+                real_subscriber = Subscriber.all().filter('email =', email).get()
+                real_subscriber.verified=True
+                real_subscriber.put()
                 self.response.write('ok')
             else:
                 self.response.write(email+','+key)

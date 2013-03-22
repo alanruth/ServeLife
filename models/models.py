@@ -5,6 +5,7 @@ from google.appengine.ext.db import polymodel
 class Subscriber(db.Model):
     email = db.StringProperty(required=True)
     created = db.DateTimeProperty(required=True,auto_now_add=True)
+    verified = db.BooleanProperty(required=True)
 
 
 class User(db.Model):
