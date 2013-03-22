@@ -1,7 +1,13 @@
 servelife
 ==========
 
-Alan and Anub building great stuff!
+Learning without mastery is a hobby.
+
+Mastery without mentoring is selfish.
+
+Combine the three and you have the essentials of a satisfied life.
+
+Join ServeLife today and begin the journey to the best version of yourself possible.
 
 Git Branching
 =============
