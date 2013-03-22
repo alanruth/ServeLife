@@ -127,9 +127,10 @@ class LandingPageHandler(SLRequestHandler):
 
 class PodcastHandler(SLRequestHandler):
     def get(self):
-        template = jinja_environment.get_template('innovationintheenterprise.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+        self.redirect('http://enterpriseinnovation.tumblr.com')
+        # template = jinja_environment.get_template('innovationintheenterprise.html')
+        # variables = {}
+        # self.response.out.write(template.render(variables))
 
 
 class UserProfileNewHandler(SLRequestHandler):
@@ -861,15 +862,25 @@ class SubscriptionHandler(webapp2.RequestHandler):
                 real_subscriber = Subscriber.all().filter('email =', email).get()
                 real_subscriber.verified=True
                 real_subscriber.put()
-                self.response.write('ok')
+
+                template = jinja_environment.get_template('subscriberconfirm.html')
+                variables = {}
+                self.response.out.write(template.render(variables))
+                #self.response.write('ok')
             else:
                 self.response.write(email+','+key)
 
 
+class TestHandler(SLRequestHandler):
+    def get(self):
+        template = jinja_environment.get_template('subscriberconfirm.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
 
 app = webapp2.WSGIApplication([
                                   (r'/', LandingPageHandler),
                                   ('/innovationintheenterprise', PodcastHandler),
+                                  ('/testsubscriber', TestHandler),
                                   ('/member/profile/(?P<user_name>.*)', UserExternalProfileHandler),
                                   ('/topic/profile/(?P<topic_name>.*)', TopicExternalProfileHandler),
                                   ('/project/profile/(?P<project_name>.*)', ProjectExternalProfileHandler),
