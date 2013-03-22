@@ -44,21 +44,30 @@
                         })();
                     </script>
 
-				    <h1>TRANSFORM LEARNING
-                        INTO EXPERIENCE BY DOING.</h1>
+				    <h3>TRANSFORM YOUR LEARNING
+                        INTO EXPERIENCE!</h3>
                     <p>
                         We are hard at work building a new and exciting platform that will enable you to build expertise
-                        on topics of your interest and then find opportunities to put that knowledge to work . Our ecosystem will facilitate knowledge discovery,
-                        encourage collaboration and foster a global community of initiators that seek to better themselves
-                        and the world around them.
+                        on topics of your interest and then find opportunities to put that knowledge to work .
                     </p>
 
-                    <div class="form-inline">
-                        <input type="text" id="myemail"> <button class="btn btn-primary btn-large" id="betasignup">Sign Up Now &raquo;</button>
+                    <div class="form-horizontal">
+                        <label id="msgbox" class="alert alert-info"></label>
+                        <label>
+                            <input type="text" id="myemail" class="input-xxlarge" placeholder="Share your email to get early access. It will be secure with us. Promise. ">
+                        </label>
+
+                        <button class="btn btn-success btn-large" id="betasignup">Ok. Sign me up for early access &raquo;</button>
+
+
                     </div>
+                    <p>Our ecosystem will facilitate knowledge discovery,
+                        encourage collaboration and foster a global community of self-initiated learners that seek to better themselves
+                        and the world around them.</p>
 
                     <script>
                         $(document).ready(function() {
+                            $("#msgbox").hide();
 
                             $('#betasignup').on('click', function(e) {
                                 // follow a topic
@@ -70,10 +79,28 @@
                                     async: true,
                                     type: "POST",
                                     success: function(response) {
-                                        $('#betasignup').html('check your mail!');
+
+                                        if (response=='ok'){
+                                            $('#betasignup').addClass('disabled');
+                                            $('#betasignup').html('Thank you :)');
+                                            $("#msgbox").fadeIn();
+                                            $('#msgbox').html('Please check your mail for a verification link.');
+                                        }
+                                        if (response=='invalid'){
+                                            $("#msgbox").fadeIn();
+                                            $('#msgbox').html('Please fill in a valid email id');
+                                        }
+                                        if(response=='exists'){
+                                            $("#msgbox").fadeIn();
+                                            $('#msgbox').html('We have already got this email id in our records!');
+
+                                        }
+
+
                                     },
                                     error: function(response) {
-                                        $('#betasignup').html('error!');
+                                        $('#betasignup').addClass('disabled');
+                                        $('#betasignup').html('Something went wrong. We will be fixing this!');
                                     }
                                 });
                             });

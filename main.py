@@ -6,8 +6,7 @@ import json
 import urllib
 import hashlib
 import logging
-
-
+import re
 import webapp2
 import jinja2
 from google.appengine.api import mail
@@ -38,6 +37,13 @@ def get_gravatar_url(size, email):
     gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
     gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
     return gravatar_url
+
+
+#utility function to check for validations
+valid = {'email':r"^[\S]+@[\S]+\.[\S]+$"}
+def is_valid(user_input,regex):
+    regex_compiled = re.compile(regex)
+    return regex_compiled.match(user_input)
 
 jinja_environment.filters['get_gravatar_url'] = get_gravatar_url
 
@@ -817,6 +823,11 @@ class SubscriptionHandler(webapp2.RequestHandler):
         if method == 'email_subscription':
 
             subscriber_email = str(self.request.get('subscriber_email'))
+            if not is_valid(subscriber_email, valid['email']):
+                self.response.write('invalid')
+                return
+
+
             subscriber_exists = Subscriber.all().filter('email =', subscriber_email).get()
             if not subscriber_exists:
                 email_template = jinja_environment.get_template('subscriber.html')
@@ -835,9 +846,9 @@ class SubscriptionHandler(webapp2.RequestHandler):
                     new_subscriber = Subscriber(email=subscriber_email)
                     new_subscriber.put()
                 except:
-                    self.response.out.write('mail config not working..')
+                    self.response.out.write('something went wrong..we will fix this error!')
             else:
-                self.response.out.write('email already exists')
+                self.response.out.write('exists')
 
     def get(self,method):
 
