@@ -371,29 +371,35 @@ class SignUpHandler(SLRequestHandler):
         email = self.request.get('email')
         username = self.request.get('username')
         password = self.request.get('password')
-        username_exists = User.all().filter('user_name =', username).get()
-        if not username_exists:
-            #save the new user unactivated
-            random_secret = "".join(random.choice(string.letters) for x in xrange(5))
-            password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
-            activation_key = hmac.new(random_secret,username).hexdigest()
-            new_user = User(email=email, user_name=username, password_hash=password_hash, activated='False', activation_key=activation_key)
-            new_user.put()
-            #mail the activation link
-            activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
-            email_template = jinja_environment.get_template('email.html')
-            try:
-                mail.send_mail(sender="ServeLife <alan@servelife.com>",
-                                to=email,
-                                subject="Activate your Servelife account!",
-                                body="no html version",
-                                html=email_template.render({'activation_link':activation_link}))
-            except:
-                self.response.out.write('mail config not working..')
+        passcode = self.request.get('passcode')
+        if passcode.lower == 'learnwithpurpose':
+            username_exists = User.all().filter('user_name =', username).get()
+            if not username_exists:
+                #save the new user unactivated
+                random_secret = "".join(random.choice(string.letters) for x in xrange(5))
+                password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
+                activation_key = hmac.new(random_secret,username).hexdigest()
+                new_user = User(email=email, user_name=username, password_hash=password_hash, activated='False', activation_key=activation_key)
+                new_user.put()
+                #mail the activation link
+                activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
+                email_template = jinja_environment.get_template('email.html')
+                try:
+                    mail.send_mail(sender="ServeLife <alan@servelife.com>",
+                                    to=email,
+                                    subject="Activate your Servelife account!",
+                                    body="no html version",
+                                    html=email_template.render({'activation_link':activation_link}))
+                except:
+                    self.response.out.write('mail config not working..')
 
-            template = jinja_environment.get_template('login.html')
-            variables = {'email':email}
-            self.response.out.write(template.render(variables))
+                template = jinja_environment.get_template('login.html')
+                variables = {'email':email}
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('user name already exists')
+        else:
+            self.response.out.write('Passcode is not correct')
 
 
 class ActivationHandler(SLRequestHandler):

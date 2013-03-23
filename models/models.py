@@ -15,6 +15,7 @@ class User(db.Model):
     activated     = db.StringProperty(required = True)
     activation_key= db.StringProperty(required = True)
     created       = db.DateTimeProperty(required = True,auto_now_add = True)
+    passcode    = db.StringProperty(required = False)
 
 
 class UserThinDB(db.Model):
