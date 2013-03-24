@@ -17,7 +17,7 @@ from google.appengine.ext import blobstore
 from models.models import *
 
 
-domain = 'http://localhost:8098'
+domain = 'http://localhost:8080'
 #domain = 'http://servelife.com'
 
 jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'views')))
