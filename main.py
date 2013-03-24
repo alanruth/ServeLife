@@ -4,6 +4,7 @@ import string
 import hmac
 import json
 import urllib
+#import urllib2
 import hashlib
 import logging
 import re
@@ -369,37 +370,33 @@ class SignUpHandler(SLRequestHandler):
 
     def post(self):
         email = self.request.get('email')
-        username = self.request.get('username')
+        username = self.request.get('username').lower()
         password = self.request.get('password')
-        passcode = self.request.get('passcode')
-        if passcode.lower == 'learnwithpurpose':
-            username_exists = User.all().filter('user_name =', username).get()
-            if not username_exists:
-                #save the new user unactivated
-                random_secret = "".join(random.choice(string.letters) for x in xrange(5))
-                password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
-                activation_key = hmac.new(random_secret,username).hexdigest()
-                new_user = User(email=email, user_name=username, password_hash=password_hash, activated='False', activation_key=activation_key)
-                new_user.put()
-                #mail the activation link
-                activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
-                email_template = jinja_environment.get_template('email.html')
-                try:
-                    mail.send_mail(sender="ServeLife <alan@servelife.com>",
-                                    to=email,
-                                    subject="Activate your Servelife account!",
-                                    body="no html version",
-                                    html=email_template.render({'activation_link':activation_link}))
-                except:
-                    self.response.out.write('mail config not working..')
+        username_exists = User.all().filter('user_name =', username).get()
+        if not username_exists:
+            #save the new user unactivated
+            random_secret = "".join(random.choice(string.letters) for x in xrange(5))
+            password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
+            activation_key = hmac.new(random_secret,username).hexdigest()
+            new_user = User(email=email, user_name=username, password_hash=password_hash, activated='False', activation_key=activation_key)
+            new_user.put()
+            #mail the activation link
+            activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
+            email_template = jinja_environment.get_template('email.html')
+            try:
+                mail.send_mail(sender="ServeLife <alan@servelife.com>",
+                                to=email,
+                                subject="Activate your Servelife account!",
+                                body="no html version",
+                                html=email_template.render({'activation_link':activation_link}))
+            except:
+                self.response.out.write('mail config not working..')
 
-                template = jinja_environment.get_template('login.html')
-                variables = {'email':email}
-                self.response.out.write(template.render(variables))
-            else:
-                self.response.out.write('user name already exists')
+            template = jinja_environment.get_template('login.html')
+            variables = {'email':email}
+            self.response.out.write(template.render(variables))
         else:
-            self.response.out.write('Passcode is not correct')
+            self.response.out.write('user name already exists')
 
 
 class ActivationHandler(SLRequestHandler):
@@ -877,6 +874,41 @@ class SubscriptionHandler(webapp2.RequestHandler):
                 self.response.write(email+','+key)
 
 
+class BetaSignupHandler(webapp2.RequestHandler):
+    def post(self, method):
+
+        beta_password = str(self.request.get('password'))
+
+        beta_passcode = str(self.request.get('passcode'))
+        if beta_passcode != 'learnwithpurpose':
+            self.response.write('invalid passcode')
+            return
+
+        beta_email = str(self.request.get('email'))
+        if not is_valid(beta_email, valid['email']):
+            self.response.write('invalid email')
+            return
+        else:
+            beta_user = User.all().filter('email =', beta_email).get()
+            if beta_user:
+                self.response.write('duplicate email')
+                return
+
+        beta_username = str(self.request.get('user_name')).lower()
+        username_exists = User.all().filter('user_name =', beta_username).get()
+        if username_exists:
+            self.response.write('duplicate username')
+            return
+
+        #data = urllib.urlencode({'password': beta_password, 'username': beta_username, 'email': beta_email})
+        #urllib.urlopen(domain + '/signup', data)
+
+        self.response.write('ok')
+        return
+
+
+
+
 #class TestHandler(SLRequestHandler):
 #    def get(self):
 #        template = jinja_environment.get_template('subscriberconfirm.html')
@@ -919,6 +951,7 @@ app = webapp2.WSGIApplication([
                                   ('/search/(?P<index>.*)', SearchHandler),
                                   ('/serve/([^/]+)?', ServeHandler),
                                   ('/email/(?P<method>.*)',SubscriptionHandler),
+                                  ('/betasignup/(?P<method>.*)', BetaSignupHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),

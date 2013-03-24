@@ -15,14 +15,92 @@
                             <h4>Create your account</h4>
                         </div>
                         <div class="form">
-                            <form action="/signup" method="post">
-                                <input name="passcode" type="text" placeholder="Beta Access Passcode" autofocus required/>
-                                <input name="email" type="text" placeholder="Email" required/>
-                                <input name="username" type="text" placeholder="Username" required/>
-                                <input name="password" type="password" placeholder="Password" required/>
-                                <input type="submit" class="btn" value="Sign up"/>
-                            </form>
+                            <!--<form action="/signup" method="post">-->
+                                <label id="msgbox" class="alert alert-info"></label>
+                                <input name="passcode" type="text" placeholder="Beta Access Passcode" autofocus required id="beta_passcode"/>
+                                <input name="email" type="text" placeholder="Email" required id="beta_email"/>
+                                <input name="username" type="text" placeholder="Username" required id="beta_username"/>
+                                <input name="password" type="password" placeholder="Password" required id="beta_password"/>
+                                <button class="btn btn-success" id="signup">Sign up &raquo;</button>
+                                <!--<input type="submit" class="btn" value="Sign up"/>-->
+                            <!-- </form> -->
                         </div>
+                        <script>
+                            $(document).ready(function() {
+                                $("#msgbox").hide();
+
+                                $('#signup').on('click', function(e) {
+                                    // follow a topic
+                                    var signup_passcode = $('#beta_passcode').val();
+                                    var signup_email = $('#beta_email').val();
+                                    var signup_username = $('#beta_username').val();
+                                    var signup_password = $('#beta_password').val();
+
+                                    $.ajax({
+                                        data:{'passcode' : signup_passcode, 'email' : signup_email, 'username' : signup_username, 'password' : signup_password},
+                                        url: "/betasignup/beta_invitation",
+                                        async: true,
+                                        type: "POST",
+                                        success: function(response) {
+
+                                            if (response=='duplicate email'){
+                                                $("#msgbox").fadeIn();
+                                                $('#msgbox').html('Do you already have an account? The email supplied is already in use.');
+                                            }
+                                            if (response=='invalid email'){
+                                                $("#msgbox").fadeIn();
+                                                $('#msgbox').html('The email supplied is not a valid email address');
+                                            }
+                                            if (response=='duplicate username'){
+                                                $("#msgbox").fadeIn();
+                                                $('#msgbox').html('Your requested user name is already taken! Please try another.');
+                                            }
+                                            if (response=='invalid passcode'){
+                                                $("#msgbox").fadeIn();
+                                                $('#msgbox').html('The passcode you supplied is incorrect.');
+                                            }
+                                            if (response=='ok'){
+                                                $.ajax({
+                                                    data:{'email' : signup_email, 'user_name' : signup_username, 'password' : signup_password},
+                                                    url: "/signup",
+                                                    async: true,
+                                                    type: "POST"
+                                            })}
+
+                                        },
+                                        error: function(response) {
+                                            $("#signup").addClass('disabled');
+                                            $('#signup').html('Something went wrong. We will be fixing this!');
+                                        }
+                                    });
+                                });
+
+                                $('#passcode').keypress(function(e) {
+                                    if(e.which == 13){//Enter Key Pressed
+                                        $('#signup').click();//Trigger click
+                                    }
+                                });
+
+                                $('#email').keypress(function(e) {
+                                    if(e.which == 13){//Enter Key Pressed
+                                        $('#signup').click();//Trigger click
+                                    }
+                                });
+
+                                $('#username').keypress(function(e) {
+                                    if(e.which == 13){//Enter Key Pressed
+                                        $('#signup').click();//Trigger click
+                                    }
+                                });
+
+                                $('#password').keypress(function(e) {
+                                    if(e.which == 13){//Enter Key Pressed
+                                        $('#signup').click();//Trigger click
+                                    }
+                                });
+                            });
+
+                        </script>
                     </div>
                 </div>
                 <p class="already">Already have an account? 
