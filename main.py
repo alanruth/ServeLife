@@ -17,8 +17,8 @@ from google.appengine.ext import blobstore
 from models.models import *
 
 
-domain = 'http://localhost:8080'
-#domain = 'http://servelife.com'
+#domain = 'http://localhost:8080'
+domain = 'http://servelife.com'
 
 jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'views')))
 
@@ -384,7 +384,7 @@ class SignUpHandler(SLRequestHandler):
             activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
             try:
-                mail.send_mail(sender="ServeLife <alan@servelife.com>",
+                mail.send_mail(sender="alan@notionlabs.com",
                                 to=email,
                                 subject="Activate your Servelife account!",
                                 body="no html version",
@@ -392,9 +392,7 @@ class SignUpHandler(SLRequestHandler):
             except:
                 self.response.out.write('mail config not working..')
 
-            template = jinja_environment.get_template('login.html')
-            variables = {'email':email}
-            self.response.out.write(template.render(variables))
+            self.response.out.write('ok')
         else:
             self.response.out.write('user name already exists')
 

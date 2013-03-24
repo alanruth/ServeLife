@@ -66,10 +66,16 @@
                                                             async: true,
                                                             type: "POST",
                                                             success: function(response) {
+                                                                if (response=='mail config not working..'){
+                                                                    $("#msgbox").fadeIn();
+                                                                    $('#msgbox').html(response);
+                                                                }
+                                                                if (response=='ok'){
                                                                     $('#signup').addClass('disabled');
                                                                     $('#signup').html('signup successful :)')
                                                                     $("#msgbox").fadeIn();
                                                                     $('#msgbox').html('Check your mail for verification link.');
+                                                                }
                                                                                 },
                                                             error: function(response) {
                                                                 $("#signup").addClass('disabled');
