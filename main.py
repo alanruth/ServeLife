@@ -917,14 +917,14 @@ class BetaSignupHandler(SLRequestHandler):
 
 #class TestHandler(SLRequestHandler):
 #    def get(self):
-#        template = jinja_environment.get_template('subscriberconfirm.html')
+#        template = jinja_environment.get_template('email.html')
 #        variables = {}
 #        self.response.out.write(template.render(variables))
 
 app = webapp2.WSGIApplication([
                                   (r'/', LandingPageHandler),
                                   ('/innovationintheenterprise', PodcastHandler),
- #                                 ('/testsubscriber', TestHandler),
+#                                  ('/testsubscriber', TestHandler),
                                   ('/member/profile/(?P<user_name>.*)', UserExternalProfileHandler),
                                   ('/topic/profile/(?P<topic_name>.*)', TopicExternalProfileHandler),
                                   ('/project/profile/(?P<project_name>.*)', ProjectExternalProfileHandler),
