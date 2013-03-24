@@ -38,7 +38,7 @@
 
                                     $.ajax({
                                         data:{'passcode' : signup_passcode, 'email' : signup_email, 'username' : signup_username, 'password' : signup_password},
-                                        url: "/betasignup/beta_invitation",
+                                        url: "/betasignup",
                                         async: true,
                                         type: "POST",
                                         success: function(response) {
@@ -61,13 +61,26 @@
                                             }
                                             if (response=='ok'){
                                                 $.ajax({
-                                                    data:{'email' : signup_email, 'user_name' : signup_username, 'password' : signup_password},
-                                                    url: "/signup",
-                                                    async: true,
-                                                    type: "POST"
-                                            })}
+                                                            data:{ 'email' : signup_email, 'username' : signup_username, 'password' : signup_password},
+                                                            url: "/signup",
+                                                            async: true,
+                                                            type: "POST",
+                                                            success: function(response) {
+                                                                    $('#signup').addClass('disabled');
+                                                                    $('#signup').html('signup successful :)')
+                                                                    $("#msgbox").fadeIn();
+                                                                    $('#msgbox').html('Check your mail for verification link.');
+                                                                                },
+                                                            error: function(response) {
+                                                                $("#signup").addClass('disabled');
+                                                                $('#signup').html('Something went wrong. We will be fixing this!');
+                                                            }
 
-                                        },
+
+                                            });
+
+
+                                        }},
                                         error: function(response) {
                                             $("#signup").addClass('disabled');
                                             $('#signup').html('Something went wrong. We will be fixing this!');

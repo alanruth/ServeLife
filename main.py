@@ -4,7 +4,7 @@ import string
 import hmac
 import json
 import urllib
-#import urllib2
+import urllib2
 import hashlib
 import logging
 import re
@@ -17,8 +17,8 @@ from google.appengine.ext import blobstore
 from models.models import *
 
 
-#'http://localhost:8080'
-domain = 'http://servelife.com'
+domain = 'http://localhost:8098'
+#domain = 'http://servelife.com'
 
 jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'views')))
 
@@ -874,11 +874,19 @@ class SubscriptionHandler(webapp2.RequestHandler):
                 self.response.write(email+','+key)
 
 
-class BetaSignupHandler(webapp2.RequestHandler):
-    def post(self, method):
+class BetaSignupHandler(SLRequestHandler):
 
+    def get(self):
+        if self.is_logged_in():
+            user = self.user
+            self.redirect('/home/'+user.user_name)
+        template = jinja_environment.get_template('signup.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+
+    def post(self):
         beta_password = str(self.request.get('password'))
-
         beta_passcode = str(self.request.get('passcode'))
         if beta_passcode != 'learnwithpurpose':
             self.response.write('invalid passcode')
@@ -951,7 +959,7 @@ app = webapp2.WSGIApplication([
                                   ('/search/(?P<index>.*)', SearchHandler),
                                   ('/serve/([^/]+)?', ServeHandler),
                                   ('/email/(?P<method>.*)',SubscriptionHandler),
-                                  ('/betasignup/(?P<method>.*)', BetaSignupHandler),
+                                  ('/betasignup', BetaSignupHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),
