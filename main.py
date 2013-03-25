@@ -121,9 +121,13 @@ class SLBSRequestHandler(SLRequestHandler, blobstore_handlers.BlobstoreUploadHan
 
 class LandingPageHandler(SLRequestHandler):
     def get(self):
-        template = jinja_environment.get_template('index.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+        if self.is_logged_in():
+            user = self.user
+            self.redirect('/home/hub/'+user.user_name)
+        else:
+            template = jinja_environment.get_template('index.html')
+            variables = {}
+            self.response.out.write(template.render(variables))
 
 
 class PodcastHandler(SLRequestHandler):
