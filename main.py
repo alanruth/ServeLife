@@ -108,6 +108,24 @@ def course_follow(course_followed, user_follower):
     return True
 
 
+def project_follow(project_followed, user_follower):
+    project_followed.follower_count += 1
+    project_followed.put()
+    user_follower.projects_followed += 1
+    user_follower.put()
+
+    return True
+
+
+def project_unfollow(project_followed, user_follower):
+    project_followed.follower_count -= 1
+    project_followed.put()
+    user_follower.project_followed -= 1
+    user_follower.put()
+
+    return True
+
+
 class SLRequestHandler(webapp2.RequestHandler):
     user = None
 
@@ -126,8 +144,10 @@ class SLRequestHandler(webapp2.RequestHandler):
         else:
             return False
 
+
 class SLBSRequestHandler(SLRequestHandler, blobstore_handlers.BlobstoreUploadHandler):
     pass
+
 
 class LandingPageHandler(SLRequestHandler):
     def get(self):
@@ -649,6 +669,29 @@ class ProjectInternalIndexHandler(SLRequestHandler):
         else:
             self.redirect('/signin')
 
+
+class ProjectPrivateIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self, project_name):
+        if self.is_logged_in():
+            #Check to see that requestor is member of project
+            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if project:
+                template = jinja_environment.get_template('projectinternalindex.html')
+                variables = json.loads(project.str_value)
+                variables['project'] = project
+                variables['user_email'] = self.user.email
+                variables['user_name'] = self.user.user_name
+                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
+                self.response.out.write(template.render(variables))
+
+            else:
+                self.response.out.write('no such project exists.')
+
+        else:
+            self.redirect('/signin')
+
+
 class NewTopicProfileHandler(SLBSRequestHandler):
     @login_required
     def get(self):
@@ -717,6 +760,7 @@ class NewProjectProfileHandler(SLBSRequestHandler):
     def post(self):
         if self.is_logged_in():
             user = self.user
+            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             project_name = self.request.get('project_name')
             project_name_lc = project_name.lower()
             project_description = self.request.get('project_description')
@@ -738,11 +782,14 @@ class NewProjectProfileHandler(SLBSRequestHandler):
                 project = ProjectThinDB(project_name=project_name_lc, asset='profile', asset_key='info', str_value=json.dumps(projectinfo), int_value=0, created_by=user, updater=user)
                 project.updater = user
                 project.put()
+            #Add Creator as a team member
+            team_member = TeamMemberThinDB(project=project, team_member=userthin)
+            team_member.put()
             doc = create_project(project)
             _INDEX_NAME = 'project'
             try:
                 search.Index(name=_INDEX_NAME).put(doc)
-                self.redirect('/build/project/profile/'+project_name_lc)
+                self.redirect('/build/project/'+project_name_lc)
             except search.Error:
                 logging.exception('Add failed')
 
@@ -1014,28 +1061,43 @@ class BetaSignupHandler(SLRequestHandler):
 
 
 class FollowProjectHandler(SLRequestHandler):
-    @login_required
-    def post(self, project_name):
-        if self.is_logged_in():
-            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
-            project_followed = ProjectThinDB.all().filter('project_name = ', project_name).get()
-            follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
-            if follow_index:
-                follow_index = ProjectFollowerIndex.followers.append(user_follower.key().id())
-                follow_index.put()
-            else:
-                follow_index = ProjectFollowerIndex(key_name='index', parent=project_followed, followers=[(user_follower.key().id())])
-                follow_index.put()
+    def post(self):
+        user_name = str(self.request.get('user_name'))
+        project_name = str(self.request.get('project_name'))
+        user_follower = UserThinDB.all().filter('user_name = ', user_name).get()
+        project_followed = ProjectThinDB.all().filter('project_name = ', project_name).get()
+        follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
 
+        #check to see if user is already a follower
+        #is_follower = db.GqlQuery(
+        #    """SELECT * FROM ProjectFollowerIndex WHERE
+        #    followers = :1 AND
+        #    parent = :2""",
+        #    user_follower, project_followed)
+        #if is_follower:
+            #Need to Unfollow
+            #if follow_index:
+            #    follow_index = ProjectFollowerIndex.followers.remove(user_follower.key().id())
+            #    follow_index.put()
+                #Increment how many users follow a a certain project = follower count and
+                #Increment how many projects a certain user follows = follow count
+            #    project_unfollow(project_followed, user_follower)
+            #    self.response.write('unfollowed')
+            #    return
+        #else:
+        #Need to Follow
+        follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
+        if follow_index:
+            follow_index = ProjectFollowerIndex.followers.append(user_follower.key().id())
+            follow_index.put()
+        else:
+            follow_index = ProjectFollowerIndex(key_name='index', parent=project_followed, followers=[(user_follower.key().id())])
+            follow_index.put()
             #Increment how many users follow a a certain project = follower count and
             #Increment how many projects a certain user follows = follow count
-            user_follow(project_followed, user_follower)
-            self.response.write('ok')
-            return
-            #self.redirect('/build//project/profile/' + project_name)
-        else:
-            self.redirect('/signin')
-
+        project_follow(project_followed, user_follower)
+        self.response.write('followed')
+        return
 
 
 #class TestHandler(SLRequestHandler):
@@ -1078,13 +1140,14 @@ app = webapp2.WSGIApplication([
                                   ('/followcourse/(?P<followed>.*)', FollowCourseHandler),
                                   ('/followtopic/(?P<followed>.*)', FollowTopicHandler),
                                   ('/unfollowtopic/(?P<followed>.*)', UnFollowTopicHandler),
-                                  ('/followproject/(?P<followed>.*)', FollowProjectHandler),
+                                  ('/followproject', FollowProjectHandler),
                                   ('/search/(?P<index>.*)', SearchHandler),
                                   ('/serve/([^/]+)?', ServeHandler),
                                   ('/email/(?P<method>.*)',SubscriptionHandler),
                                   ('/betasignup', BetaSignupHandler),
                                   ('/project/new', NewProjectProfileHandler),
                                   ('/build/project/profile/(?P<project_name>.*)', ProjectInternalIndexHandler),
+                                  ('/build/project/(?P<project_name>.*)', ProjectPrivateIndexHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),

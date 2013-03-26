@@ -27,6 +27,7 @@ class UserThinDB(db.Model):
     follow_count = db.IntegerProperty(required=False, default=0)
     topics_followed = db.IntegerProperty(required=False, default=0)
     courses_followed = db.IntegerProperty(required=False, default=0)
+    projects_followed = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
     updated       = db.DateTimeProperty(required=True, auto_now=True)
     profile_pic     = db.BlobProperty(default=None)

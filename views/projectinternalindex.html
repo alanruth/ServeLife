@@ -9,13 +9,20 @@
     $(document).ready(function() {
         $('#follow_project').on('click', function(e) {
             // follow a project
+            var user = "{{ user_name }}";
+            var project = "{{ project.project_name }}";
             $.ajax({
-
-                url: "../../followproject/{{ project.project_name }}",
+                data: {'user_name' : user, 'project_name' : project},
+                url: "../../../followproject",
                 async: true,
                 type: "POST",
                 success: function(response) {
-                    $('#follow_project').html('following');
+                    if (response=='unfollowed') {
+                        $('#follow_project').html('Follow');
+                    }
+                    if (response=='followed'){
+                        $('#follow_project').html('Following');
+                    }
                 },
                 error: function(response) {
                     $('#follow_project').html('error!');
@@ -23,8 +30,7 @@
             });
         });
     });
-
-</script>
+ </script>
 
 
 <div class="topic-header">
@@ -39,7 +45,7 @@
         <div class="span5">
             <span class="pull-right"><strong>Created: </strong>{{ project.created.strftime('%m/%d/%Y') }}</span>
             <div class="pull-right follow-button">
-                <button id="follow_topic" class="btn btn-mini btn-primary">Follow</button>
+                <button id="follow_project" class="btn btn-mini btn-primary">Follow</button>
 
             </div>
             <h2>{{project_name }}</h2>
@@ -51,7 +57,7 @@
             <div class="row-fluid">
                 <a class="quick-button-small span2">
                     <img alt="Followers" src="/static/img/group.png" />
-                    <span class="notification followers">7</span>
+                    <span class="notification followers">{{ project.follower_count }}</span>
                     <p>Followers</p>
                 </a>
                 <a class="quick-button-small span2">
