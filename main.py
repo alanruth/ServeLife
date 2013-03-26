@@ -32,6 +32,16 @@ def create_topic(topic):
                                                                  search.TextField(name='created_by', value=created_by),])
 
 
+def create_project(project):
+    project_info = json.loads(project.str_value)
+    project_description = project_info.get('project_description')
+    parent_project = project_info.get('parent_project')
+    created_by = project.created_by.user_name
+    return search.Document(doc_id=str(project.key().id()),fields = [search.TextField(name='description',value=project_description),
+                                                                  search.TextField(name='parent_project', value=parent_project),
+                                                                  search.TextField(name='created_by', value=created_by),])
+
+
 #utility function to get gravatar image url
 def get_gravatar_url(size, email):
     default = domain + "/static/img/defaultavatar.png"
@@ -619,6 +629,26 @@ class DiscoverTopicIndexHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
+class ProjectInternalIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self, project_name):
+        if self.is_logged_in():
+            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if project:
+                template = jinja_environment.get_template('projectinternalindex.html')
+                variables = json.loads(project.str_value)
+                variables['project'] = project
+                variables['user_email'] = self.user.email
+                variables['user_name'] = self.user.user_name
+                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
+                self.response.out.write(template.render(variables))
+
+            else:
+                self.response.out.write('no such project exists.')
+
+        else:
+            self.redirect('/signin')
+
 class NewTopicProfileHandler(SLBSRequestHandler):
     @login_required
     def get(self):
@@ -670,6 +700,57 @@ class NewTopicProfileHandler(SLBSRequestHandler):
             self.redirect('/signin')
 
 
+class NewProjectProfileHandler(SLBSRequestHandler):
+    @login_required
+    def get(self):
+        if self.is_logged_in():
+            upload_url = blobstore.create_upload_url('/project/new')
+            #upload_url = blobstore.create_upload_url('/upload')
+            template = jinja_environment.get_template('projectnewprofile.html')
+            variables = {'user_email': self.user.email,'upload_url':upload_url}
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
+
+    @login_required
+    def post(self):
+        if self.is_logged_in():
+            user = self.user
+            project_name = self.request.get('project_name')
+            project_name_lc = project_name.lower()
+            project_description = self.request.get('project_description')
+            parent_project = self.request.get('parent_project')
+            upload_files = self.get_uploads('parent_image')
+            #blob_info = upload_files[0]
+            projectinfo = {'project_name': project_name,
+                         'project_description': project_description,
+                         'parent_project': parent_project,
+                         #'blob_key':str(blob_info.key()),
+                         }
+            project = ProjectThinDB.all().filter('project_name = ', project_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
+            if project:
+                project.created_by = user
+                project.updater = user
+                project.str_value = json.dumps(projectinfo)
+                project.put()
+            else:
+                project = ProjectThinDB(project_name=project_name_lc, asset='profile', asset_key='info', str_value=json.dumps(projectinfo), int_value=0, created_by=user, updater=user)
+                project.updater = user
+                project.put()
+            doc = create_project(project)
+            _INDEX_NAME = 'project'
+            try:
+                search.Index(name=_INDEX_NAME).put(doc)
+                self.redirect('/build/project/profile/'+project_name_lc)
+            except search.Error:
+                logging.exception('Add failed')
+
+
+        else:
+            self.redirect('/signin')
+
+
 class FollowUserHandler(SLRequestHandler):
     @login_required
     def post(self, followed):
@@ -711,6 +792,25 @@ class FollowTopicHandler(SLRequestHandler):
             #Increment how many users follow a a certain user = follower count and
             #Increment how many users a certain user follows = follow count
             topic_follow(topic_followed, follower)
+            self.redirect('/discover/topic/'+topic)
+        else:
+            self.redirect('/signin')
+
+
+class UnFollowTopicHandler(SLRequestHandler):
+    @login_required
+    def post(self, topic):
+        if self.is_logged_in():
+            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            topic_unfollowed = TopicThinDB.all().filter('topic_name = ', topic).get()
+            follow_index = TopicFollowerIndex.all().filter('parent = ', topic_unfollowed).get()
+            if follow_index:
+                follow_index = TopicFollowerIndex.followers.remove((follower.key().id()))
+                follow_index.put()
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            #topic_follow(topic_followed, follower)
             self.redirect('/discover/topic/'+topic)
         else:
             self.redirect('/signin')
@@ -913,6 +1013,29 @@ class BetaSignupHandler(SLRequestHandler):
         return
 
 
+class FollowProjectHandler(SLRequestHandler):
+    @login_required
+    def post(self, project_name):
+        if self.is_logged_in():
+            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            project_followed = ProjectThinDB.all().filter('project_name = ', project_name).get()
+            follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
+            if follow_index:
+                follow_index = ProjectFollowerIndex.followers.append(user_follower.key().id())
+                follow_index.put()
+            else:
+                follow_index = ProjectFollowerIndex(key_name='index', parent=project_followed, followers=[(user_follower.key().id())])
+                follow_index.put()
+
+            #Increment how many users follow a a certain project = follower count and
+            #Increment how many projects a certain user follows = follow count
+            user_follow(project_followed, user_follower)
+            self.response.write('ok')
+            return
+            #self.redirect('/build//project/profile/' + project_name)
+        else:
+            self.redirect('/signin')
+
 
 
 #class TestHandler(SLRequestHandler):
@@ -954,10 +1077,14 @@ app = webapp2.WSGIApplication([
                                   ('/follow/(?P<followed>.*)', FollowUserHandler),
                                   ('/followcourse/(?P<followed>.*)', FollowCourseHandler),
                                   ('/followtopic/(?P<followed>.*)', FollowTopicHandler),
+                                  ('/unfollowtopic/(?P<followed>.*)', UnFollowTopicHandler),
+                                  ('/followproject/(?P<followed>.*)', FollowProjectHandler),
                                   ('/search/(?P<index>.*)', SearchHandler),
                                   ('/serve/([^/]+)?', ServeHandler),
                                   ('/email/(?P<method>.*)',SubscriptionHandler),
                                   ('/betasignup', BetaSignupHandler),
+                                  ('/project/new', NewProjectProfileHandler),
+                                  ('/build/project/profile/(?P<project_name>.*)', ProjectInternalIndexHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),

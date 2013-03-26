@@ -8,23 +8,39 @@
 
 <script>
     $(document).ready(function() {
-    $('#follow_topic').on('click', function(e) {
-        // follow a topic
-        $.ajax({
+        $('#follow_topic').on('click', function(e) {
+            // follow a topic
+            if ($('#follow_topic').value  == "Following") {
+                $.ajax({
 
-            url: "../../followtopic/{{ topic.topic_name }}",
-            async: true,
-            type: "POST",
-            success: function(response) {
-                $('#follow_topic').html('following');
-            },
-            error: function(response) {
-                $('#follow_topic').html('error!');
+                    url: "../../unfollowtopic/{{ topic.topic_name }}",
+                    async: true,
+                    type: "POST",
+                    success: function(response) {
+                        $('#follow_topic').html('Follow');
+                    },
+                    error: function(response) {
+                        $('#follow_topic').html('error!');
+                    }
+                });
             }
-        });
-    });
-        });
+            else
+            {
+                $.ajax({
 
+                    url: "../../followtopic/{{ topic.topic_name }}",
+                    async: true,
+                    type: "POST",
+                    success: function(response) {
+                        $('#follow_topic').html('Following');
+                    },
+                    error: function(response) {
+                        $('#follow_topic').html('error!');
+                    }
+
+                });}
+            });
+        });
 </script>
 
 

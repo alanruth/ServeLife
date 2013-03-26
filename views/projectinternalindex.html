@@ -1,0 +1,103 @@
+{% extends "secure.html" %}
+
+{% block title %}{{ project_name }}{% endblock title %}
+
+{% block description %}{{ project_description }}{% endblock description %}
+
+{% block page %}
+ <script>
+    $(document).ready(function() {
+        $('#follow_project').on('click', function(e) {
+            // follow a project
+            $.ajax({
+
+                url: "../../followproject/{{ project.project_name }}",
+                async: true,
+                type: "POST",
+                success: function(response) {
+                    $('#follow_project').html('following');
+                },
+                error: function(response) {
+                    $('#follow_project').html('error!');
+                }
+            });
+        });
+    });
+
+</script>
+
+
+<div class="topic-header">
+    <div class="main">
+    <div class="container">
+    <div class="wrapper">
+    <div class="row-fluid topic-main">
+        <div class="span2">
+            <!-- INSERT PICTURE FROM PROFILE -->
+            <img alt="{{ project_name }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
+        </div>
+        <div class="span5">
+            <span class="pull-right"><strong>Created: </strong>{{ project.created.strftime('%m/%d/%Y') }}</span>
+            <div class="pull-right follow-button">
+                <button id="follow_topic" class="btn btn-mini btn-primary">Follow</button>
+
+            </div>
+            <h2>{{project_name }}</h2>
+            <h4>INSERT PROJECT LEVEL</h4>
+            <!-- INSERT PROJECT HEADLINE FROM PROFILE - WE SHOULD LIMIT LENGTH OF HEADLINE -->
+            <p>{{ project_description }}</p>
+        </div>
+        <div class="span5">
+            <div class="row-fluid">
+                <a class="quick-button-small span2">
+                    <img alt="Followers" src="/static/img/group.png" />
+                    <span class="notification followers">7</span>
+                    <p>Followers</p>
+                </a>
+                <a class="quick-button-small span2">
+                    <img alt="Discussions" src="/static/img/conversation.png" />
+                    <span class="notification discussions">7</span>
+                    <p>Discussions</p>
+                </a>
+                <a class="quick-button-small span2">
+                    <img alt="Ideas" class="ideas" src="/static/img/lightbulb.png" />
+                    <span class="notification ideas">7</span>
+                    <p>Ideas</p>
+                </a>
+                <a class="quick-button-small span2">
+                    <img alt="Questions" class="questions" src="/static/img/question.png" />
+                    <span class="notification ideas">7</span>
+                    <p>Questions</p>
+                </a>
+                <a class="quick-button-small span2">
+                    <img alt="Experiments" class="experiments" src="/static/img/magic.png" />
+                    <span class="notification ideas">7</span>
+                    <p>Experiments</p>
+                </a>
+                <a class="quick-button-small span2">
+                    <img alt="Articles" class="articles" src="/static/img/newspaper.png" />
+                    <div class="quick-button-small-article"><p>Articles</p></div>
+                    <span class="notification ideas">7</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <hr class="heavy">
+
+    <div class="row-fluid topic-body">
+        <div class="span12">
+            <ul class="nav nav-tabs btn-topic pull-right">
+                <li><a href="#">Goals</a></li>
+                <li><a href="#">Team</a></li>
+                <li><a href="#">Metrics</a></li>
+                <li><a href="#">Riffs</a></li>
+                <li><a href="#">Something</a></li>
+            </ul>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+{% endblock page %}
