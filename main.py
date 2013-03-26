@@ -497,8 +497,17 @@ class UserHomePageHandler(SLRequestHandler):
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
+            projects = ProjectThinDB.all().get().all()
+
+
+            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            #indexes = db.GqlQuery(
+            #    "SELECT project FROM TeamMemberThinDB "
+            #    "WHERE team_member = :1", userthin)
+
+
             template = jinja_environment.get_template('userhome.html')
-            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email}
+            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin, 'projects': projects}
             self.response.out.write(template.render(variables))
 
 
@@ -507,7 +516,7 @@ class DiscoverHubIndexHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
-            template = jinja_environment.get_template('discover.html')
+            template = jinja_environment.get_template('discoverindex.html')
             variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
             self.response.out.write(template.render(variables))
 
@@ -515,12 +524,51 @@ class DiscoverHubIndexHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
-class LearningCenterPageHandler(SLRequestHandler):
+class LearnHubIndexHandler(SLRequestHandler):
     @login_required
-    def get(self, user_name):
+    def get(self):
         if self.is_logged_in():
             user = self.user
-            template = jinja_environment.get_template('learnprivateindex.html')
+            template = jinja_environment.get_template('learnindex.html')
+            variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
+
+
+class BuildHubIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self):
+        if self.is_logged_in():
+            user = self.user
+            template = jinja_environment.get_template('buildindex.html')
+            variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
+
+
+class WorkHubIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self):
+        if self.is_logged_in():
+            user = self.user
+            template = jinja_environment.get_template('workindex.html')
+            variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
+            self.response.out.write(template.render(variables))
+
+        else:
+            self.redirect('/signin')
+
+
+class CommunityHubIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self):
+        if self.is_logged_in():
+            user = self.user
+            template = jinja_environment.get_template('communityindex.html')
             variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
             self.response.out.write(template.render(variables))
 
@@ -907,7 +955,7 @@ class FollowCourseHandler(SLRequestHandler):
 #
 # class ProjectCenterPageHandler(SLRequestHandler):
 #     def get(self):
-#         template = jinja_environment.get_template('learnprivateindex.html')
+#         template = jinja_environment.get_template('learnindex.html')
 #         variables = {}
 #         self.response.out.write(template.render(variables))
 #
@@ -1136,7 +1184,10 @@ app = webapp2.WSGIApplication([
                                   ('/discover/topic/(?P<topic_name>.*)', TopicInternalIndexHandler),
                                   ('/discover/topics.*', DiscoverTopicIndexHandler),
                                   ('/discover/hub.*', DiscoverHubIndexHandler),
-                                  ('/learn/hub/(?P<user_name>.*)', LearningCenterPageHandler),
+                                  ('/learn/hub.*', LearnHubIndexHandler),
+                                  ('/build/hub.*', BuildHubIndexHandler),
+                                  ('/work/hub.*', WorkHubIndexHandler),
+                                  ('/community/hub.*', CommunityHubIndexHandler),
                                   ('/course/new', NewCourseProfileHandler),
                                   ('/course/edit/(?P<course_name>.*)', CourseEditProfileHandler),
                                   ('/course/(?P<course_name>.*)', CourseInternalIndexHandler),
