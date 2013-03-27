@@ -834,7 +834,7 @@ footer .copyright .copy p {
   /*//background: linear-gradient(to bottom,  #ffffff 1%,#f9f9f9 100%); *//* W3C */
   /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); *//* IE6-9 */
   height: auto;
-  padding-bottom: 50px;
+  padding-bottom: 5px;
   /*border-bottom: 1px solid #d1d2d4;*/
   /*//box-shadow: 0px 3px 8px 0px #e7e7e7;*/
 }
@@ -846,7 +846,7 @@ footer .copyright .copy p {
 }
 #comingsoon .countdown .left h1 {
   margin-top: 0px;
-  font-size: 40px;
+  font-size: 24px;
 }
 #comingsoon .countdown .left p {
   margin-top: 20px;
@@ -2215,7 +2215,7 @@ width: 100%;
 }
 
 #betasignup {
-    margin-right: 50px;
+    margin-left: 10px;
 }
 
 .follow-button {
@@ -2660,4 +2660,26 @@ ul.header-tabs>li.active>a:hover{
 
 .quick-button-small-article {
     margin-top: -5px;
+}
+
+/* feature listing - index page */
+.feature-listing {
+    margin: 10px 0 0;
+}
+
+.feature-listing ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.feature-listing ul li {
+    background: url("/static/img/checkmark.png") no-repeat scroll left 10px transparent;
+    padding: 6px 0 6px 25px;
+    list-style-type: none;
+    font-family: HelveticaNeue-Light,'Helvetica Neue Light','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-size: 16px;
+}
+
+#betasignup {
+
 }
