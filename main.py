@@ -455,7 +455,7 @@ class ActivationHandler(SLRequestHandler):
         if user:
             user.activated='True'
             user.put()
-            username = user.username
+            username = user.user_name
             user_influence = UserThinDB(user_name=username,
                                     asset= 'profile',
                                     asset_key= 'influence',
