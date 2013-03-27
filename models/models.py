@@ -73,6 +73,18 @@ class ArticleEvent(EventItem):
     creator = db.ReferenceProperty(UserThinDB, required=True)
 
 
+class Activity(db.Model):
+    actor = db.ReferenceProperty(UserThinDB, required=True)
+    message = db.TextProperty()
+    object_type = db.StringProperty()
+    action = db.StringProperty()
+    created = db.DateTimeProperty(required=True, auto_now_add=True)
+
+
+class ActivityIndex(db.Model):
+    receivers = db.ListProperty(int)
+
+
 class UserFollowerIndex(db.Model):
     followers       = db.ListProperty(int)
 

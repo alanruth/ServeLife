@@ -42,6 +42,23 @@ def create_project(project):
                                                                   search.TextField(name='created_by', value=created_by),])
 
 
+def create_activity(actor, actor_type, entity, entity_type, activity_type):
+    if actor_type == "user":
+        actor_name = actor.user_name
+
+    if entity_type == "project":
+        entity_name = entity.project_name
+    elif entity_type == "topic":
+        entity_name = entity.topic_name
+
+    if activity_type == "create":
+        body = str(actor_name + ' created a new ' + entity_type + ' named ' + entity_name)
+
+    activity = Activity(actor=actor, message=body, object_type=entity_type, action=activity_type)
+    activity.put()
+    return True
+
+
 #utility function to get gravatar image url
 def get_gravatar_url(size, email):
     default = domain + "/static/img/defaultavatar.png"
@@ -492,12 +509,12 @@ class LogOutHandler(SLRequestHandler):
         self.redirect('/')
 
 
-class UserHomePageHandler(SLRequestHandler):
+class UserHomeHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
-            projects = ProjectThinDB.all().get().all()
+            #projects = ProjectThinDB.all().get().all()
 
 
             userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
@@ -507,8 +524,63 @@ class UserHomePageHandler(SLRequestHandler):
 
 
             template = jinja_environment.get_template('userhome.html')
+            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin}
+            self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
+
+
+class UserProjectHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            projects = ProjectThinDB.all().get().all()
+            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            template = jinja_environment.get_template('userproject.html')
             variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin, 'projects': projects}
             self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
+
+
+class UserClassHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            template = jinja_environment.get_template('userclass.html')
+            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin}
+            self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
+
+
+class UserTopicHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            template = jinja_environment.get_template('usertopic.html')
+            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin}
+            self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
+
+
+class UserResearchHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            template = jinja_environment.get_template('userresearch.html')
+            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin}
+            self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
 
 
 class DiscoverHubIndexHandler(SLRequestHandler):
@@ -516,8 +588,12 @@ class DiscoverHubIndexHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
+            topics = TopicThinDB.all().get().all()
+            #for t in topics:
+            #    t.blob_key = json.loads(t.str_value).get('blob_key')
+            #    t.topic_description = json.loads(t.str_value).get('topic_description')
             template = jinja_environment.get_template('discoverindex.html')
-            variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name}
+            variables = {'user': user, 'user_email': user.email, 'user_name': user.user_name, 'topics': topics}
             self.response.out.write(template.render(variables))
 
         else:
@@ -761,6 +837,7 @@ class NewTopicProfileHandler(SLBSRequestHandler):
     def post(self):
         if self.is_logged_in():
             user = self.user
+            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             topic_name = self.request.get('topic_name')
             topic_name_lc = topic_name.lower()
             topic_description = self.request.get('topic_description')
@@ -774,14 +851,20 @@ class NewTopicProfileHandler(SLBSRequestHandler):
                         }
             topic = TopicThinDB.all().filter('topic_name = ', topic_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
             if topic:
-                topic.created_by = user
-                topic.updater = user
+                topic.created_by = userthin
+                topic.updater = userthin
                 topic.str_value = json.dumps(topicinfo)
                 topic.put()
             else:
-                topic = TopicThinDB(topic_name=topic_name_lc, asset='profile', asset_key='info', str_value=json.dumps(topicinfo), int_value=0, created_by=user, updater=user)
-                topic.updater = user
+                topic = TopicThinDB(topic_name=topic_name_lc, asset='profile', asset_key='info', str_value=json.dumps(topicinfo), int_value=0, created_by=userthin, updater=userthin)
+                topic.updater = userthin
                 topic.put()
+            #Add user as a follower
+            follow_index = TopicFollowerIndex(key_name='index', parent=topic, followers=[(userthin.key().id())])
+            follow_index.put()
+            topic_follow(topic, userthin)
+            #write to the activity model
+            activity = create_activity(userthin, "user", topic, "topic", "create")
             doc = create_topic(topic)
             _INDEX_NAME = 'topic'
             try:
@@ -789,7 +872,6 @@ class NewTopicProfileHandler(SLBSRequestHandler):
                 self.redirect('/discover/topic/'+topic_name_lc)
             except search.Error:
                 logging.exception('Add failed')
-
 
         else:
             self.redirect('/signin')
@@ -837,6 +919,7 @@ class NewProjectProfileHandler(SLBSRequestHandler):
             #Add Creator as a team member
             team_member = TeamMemberThinDB(project=project, team_member=userthin)
             team_member.put()
+            activity = create_activity(userthin, "user", project, "project", "create")
             doc = create_project(project)
             _INDEX_NAME = 'project'
             try:
@@ -1175,7 +1258,11 @@ app = webapp2.WSGIApplication([
                                   ('/user/subscription/(?P<user_name>.*)', UserSubscriptionEditHandler),
                                   ('/profile/(?P<user_name>.*)', UserPrivateProfileHandler),
                                   ('/user/profile/(?P<user_name>.*)', UserInternalProfileHandler),
-                                  ('/home/hub/(?P<user_name>.*)', UserHomePageHandler),
+                                  ('/home/hub/(?P<user_name>.*)', UserHomeHandler),
+                                  ('/home/projects/(?P<user_name>.*)', UserProjectHandler),
+                                  ('/home/classes/(?P<user_name>.*)', UserClassHandler),
+                                  ('/home/topics/(?P<user_name>.*)', UserTopicHandler),
+                                  ('/home/research/(?P<user_name>.*)', UserResearchHandler),
                                   #('/home/contributions/(?P<user_name>.*)', UserContributionsPageHandler),
                                   #('/home/achievements/(?P<user_name>.*)', UserAchievementsPageHandler),
                                   #('/home/efforts/(?P<user_name>.*)', UserEffortsPageHandler),

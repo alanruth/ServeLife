@@ -1,9 +1,8 @@
 {% extends "secure.html" %}
 
-{% block title %}Home{% endblock title %}
+{% block title %}{{ user_name }}'s Research{% endblock title %}
 
-{% block description %}"{{ user.user_name }}'s home brings together all the activities, collaborations and ServeLife User Profile uniquely identifies them within the ServeLife
-  ecosystem."{% endblock description %}
+{% block description %}"{{ user.user_name }}'s research page brings together all the private articles, private ideas and solo projects for a servelife member."{% endblock description %}
 
 {% block page %}
     <div class="topic-header">
@@ -58,14 +57,14 @@
 
                     <hr class="heavy">
 
-                    <div class="row-fluid topic-body">
+                    <div class="row-fluid">
                         <div class="span12">
                             <ul class="nav nav-pills pull-right">
-                                <li class="active"><a href="/home/hub/{{ user_name }}">Activity</a></li>
+                                <li><a href="/home/hub/{{ user_name }}">Activity</a></li>
                                 <li><a href="/home/projects/{{ user_name }}">Projects</a></li>
                                 <li><a href="/home/classes/{{ user_name }}">Classes</a></li>
                                 <li><a href="/home/topics/{{ user_name }}">Topics</a></li>
-                                <li><a href="/home/research/{{ user_name }}">Research</a></li>
+                                <li class="active"><a href="/home/research/{{ user_name }}">Research</a></li>
                             </ul>
                         </div>
                     </div>
