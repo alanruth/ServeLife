@@ -510,19 +510,29 @@ class SignInHandler(SLRequestHandler):
                 profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
                 if profile:
                     url_path = str('/home/hub/' + user.user_name)
-                    self.response.headers.add_header('url', url_path)
-                    self.response.write('ok')
+                    #AS: create a response payload of as many items you want to have in a dictionary
+                    response = {'status':'ok', 'location':url_path}
+                    # then serialize this python object into a string representation for a javascript object
+                    # this is what is called JavaScript Object Notation or JSON
+                    response_string = json.dumps(response)
+                    #now send this json to the browser!
+                    self.response.write(response_string)
                     return
                 else:
                     url_path = str('/user/profile/new/' + user.user_name)
-                    self.response.headers.add_header('url', url_path)
-                    self.response.write('no profile')
+                    response = {'status':'ok', 'location':url_path}
+                    response_string = json.dumps(response)
+                    self.response.write(response_string)
                     return
             else:
-                self.response.write('invalid password')
+                response = {'status':'invalid password'}
+                response_string = json.dumps(response)
+                self.response.write(response_string)
                 return
         else:
-            self.response.write('invalid email')
+            response = {'status': 'invalid email'}
+            response_string = json.dumps(response)
+            self.response.write(response_string)
             return
 
 
