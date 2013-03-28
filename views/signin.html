@@ -48,28 +48,24 @@
                                         url: "/signin",
                                         async: true,
                                         type: "POST",
-                                        success: function(response) {
+                                        success: function(response_string) {
+                                            response_object = JSON.parse(response_string);
 
-                                            if (response=='invalid email'){
+                                            if (response_object.status=='invalid email'){
                                                 $("#msgbox").fadeIn();
                                                 $("#login_password").val("");
                                                 $('#msgbox').html('Invalid email and password combination. Please try again.');
                                             }
-                                            if (response=='invalid password'){
+                                            if (response_object.status=='invalid password'){
                                                 $("#msgbox").fadeIn();
                                                 $("#login_password").val("");
                                                 $('#msgbox').html('Invalid email and password combination. Please try again.');
                                             }
-                                            if (response=='ok'){
-                                                //$("#msgbox").fadeIn();
-                                                //$('#msgbox').html("success");
-                                                window.location.replace('/signin');
-                                                //$(window.location.replace(url));
-                                                //var url = response.header('url');
-                                                //$(window.location.replace(url))
+                                            if (response_object.status=='ok'){
+                                                $(window.location.replace(response_object.location));
                                             }
-                                            if (response=='no profile'){
-                                                window.location.replace('/signin');
+                                            if (response_object.status=='no profile'){
+                                                $(window.location.replace(response_object.location));
                                             }
 
                                         },
