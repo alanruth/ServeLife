@@ -16,24 +16,87 @@
                         </div>
 
                         <div class="form">
-                            <form action="/signin" method="post">
-                                <input type="text" name="email" placeholder="Email" autofocus=""/>
-                                <input type="password" name="password" placeholder="Password"/>
-                                <div class="remember">
-                                    <div class="left">
-                                        <input id="remember_me" type="checkbox">
-                                        <label for="remember_me">Remember me</label>
-                                    </div>
-                                    <div class="right">
-                                        <a href="reset.html">Forgot password?</a>
-                                    </div>
+                            <!--<form action="/signin" method="post">-->
+                            <label id="msgbox" class="alert alert-info"></label>
+                            <input type="text" name="email" placeholder="Email" autofocus="" id="login_email"/>
+                            <input type="password" name="password" placeholder="Password" id="login_password"/>
+                            <div class="remember">
+                                <div class="left">
+                                    <input id="remember_me" type="checkbox">
+                                    <label for="remember_me">Remember me</label>
                                 </div>
-                                <input type="submit" class="btn" value="Sign in"/>
-                            </form>
+                                <div class="right">
+                                    <a href="/reset.html">Forgot password?</a>
+                                </div>
+                            </div>
+                            <button class="btn btn-success" id="signin">Sign in &raquo;</button>
+                            <!--<input type="submit" class="btn" value="Sign in"/> -->
+                            <!--</form>-->
                         </div>
+                        <script>
+                            $(document).ready(function() {
+                                $("#msgbox").hide();
+
+                                $('#signin').on('click', function(e) {
+                                    // follow a topic
+                                    var login_email = $('#login_email').val();
+                                    var login_password = $('#login_password').val();
+                                    var login_remember = $('#remember_me').val();
+
+                                    $.ajax({
+                                        data:{'email' : login_email, 'password' : login_password},
+                                        url: "/signin",
+                                        async: true,
+                                        type: "POST",
+                                        success: function(response) {
+
+                                            if (response=='invalid email'){
+                                                $("#msgbox").fadeIn();
+                                                $("#login_password").val("");
+                                                $('#msgbox').html('Invalid email and password combination. Please try again.');
+                                            }
+                                            if (response=='invalid password'){
+                                                $("#msgbox").fadeIn();
+                                                $("#login_password").val("");
+                                                $('#msgbox').html('Invalid email and password combination. Please try again.');
+                                            }
+                                            if (response=='ok'){
+                                                //$("#msgbox").fadeIn();
+                                                //$('#msgbox').html("success");
+                                                window.location.replace('/signin');
+                                                //$(window.location.replace(url));
+                                                //var url = response.header('url');
+                                                //$(window.location.replace(url))
+                                            }
+                                            if (response=='no profile'){
+                                                window.location.replace('/signin');
+                                            }
+
+                                        },
+                                        error: function(response) {
+                                            $("#signin").addClass('disabled');
+                                            $('#signin').html('Something went wrong. We will be fixing this!');
+                                        }
+                                    });
+                                });
+
+                                $('#login_email').keypress(function(e) {
+                                    if(e.which == 13){//Enter Key Pressed
+                                        $('#signin').click();//Trigger click
+                                    }
+                                });
+
+                                $('#login_password').keypress(function(e) {
+                                    if(e.which == 13){//Enter Key Pressed
+                                        $('#signin').click();//Trigger click
+                                    }
+                                });
+                            });
+
+                        </script>
                     </div>
                 </div>
-                <p class="already">Don't have an account? <a href="signup"> Sign up</a></p>
+                <p class="already">Don't have an account? <a href="/signup"> Sign up</a></p>
             </div>
         </div>
     </div>

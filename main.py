@@ -462,23 +462,38 @@ class ActivationHandler(SLRequestHandler):
                                     str_value= '',
                                     int_value= 100)
             user_influence.put()
-            self.response.out.write('Your account has been activated!')
+            template = jinja_environment.get_template('publicconfirm.html')
+            alert = "Thank You"
+            msg = "Your ServeLife account has been confirmed. Login and begin your learning adventure!"
+            variables = {'alert': alert, 'msg': msg}
+            self.response.out.write(template.render(variables))
+            #self.response.out.write('Your account has been activated!')
         else:
-            self.response.out.write('No such activation key!')
+            template = jinja_environment.get_template('publicconfirm.html')
+            alert = "An Error Has Occurred"
+            msg = "The activation key used is not valid. Please submit your email address again."
+            variables = {'alert': alert, 'msg': msg}
+            self.response.out.write(template.render(variables))
+            #self.response.out.write('No such activation key!')
 
 
 class SignInHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
-            self.redirect('/home/hub/'+user.user_name)
+            #ABR: check to see if the user has a profile
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if profile:
+                self.redirect('/home/hub/'+ user.user_name)
+            else:
+                self.redirect('/user/profile/new/'+ user.user_name)
         template = jinja_environment.get_template('signin.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
     def post(self):
-        email = self.request.get('email')
-        password = self.request.get('password')
+        password = str(self.request.get('password'))
+        email = str(self.request.get('email'))
         user = User.all().filter('email =', email).get()
         if user:
             pass_split = user.password_hash.split('|')
@@ -489,18 +504,26 @@ class SignInHandler(SLRequestHandler):
                 #user_id|random_secret|hash
                 cookie_value = user_id+'|'+random_secret+'|'+hmac.new(random_secret,user_id).hexdigest()
                 cookie = 'user_id = '+cookie_value+';Path = /'
-                self.response.headers.add_header('Set-Cookie',cookie)
+                self.response.headers.add_header('Set-Cookie', cookie)
 
                 #ABR: check to see if the user has a profile
                 profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
                 if profile:
-                    self.redirect('/home/hub/'+user.user_name)
+                    url_path = str('/home/hub/' + user.user_name)
+                    self.response.headers.add_header('url', url_path)
+                    self.response.write('ok')
+                    return
                 else:
-                    self.redirect('/user/profile/new/' + user.user_name)
+                    url_path = str('/user/profile/new/' + user.user_name)
+                    self.response.headers.add_header('url', url_path)
+                    self.response.write('no profile')
+                    return
             else:
-                self.response.out.write('password error!')
+                self.response.write('invalid password')
+                return
         else:
-            self.response.out.write('no such email signup with us!')
+            self.response.write('invalid email')
+            return
 
 
 class LogOutHandler(SLRequestHandler):
@@ -1021,66 +1044,11 @@ class FollowCourseHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
-#ABR not used yet - moved to clean up
-# class TeamProfileHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('teampublicprofile.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class ProjectProfileHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('projectpublicprofile.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class ProjectCenterPageHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('learnindex.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class ClassProfilePageHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('class.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# class CourseProfilePageHandler(SLRequestHandler):
-#     def get(self):
-#         template = jinja_environment.get_template('course.html')
-#         variables = {}
-#         self.response.out.write(template.render(variables))
-#
-#
-# @login_required
-# class GetUserFeedHandler(SLRequestHandler):
-#     def get(self, username):
-#         user = 'mogambo'
-#         if self.is_logged_in():
-#             user = self.user
-#             self.response.out.write('feed from username: '+username+'. Logged in user is:'+user.username)
-#
-# class GetUserTopicFeedHandler(SLRequestHandler):
-#     @login_required
-#     def get(self, username, topic):
-#         self.response.out.write('feed from username: '+username+' on topic: '+topic)
-#
-# class AddCourseHandler(SLRequestHandler):
-#     @login_required
-#     def get(self):
-#         #add course form
-#         pass
-
-
 def handle_404(request, response, exception):
     logging.exception(exception)
     response.write('Oops! I could swear this page was here!')
     response.set_status(404)
+
 
 class SearchHandler(webapp2.RequestHandler):
     def get(self, index):
@@ -1110,7 +1078,6 @@ class SubscriptionHandler(webapp2.RequestHandler):
             if not is_valid(subscriber_email, valid['email']):
                 self.response.write('invalid')
                 return
-
 
             subscriber_exists = Subscriber.all().filter('email =', subscriber_email).get()
             if not subscriber_exists:
@@ -1146,8 +1113,10 @@ class SubscriptionHandler(webapp2.RequestHandler):
                 real_subscriber.verified=True
                 real_subscriber.put()
 
-                template = jinja_environment.get_template('subscriberconfirm.html')
-                variables = {}
+                template = jinja_environment.get_template('publicconfirm.html')
+                alert = "Thank You"
+                msg = "Your email has been confirmed. We will be in touch shortly concerning early access."
+                variables = {'alert': alert, 'msg': msg}
                 self.response.out.write(template.render(variables))
                 #self.response.write('ok')
             else:
@@ -1155,7 +1124,6 @@ class SubscriptionHandler(webapp2.RequestHandler):
 
 
 class BetaSignupHandler(SLRequestHandler):
-
     def get(self):
         if self.is_logged_in():
             user = self.user
@@ -1163,7 +1131,6 @@ class BetaSignupHandler(SLRequestHandler):
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
-
 
     def post(self):
         beta_password = str(self.request.get('password'))
@@ -1237,8 +1204,10 @@ class FollowProjectHandler(SLRequestHandler):
 
 #class TestHandler(SLRequestHandler):
 #    def get(self):
-#        template = jinja_environment.get_template('email.html')
-#        variables = {}
+#        template = jinja_environment.get_template('publicconfirm.html')
+#        alert = "Thank You"
+#        msg = "Your ServeLife account has been confirmed. Login and begin your learning adventure!"
+#        variables = {'alert': alert, 'msg': msg}
 #        self.response.out.write(template.render(variables))
 
 app = webapp2.WSGIApplication([

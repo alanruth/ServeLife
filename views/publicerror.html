@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Email Confirmation{% endblock title %}
+{% block title %}Error{% endblock title %}
 
 {% block description %}"Learn with purpose! ServeLife helps you acquire knowledge and put that knowledge to work building real world experience. Contribute. Collaborate. Be Discovered."{% endblock description %}
 
@@ -14,11 +14,9 @@
                         <div class="container">
                             <div class="countdown">
                                 <div class="row">
-                                    <div class="alert alert-success">
-                                         <h3>Thank You!</h3>
-
-                                             <p>Your email has been confirmed. <strong>We will be in touch shortly.</strong></p>
-
+                                    <div class="alert alert-error">
+                                         <h3>{{ alert }}</h3>
+                                         <p>{{ msg }}</p>
                                     </div>
                                 </div>
                             </div>
