@@ -33,6 +33,30 @@ class UserThinDB(db.Model):
     profile_pic     = db.BlobProperty(default=None)
 
 
+class UserGoalThinDB(db.Model):
+    user = db.ReferenceProperty(UserThinDB)
+    name = db.StringProperty(required=True)
+    description = db.StringProperty(required=True)
+    rank = db.IntegerProperty(required=False)
+    goal_status = db.StringProperty(choices=('accomplished', 'active', 'not started'))
+    goal_type = db.StringProperty(choices=('goal', 'step'))
+    accomplished_measure = db.StringProperty(required=True)
+    due_date = db.DateTimeProperty(required=False)
+    created = db.DateTimeProperty(required=True, auto_now_add=True)
+    updated = db.DateTimeProperty(required=True, auto_now=True)
+    started_date = db.DateTimeProperty(required=False)
+    accomplished_date = db.DateTimeProperty(required=False)
+    accomplished_comment = db.StringProperty(required=False)
+    goal_tags = db.StringListProperty()
+    parent_goal = db.SelfReferenceProperty()
+
+
+class UserGoalEventThinDB(db.Model):
+    goal = db.ReferenceProperty(UserGoalThinDB)
+    event = db.StringProperty(required=True)
+    reason = db.StringProperty(required=False)
+    created = db.DateTimeProperty(required=True, auto_now_add=True)
+
 class CourseThinDB(db.Model):
     course_name    = db.StringProperty(required=True)
     asset         = db.StringProperty(required=True)
@@ -42,8 +66,9 @@ class CourseThinDB(db.Model):
     follower_count = db.IntegerProperty(required=False, default=0)
     course_tags   = db.StringListProperty()
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    created_by      = db.ReferenceProperty(User, required=True)
+    #created_by      = db.ReferenceProperty(UserThinDB, collection_name='creator')
     updated       = db.DateTimeProperty(required=True, auto_now=True)
+    #updated_by      = db.ReferenceProperty(UserThinDB, collection_name='updater')
 
 
 class TopicThinDB(db.Model):
@@ -54,9 +79,9 @@ class TopicThinDB(db.Model):
     int_value     = db.IntegerProperty(required=False)
     follower_count = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    created_by      = db.ReferenceProperty(UserThinDB, required=True, collection_name='creator')
+    #created_by      = db.ReferenceProperty(UserThinDB, collection_name='creator')
     updated       = db.DateTimeProperty(required=True, auto_now=True)
-    updater       = db.ReferenceProperty(UserThinDB, required=True, collection_name='updater')
+    #updated_by      = db.ReferenceProperty(UserThinDB, collection_name='updater')
     profile_pic     = db.BlobProperty(default=None)
 
 
@@ -70,11 +95,11 @@ class ArticleEvent(EventItem):
     article_url = db.LinkProperty(required=True)
     article_title = db.StringProperty()
     article_image = db.LinkProperty()
-    creator = db.ReferenceProperty(UserThinDB, required=True)
+    creator      = db.ReferenceProperty(UserThinDB)
 
 
 class Activity(db.Model):
-    actor = db.ReferenceProperty(UserThinDB, required=True)
+    actor = db.ReferenceProperty()
     message = db.TextProperty()
     object_type = db.StringProperty()
     action = db.StringProperty()
@@ -112,15 +137,6 @@ class LikedIndex(db.Model):
     liked_id           = db.ListProperty(int)
 
 
-#class TeamThinDB(db.Model):
-#    team_name      = db.StringProperty(required = True)
-#    asset         = db.StringProperty(required = True)
-#    asset_key     = db.StringProperty(required = True)
-#    str_value     = db.StringProperty(required = False)
-#    int_value     = db.IntegerProperty(required= False)
-#    updated       = db.DateTimeProperty(required = True,auto_now = True)
-
-
 class ProjectThinDB(db.Model):
     project_name   = db.StringProperty(required = True)
     asset         = db.StringProperty(required = True)
@@ -129,15 +145,24 @@ class ProjectThinDB(db.Model):
     int_value     = db.IntegerProperty(required= False)
     follower_count = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    created_by      = db.ReferenceProperty(User, required=True, collection_name='creator')
+    created_by      = db.ReferenceProperty(UserThinDB, collection_name='creator')
     updated       = db.DateTimeProperty(required=True, auto_now=True)
-    updater       = db.ReferenceProperty(User, required=True, collection_name='updater')
-#    profile_pic     = db.BlobProperty(default=None)
+    updated_by      = db.ReferenceProperty(UserThinDB, collection_name='updater')
+    profile_pic     = db.BlobProperty(default=None)
 
-class TeamMemberThinDB(db.Model):
+
+class ProjectMemberThinDB(db.Model):
     project = db.ReferenceProperty(ProjectThinDB, required=True)
-    team_member = db.ReferenceProperty(UserThinDB, required=True)
+    team_member = db.ReferenceProperty(UserThinDB, required=True, collection_name='user')
+    #may need to break role into its own model and reference UserProject to capture multiple roles on same project
     role = db.StringProperty(required=False)
+    joined = db.DateTimeProperty(required=True, auto_now_add=True)
+
+
+class TeamThinDB(db.Model):
+    team_name = db.StringProperty(required=True)
+    created = db.DateTimeProperty(required=True, auto_now_add=True)
+
 
 """
 class Member(db.Model):

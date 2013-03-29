@@ -1,0 +1,124 @@
+{% extends "secure.html" %}
+
+{% block title %}Goals{% endblock title %}
+
+{% block description %}"Goals are where ServeLife members establish what they want to accomplish, by when and the steps necessary."{% endblock description %}
+
+{% block page %}
+    <script>
+        $(function() {
+            $("#datepicker").datepicker();
+        });
+    </script>
+
+    <div class="topic-header">
+        <div class="main">
+            <div class="container">
+                <div class="wrapper">
+                    <div class="row-fluid topic-main">
+                        <div class="span2">
+                            <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
+                            <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
+                            <img alt="{{ userthin.user_name }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
+                        </div>
+                        <div class="span5">
+                            <!-- Insert some metrics, share & invite buttons -->
+                            <h4>NEED TO REDO PAGE - TEMPORARY DESIGN</h4>
+                        </div>
+                        <div class="span5">
+                            <div class="row-fluid">
+                                <a class="quick-button-small span2">
+                                    <img alt="Followers" src="/static/img/group.png" />
+                                    <span class="notification followers">{{ userthin.follower_count }}</span>
+                                    <p>Followers</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Discussions" src="/static/img/conversation.png" />
+                                    <span class="notification discussions">7</span>
+                                    <p>Discussions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Ideas" class="ideas" src="/static/img/lightbulb.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Ideas</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Questions" class="questions" src="/static/img/question.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Questions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Tasks" class="questions" src="/static/img/alarm.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Tasks</p>
+                                </a>
+                                <a class="quick-button-small span2" href="/home/goals/{{ userthin.user_name }}">
+                                    <img alt="Goals" src="/static/img/certificate.png" />
+                                    <span class="notification ideas">7</span>
+                                    <div class="quick-button-small-article"><p>Goals</p></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="heavy">
+
+                    <div class="row">
+                        <div class="span4">
+                            <button type="button" data-toggle="modal" data-target="#add_goal">Add a Goal</button>
+
+                            <!-- MODAL TO ADD A GOAL -->
+                            <div id="add_goal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_goal_label" aria-hidden="true">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h3 id="add_goal_label">Add Personal Goal</h3>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form-horizontal">
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_name">Name</label>
+                                            <div class="controls">
+                                                <input class="span3" id="goal_name" name="goal_name" size="30" type="text" value="{{ name }}" required maxlength="50" placeholder="Enter a short name for your goal."/>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_description">Description</label>
+                                            <div class="controls">
+                                                <textarea rows="3" class="span3" id="goal_description" name="goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal. (250 max)">{{ description }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_attainment">Measure</label>
+                                            <div class="controls">
+                                                <textarea rows="3" class="span3" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal.">{{ attainment_measure }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_due">Due Date</label>
+                                            <div class="controls">
+                                                <input type="text" class="span3" id="goal_due" name="goal_due" value="{{ goal_due }}"/>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_tags">Tags</label>
+                                            <div class="controls">
+                                            <textarea rows="3" class="span3" id="goal_tags" name="goal_tags"
+                                                  placeholder="Provide keywords (separated by a comma) that help describe the goal - supports search.">{{ goal_tags }}</textarea>
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                                    <button class="btn btn-primary">Save changes</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page %}
