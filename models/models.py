@@ -34,20 +34,20 @@ class UserThinDB(db.Model):
 
 
 class UserGoalThinDB(db.Model):
-    user = db.ReferenceProperty(UserThinDB)
+    goal_user = db.ReferenceProperty(UserThinDB)
     name = db.StringProperty(required=True)
     description = db.StringProperty(required=True)
-    rank = db.IntegerProperty(required=False)
+    rank = db.IntegerProperty(required=False, default=0)
     goal_status = db.StringProperty(choices=('accomplished', 'active', 'not started'))
     goal_type = db.StringProperty(choices=('goal', 'step'))
     accomplished_measure = db.StringProperty(required=True)
-    due_date = db.DateTimeProperty(required=False)
+    due_date = db.DateProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now_add=True)
     updated = db.DateTimeProperty(required=True, auto_now=True)
     started_date = db.DateTimeProperty(required=False)
     accomplished_date = db.DateTimeProperty(required=False)
     accomplished_comment = db.StringProperty(required=False)
-    goal_tags = db.StringListProperty()
+    tags = db.StringListProperty()
     parent_goal = db.SelfReferenceProperty()
 
 

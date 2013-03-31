@@ -1,16 +1,74 @@
 {% extends "secure.html" %}
 
+{% block custom_script %}
+
+    $(function() {
+        $('#goal_due').datepicker();
+
+        $('#sortable').sortable({
+            revert: true,
+            cursor: "move"
+        });
+
+        $('#sortable').disableSelection();
+
+    });
+
+    $().ready(function() {
+
+        $('.table > tbody > tr').on('click', function(e) {
+            $(this).addClass('info').siblings().removeClass('info');
+        });
+
+        $('#goal').validate();
+
+        $('#save_goal').on('click', function(e) {
+
+            valid = $('#goal').valid();
+            if(valid) {
+                // save a goal
+                var goal_name = $('#goal_name').val();
+                var goal_description = $('#goal_description').val();
+                var goal_measure = $('#goal_attainment').val();
+                var goal_date = $('#goal_due').val();
+                var goal_tags = $('#goal_tags').val();
+
+                $.ajax({
+                    data:{'goal_name' : goal_name, 'goal_description' : goal_description, 'goal_measure' : goal_measure, 'goal_date' : goal_date,  'goal_tags' : goal_tags},
+                    url: "/goal/new",
+                    async: true,
+                    type: "POST",
+                    success: function(response) {
+
+                        if (response=='ok'){
+                            $("#modal-close").click();
+                            $(window.location.replace('/home/goals/{{ userthin.user_name }}'));
+
+                        }
+                    },
+                    error: function(response) {
+                        $("#save_goal").addClass('disabled');
+                        $('#save_goal').html('Something went wrong.');
+                    }
+                });
+            }});
+    });
+
+{% endblock custom_script %}
+
+{% block custom_style %}
+<style>
+    #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+    #sortable li span { position: absolute; margin-left: -1.3em; }
+</style>
+{% endblock custom_style %}
+
 {% block title %}Goals{% endblock title %}
 
 {% block description %}"Goals are where ServeLife members establish what they want to accomplish, by when and the steps necessary."{% endblock description %}
 
 {% block page %}
-    <script>
-        $(function() {
-            $("#datepicker").datepicker();
-        });
-    </script>
-
     <div class="topic-header">
         <div class="main">
             <div class="container">
@@ -63,60 +121,123 @@
 
                     <hr class="heavy">
 
-                    <div class="row">
-                        <div class="span4">
-                            <button type="button" data-toggle="modal" data-target="#add_goal">Add a Goal</button>
 
-                            <!-- MODAL TO ADD A GOAL -->
-                            <div id="add_goal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_goal_label" aria-hidden="true">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                    <h3 id="add_goal_label">Add Personal Goal</h3>
-                                </div>
-                                <div class="modal-body">
-                                    <form class="form-horizontal">
-                                        <div class="control-group">
-                                            <label class="control-label" for="goal_name">Name</label>
-                                            <div class="controls">
-                                                <input class="span3" id="goal_name" name="goal_name" size="30" type="text" value="{{ name }}" required maxlength="50" placeholder="Enter a short name for your goal."/>
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label" for="goal_description">Description</label>
-                                            <div class="controls">
-                                                <textarea rows="3" class="span3" id="goal_description" name="goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal. (250 max)">{{ description }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label" for="goal_attainment">Measure</label>
-                                            <div class="controls">
-                                                <textarea rows="3" class="span3" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal.">{{ attainment_measure }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label" for="goal_due">Due Date</label>
-                                            <div class="controls">
-                                                <input type="text" class="span3" id="goal_due" name="goal_due" value="{{ goal_due }}"/>
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label" for="goal_tags">Tags</label>
-                                            <div class="controls">
-                                            <textarea rows="3" class="span3" id="goal_tags" name="goal_tags"
-                                                  placeholder="Provide keywords (separated by a comma) that help describe the goal - supports search.">{{ goal_tags }}</textarea>
-                                            </div>
-                                        </div>
-
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                                    <button class="btn btn-primary">Save changes</button>
+                    <div class="row-fluid">
+                        <div class="box span6">
+                            <div class="box-header">
+                                <h2><img src="/static/img/certificate.png" class="certificate"/>
+                                    <span class="break"></span>Learning Goals
+                                </h2>
+                                <div class="box-icon">
+                                    <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_goal"><img src="/static/img/halflings_plus.png"/></a>
                                 </div>
                             </div>
 
+
+                            <div class="table-box-content">
+                                <table class="table table-hover table-bordered" id="goals">
+                                    <thead class="table_head">
+                                    <tr>
+                                        <th class="goal-header">Goal</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="sortable">
+                                    {% for goal in goals %}
+                                    <tr onclick="input">
+                                        <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span>{{ goal.name }}</td>
+                                        <td class="text-center">{{ goal.due_date }}</td>
+                                        <td>
+                                            <span class="label label-success">{{ goal.goal_status }}</span>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr class="info">
+                                        <td colspan="3" class="table-row"><strong>No goals found. Please add some.</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                                <!--<div class="pagination pagination-centered">
+                                    <ul>
+                                        <li><a href="#">Prev</a></li>
+                                        <li class="active">
+                                            <a href="#">1</a>
+                                        </li>
+                                        <li><a href="#">2</a></li>
+                                        <li><a href="#">3</a></li>
+                                        <li><a href="#">4</a></li>
+                                        <li><a href="#">Next</a></li>
+                                    </ul>
+                                </div>-->
+
+
+                        <div class="box span6">
+                            <div class="box-header">
+                                <h2>Goal Details</h2>
+                            </div>
+                            <div class=box-content>
+
+                                <p>WHEN GOAL CLICKED POPULATE THIS SIDE. TODO!</p>
+                                <ul>
+                                    <li>Need to create the html layout showing goal details</li>
+                                    <li>Need to determine how best to display, manage a goal's actions</li>
+                                    <li>Need to determine how best to retrieve/show goal details (object) or Ajax call</li>
+                                    <li>Need to build share functionality for goals</li>
+                                </ul>
+
+                            </div>
                         </div>
                     </div>
+                    <!-- MODAL TO ADD A GOAL -->
+                    <div id="add_goal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_goal_label" aria-hidden="true">
+                        <div class="modal-header">
+                            <button type="button" id="modal-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+                            <h3 id="add_goal_label">Add Personal Goal</h3>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal" id="goal">
+                                <div class="control-group">
+                                    <label class="control-label" for="goal_name">Name</label>
+                                    <div class="controls">
+                                        <input class="span3" id="goal_name" required name="goal_name" size="30" type="text" value="{{ name }}" maxlength="50" placeholder="Enter a short name for your goal."/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="goal_description">Description</label>
+                                    <div class="controls">
+                                        <textarea rows="3" class="required span3" id="goal_description" name="goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal. (250 max)">{{ description }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="goal_attainment">Measure</label>
+                                    <div class="controls">
+                                        <textarea rows="3" class="span3" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal.">{{ attainment_measure }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="goal_due">Due Date</label>
+                                    <div class="controls">
+                                        <input type="text" class="span3" id="goal_due" name="goal_due" value="{{ goal_due }}"/>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label" for="goal_tags">Tags</label>
+                                    <div class="controls">
+                                    <textarea rows="3" class="span3" id="goal_tags" name="goal_tags"
+                                          placeholder="Provide keywords (separated by a comma) that help describe the goal - supports search.">{{ goal_tags }}</textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" id="save_goal">Create</button>
+                        </div>
+                    </div>
+                    <!-- End Modal -->
                 </div>
             </div>
         </div>

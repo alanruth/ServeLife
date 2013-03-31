@@ -10,6 +10,7 @@ import logging
 import re
 import webapp2
 import jinja2
+import datetime
 from google.appengine.api import mail
 from google.appengine.api import search
 from google.appengine.ext.webapp import blobstore_handlers
@@ -170,7 +171,11 @@ class LandingPageHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
-            self.redirect('/home/hub/'+user.user_name)
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if profile:
+                self.redirect('/home/hub/'+ user.user_name)
+            else:
+                self.redirect('/user/profile/new/'+ user.user_name)
         else:
             template = jinja_environment.get_template('index.html')
             variables = {}
@@ -414,7 +419,11 @@ class SignUpHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
-            self.redirect('/home/'+user.user_name)
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if profile:
+                self.redirect('/home/hub/'+ user.user_name)
+            else:
+                self.redirect('/user/profile/new/'+ user.user_name)
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
@@ -441,11 +450,11 @@ class SignUpHandler(SLRequestHandler):
                                 body="no html version",
                                 html=email_template.render({'activation_link':activation_link}))
             except:
-                self.response.out.write('mail config not working..')
+                self.response.write('mail config not working..')
 
-            self.response.out.write('ok')
+            self.response.write('ok')
         else:
-            self.response.out.write('user name already exists')
+            self.response.write('user name already exists')
 
 
 class ActivationHandler(SLRequestHandler):
@@ -903,7 +912,7 @@ class NewTopicProfileHandler(SLBSRequestHandler):
                 search.Index(name=_INDEX_NAME).put(doc)
                 self.redirect('/discover/topic/'+topic_name_lc)
             except search.Error:
-                logging.exception('Add failed')
+                logging.exception('Add topic search index failed')
 
         else:
             self.redirect('/signin')
@@ -1132,9 +1141,9 @@ class SubscriptionHandler(webapp2.RequestHandler):
 
 class BetaSignupHandler(SLRequestHandler):
     def get(self):
-        if self.is_logged_in():
-            user = self.user
-            self.redirect('/home/'+user.user_name)
+        #if self.is_logged_in():
+        #    user = self.user
+        #    self.redirect('/home/'+user.user_name)
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
@@ -1161,9 +1170,6 @@ class BetaSignupHandler(SLRequestHandler):
         if username_exists:
             self.response.write('duplicate username')
             return
-
-        #data = urllib.urlencode({'password': beta_password, 'username': beta_username, 'email': beta_email})
-        #urllib.urlopen(domain + '/signup', data)
 
         self.response.write('ok')
         return
@@ -1209,20 +1215,60 @@ class FollowProjectHandler(SLRequestHandler):
         return
 
 
-#class NewUserGoalHandler(SLRequestHandler):
-
-
 class UserGoalHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
             userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            goals = UserGoalThinDB.gql("WHERE goal_user = :1", userthin)
             template = jinja_environment.get_template('usergoal.html')
-            variables = {'user_email': user.email, 'userthin': userthin, 'blob_key': json.loads(userthin.str_value).get('blob_key')}
+            variables = {'user_email': user.email, 'userthin': userthin, 'blob_key': json.loads(userthin.str_value).get('blob_key'), 'goals': goals}
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
+
+    @login_required
+    def post(self):
+        if self.is_logged_in():
+            userthin = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            goal_name = self.request.get('goal_name')
+            goal_description = self.request.get('goal_description')
+            goal_measure = self.request.get('goal_measure')
+            goal_date_str = self.request.get('goal_date')
+            if goal_date_str:
+                goal_date = datetime.datetime.strptime(self.request.get('goal_date'), "%m/%d/%Y").date()
+            else:
+                goal_date = None
+            goal_tags = self.request.get('goal_tags').split(',')
+            goal = UserGoalThinDB.all().filter('goal_name = ', goal_name).get()
+            if goal:
+                goal_status = self.request.get('goal_status')
+            else:
+                goal_status = 'not started'
+            goal = UserGoalThinDB(goal_user=userthin,
+                              name=goal_name,
+                              description=goal_description,
+                              goal_status=goal_status,
+                              accomplished_measure=goal_measure,
+                              due_date=goal_date,
+                              tags=goal_tags)
+            try:
+                goal.put()
+                #TODO increment goal count on userthin
+                #TODO add row to Goal Event
+
+                self.response.write('ok')
+                return
+            except goal.Error:
+                logging.exception('Goal creation failed')
+
+        else:
+            self.redirect('/signin')
+
+
+#class UserGoalHandler(SLRequestHandler):
+
 
 
 
@@ -1257,6 +1303,7 @@ app = webapp2.WSGIApplication([
                                   ('/home/topics/(?P<user_name>.*)', UserTopicHandler),
                                   ('/home/research/(?P<user_name>.*)', UserResearchHandler),
                                   ('/home/goals/(?P<user_name>.*)', UserGoalHandler),
+                                  ('/goal/new', UserGoalHandler),
                                   #('/home/contributions/(?P<user_name>.*)', UserContributionsPageHandler),
                                   #('/home/achievements/(?P<user_name>.*)', UserAchievementsPageHandler),
                                   #('/home/efforts/(?P<user_name>.*)', UserEffortsPageHandler),
