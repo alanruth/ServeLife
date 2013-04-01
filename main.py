@@ -203,7 +203,7 @@ class UserProfileHandler(SLRequestHandler):
 
             variables['user_email'] = user.email
             variables['user_name'] = user.user_name
-            template = jinja_environment.get_template('userprofileedit.html')
+            template = jinja_environment.get_template('userprofile.html')
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')

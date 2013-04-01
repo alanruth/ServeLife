@@ -21,6 +21,8 @@
     <!-- Twitter Bootstrap Overrides -->
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap_and_overrides.css">
 
+    {% block custom_head %} {% endblock custom_head %}
+
     <!-- GOOGLE ANALYTICS -->
     <script type="text/javascript">
 
@@ -34,10 +36,10 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
 
-        {% block custom_script %}{% endblock %}
+        {% block custom_script %}{% endblock custom_script%}
     </script>
 
-    {% block custom_style %}{% endblock %}
+    {% block custom_style %}{% endblock custom_style %}
 </head>
 
 <body>

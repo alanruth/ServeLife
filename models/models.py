@@ -47,10 +47,10 @@ class UserThinDB(db.Model):
 class UserGoal(db.Model):
     goal_user = db.ReferenceProperty(UserThinDB)
     name = db.StringProperty(required=True)
-    description = db.StringProperty(required=True)
+    description = db.StringProperty(required=False)
     rank = db.IntegerProperty(required=False, default=0)
     goal_status = db.StringProperty(choices=('completed', 'active', 'not started', 'on hold', 'deleted'))
-    accomplished_measure = db.StringProperty(required=True)
+    accomplished_measure = db.StringProperty(required=False)
     due_date = db.DateProperty(required=False)
     started_date = db.DateTimeProperty(required=False)
     completed_date = db.DateTimeProperty(required=False)
@@ -68,24 +68,24 @@ class GoalAction(UserGoal):
     effort_remaining = db.IntegerProperty()
     progress = db.FloatProperty()
 
-    def set_progress(self):
-        self.progress = self.calculate_progress()
+    #def set_progress(self):
+    #    self.progress = self.calculate_progress()
 
-    def calculate_progress(self):
-        if self.goal_status == 'active' or self.goal_status == 'on hold':
-            if self.effort_to_date > 0:  # work hasn't started
-                if self.effort_remaining > 0:  # work has started and effort remains
-                    return float(self.effort_to_date) / float(self.effort_to_date + self.effort_remaining)
-                else:  # work has started and no effort remains (essentially this is a complete action)
-                    return float(self.effort_to_date) / float(self.estimate)
-            else:
-                return 0
-        elif self.goal_status == 'completed':
-            return 1
-        elif self.goal_status == 'not started' or self.goal_status == 'deleted':
-            return 0
-        else:
-            return 0
+    #def calculate_progress(self):
+    #    if self.goal_status == 'active' or self.goal_status == 'on hold':
+    #        if self.effort_to_date > 0:  # work hasn't started
+    #            if self.effort_remaining > 0:  # work has started and effort remains
+    #                return float(self.effort_to_date) / float(self.effort_to_date + self.effort_remaining)
+    #            else:  # work has started and no effort remains (essentially this is a complete action)
+    #                return float(self.effort_to_date) / float(self.estimate)
+    #        else:
+    #            return 0
+    #    elif self.goal_status == 'completed':
+    #        return 1
+    #    elif self.goal_status == 'not started' or self.goal_status == 'deleted':
+    #        return 0
+    #    else:
+    #        return 0
 
 
 class UserGoalEvent(db.Model):

@@ -2732,3 +2732,18 @@ table .table-row {
 .input-append {
     margin-top: 10px;
 }
+
+/* Overrides on Bootstrap Modal for SmartWizard */
+.modal#add_goal{
+    width: inherit;
+    margin-left: inherit;
+    left: 20%;
+}
+
+.swMain .stepContainer .form-horizontal {
+    margin-top: 10px;
+}
+
+.ui-datepicker {
+    z-index: 1051 !important;
+}
