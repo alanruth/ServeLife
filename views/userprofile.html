@@ -335,6 +335,11 @@
                                                         <option value="ZM">Zambia</option>
                                                         <option value="ZW">Zimbabwe</option>
                                                         </select>
+                                                    <script>
+                                                        $(document).ready(function(){
+                                                        $('#member_country> option[value="{{ country }}"]').attr("selected", "selected");
+                                                        });
+                                                    </script>
                                                     </div>
                                                 </div>
                                                 <div class="row">
