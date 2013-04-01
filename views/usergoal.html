@@ -52,6 +52,14 @@
                     $('#msgbox-step1').hide();
                     isValid = true;
                 }
+                var goal_description = $('#goal_description').val();
+                if(!goal_description && goal_description.length <= 0){
+                    isValid = false;
+                    $('#msgbox-step1').html('Please add a description for yor goal').show();
+                }else{
+                    $('#msgbox-step1').hide();
+                isValid = true;
+                }
             }
         }
 
@@ -254,117 +262,119 @@
                             <h3 id="add_goal_label">Add Personal Goal</h3>
                         </div>
                         <!-- Modal Body -->
-                        <div id="wizard" class="swMain">
-                            <ul>
-                                <li>
-                                    <a href="#step-1">
-                                    <label class="stepNumber">1</label>
-                                    <span class="stepDesc">Step 1<br />
-                                        <small>What is your goal?</small>
-                                    </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#step-2">
-                                    <label class="stepNumber">2</label>
-                                    <span class="stepDesc">Step 2<br />
-                                        <small>When should it be done?</small>
-                                    </span></a>
-                                </li>
-                                <li>
-                                    <a href="#step-3">
-                                    <label class="stepNumber">3</label>
-                                    <span class="stepDesc">Step 3<br />
-                                        <small>What is the first step?</small>
-                                    </span>
-                                    </a>
-                                </li>
-                                <li><a href="#step-4">
-                                    <label class="stepNumber">4</label>
-                                    <span class="stepDesc">Step 4<br />
-                                        <small>Want to share this?</small>
-                                    </span>
-                                </a></li>
-                            </ul>
-                            <div id="step-1">
-                                <h2 class="StepTitle">Define Your Goal</h2>
-                                <!-- step content -->
-                                <div class="form-horizontal">
-                                    <label id="msgbox-step1" class="alert alert-error"></label>
-                                    <div class="control-group">
-                                        <label class="control-label" for="goal_name">Goal Name</label>
-                                        <div class="controls">
-                                            <input class="span4" id="goal_name" required name="goal_name" size="50" type="text" value="{{ name }}" maxlength="50" placeholder="Enter a short name for your goal."/>
+                        <div class="modal-body">
+                            <div id="wizard" class="swMain">
+                                <ul>
+                                    <li>
+                                        <a href="#step-1">
+                                        <label class="stepNumber">1</label>
+                                        <span class="stepDesc">Step 1<br />
+                                            <small>What is your goal?</small>
+                                        </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#step-2">
+                                        <label class="stepNumber">2</label>
+                                        <span class="stepDesc">Step 2<br />
+                                            <small>When should it be done?</small>
+                                        </span></a>
+                                    </li>
+                                    <li>
+                                        <a href="#step-3">
+                                        <label class="stepNumber">3</label>
+                                        <span class="stepDesc">Step 3<br />
+                                            <small>What is the first step?</small>
+                                        </span>
+                                        </a>
+                                    </li>
+                                    <li><a href="#step-4">
+                                        <label class="stepNumber">4</label>
+                                        <span class="stepDesc">Step 4<br />
+                                            <small>Want to share this?</small>
+                                        </span>
+                                    </a></li>
+                                </ul>
+                                <div id="step-1">
+                                    <h2 class="StepTitle">Define Your Goal</h2>
+                                    <!-- step content -->
+                                    <div class="form-horizontal">
+                                        <label id="msgbox-step1" class="alert alert-error"></label>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_name">Goal Name</label>
+                                            <div class="controls">
+                                                <input class="span4" id="goal_name" required name="goal_name" size="50" type="text" value="{{ name }}" maxlength="50" placeholder="Enter a short name for your goal."/>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label" for="goal_description">Brief Description<br/><small>(250 character limit)</small></label>
-                                        <div class="controls">
-                                            <textarea rows="4" class="required span4" id="goal_description" name="goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal.">{{ description }}</textarea>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_description">Brief Description<br/><small>(250 character limit)</small></label>
+                                            <div class="controls">
+                                                <textarea rows="4" class="required span4" id="goal_description" name="goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal.">{{ description }}</textarea>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label" for="goal_tags">Keyword Tags<br/><small>(separate with commas)</small></label>
-                                        <div class="controls">
-                                            <textarea rows="2" class="span4" id="goal_tags" name="goal_tags"
-                                                      placeholder="Provide keywords that help describe the goal. Supports categorization and search.">{{ goal_tags }}</textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="step-2">
-                                <h2 class="StepTitle">Define Its Achievement</h2>
-                                <!-- step content -->
-                                <div class="form-horizontal">
-                                    <label id="msgbox-step2" class="alert alert-error"></label>
-                                    <div class="control-group">
-                                        <label class="control-label" for="goal_due">Target Due Date</label>
-                                        <div class="controls">
-                                            <input type="text" class="span3" id="goal_due" name="goal_due" value="{{ goal_due }}"/>
-                                        </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label" for="goal_attainment">Attainment Measure<br/><small>(250 character limit)</small></label>
-                                        <div class="controls">
-                                            <textarea rows="4" class="span4" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal. Be Specific.">{{ attainment_measure }}</textarea>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_tags">Keyword Tags<br/><small>(separate with commas)</small></label>
+                                            <div class="controls">
+                                                <textarea rows="2" class="span4" id="goal_tags" name="goal_tags"
+                                                          placeholder="Provide keywords that help describe the goal. Supports categorization and search.">{{ goal_tags }}</textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div id="step-3">
-                                <h2 class="StepTitle">Define The First Step to be Taken</h2>
-                                <!-- step content -->
-                                <div class="form-horizontal">
-                                    <label id="msgbox-step3" class="alert alert-error"></label>
-                                    <div class="control-group">
-                                        <label class="control-label" for="action_name">Action Name</label>
-                                        <div class="controls">
-                                            <input class="span4" id="action_name" required name="action_name" size="50" type="text" maxlength="50" placeholder="Enter a short name for the action to be taken."/>
+                                <div id="step-2">
+                                    <h2 class="StepTitle">Define Its Achievement</h2>
+                                    <!-- step content -->
+                                    <div class="form-horizontal">
+                                        <label id="msgbox-step2" class="alert alert-error"></label>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_due">Target Due Date</label>
+                                            <div class="controls">
+                                                <input type="text" class="span3" id="goal_due" name="goal_due" value="{{ goal_due }}"/>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label" for="action_description">Brief Description<br/><small>(250 character limit)</small></label>
-                                        <div class="controls">
-                                            <textarea rows="4" class="required span4" id="action_description" name="action_description" required maxlength="250" placeholder="Enter a brief but specific description for this action."></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label" for="estimate">How much effort?<br/><small>(in hours)</small></label>
-                                        <div class="controls">
-                                            <input class="span4" id="estimate" required name="estimate" type="number" placeholder="e.g. 40"/>
+                                        <div class="control-group">
+                                            <label class="control-label" for="goal_attainment">Attainment Measure<br/><small>(250 character limit)</small></label>
+                                            <div class="controls">
+                                                <textarea rows="4" class="span4" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal. Be Specific.">{{ attainment_measure }}</textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div id="step-4">
-                                <h2 class="StepTitle">Share Your Goal With Your Friends</h2>
-                                <!-- step content -->
-                                <div class="form-horizontal">
-                                    <div class="control-group">
-                                        <label class="control-label" for="friends_email">Email Addresses<br/><small>(separate with commas)</small></label>
-                                        <div class="controls">
-                                            <textarea rows="5" class="span4" id="friends_email" name="friends_email"
-                                                      placeholder="Provide the email addresses for whom you would like to share this new goal. They won't be spammed. Promise!"></textarea>
+                                <div id="step-3">
+                                    <h2 class="StepTitle">Define The First Step to be Taken</h2>
+                                    <!-- step content -->
+                                    <div class="form-horizontal">
+                                        <label id="msgbox-step3" class="alert alert-error"></label>
+                                        <div class="control-group">
+                                            <label class="control-label" for="action_name">Action Name</label>
+                                            <div class="controls">
+                                                <input class="span4" id="action_name" required name="action_name" size="50" type="text" maxlength="50" placeholder="Enter a short name for the action to be taken."/>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label" for="action_description">Brief Description<br/><small>(250 character limit)</small></label>
+                                            <div class="controls">
+                                                <textarea rows="4" class="required span4" id="action_description" name="action_description" required maxlength="250" placeholder="Enter a brief but specific description for this action."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label" for="estimate">How much effort?<br/><small>(in hours)</small></label>
+                                            <div class="controls">
+                                                <input class="span4" id="estimate" required name="estimate" type="number" placeholder="e.g. 40"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="step-4">
+                                    <h2 class="StepTitle">Share Your Goal With Your Friends</h2>
+                                    <!-- step content -->
+                                    <div class="form-horizontal">
+                                        <div class="control-group">
+                                            <label class="control-label" for="friends_email">Email Addresses<br/><small>(separate with commas)</small></label>
+                                            <div class="controls">
+                                                <textarea rows="5" class="span4" id="friends_email" name="friends_email"
+                                                          placeholder="Provide the email addresses for whom you would like to share this new goal. They won't be spammed. Promise!"></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

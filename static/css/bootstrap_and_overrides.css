@@ -2747,3 +2747,7 @@ table .table-row {
 .ui-datepicker {
     z-index: 1051 !important;
 }
+
+#add_goal .modal-body, #wizard {
+    max-height: 800px;
+}
