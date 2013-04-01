@@ -2728,3 +2728,7 @@ table .table-row {
 .small {
     font-size: 10px;
 }
+
+.input-append {
+    margin-top: 10px;
+}

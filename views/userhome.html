@@ -14,7 +14,7 @@
                         <div class="span2">
                             <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
                             <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
-                            <img alt="{{ user_name }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
+                            <img alt="{{ user_name }}" src="/static/img/defaultavatar.png" class="thumbnail img-polaroid member-pic" />
                         </div>
                         <div class="span5">
                             <!-- Insert some metrics, share & invite buttons -->
@@ -49,7 +49,7 @@
                                 </a>
                                 <a class="quick-button-small span2" href="/home/goals/{{ userthin.user_name }}.html">
                                     <img alt="Goals" src="/static/img/certificate.png" />
-                                    <span class="notification ideas">7</span>
+                                    <span class="notification ideas">{{ userthin.active_goals }}</span>
                                     <div class="quick-button-small-article"><p>Goals</p></div>
                                 </a>
                             </div>

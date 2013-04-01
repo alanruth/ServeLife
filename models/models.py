@@ -30,29 +30,66 @@ class UserThinDB(db.Model):
     projects_followed = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
     updated       = db.DateTimeProperty(required=True, auto_now=True)
-    profile_pic     = db.BlobProperty(default=None)
+    profile_pic     = db.StringProperty()
+    active_goals = db.IntegerProperty(default=0)
+
+    #def set_active_goals(self):
+    #    self.active_goals = self.calculate_active_goals()
+
+    #def calculate_active_goals(self):
+    #    goals = UserGoal.all().filter('goal_user = ', self).count(25)
+    #    if goals:
+    #        return goals
+    #    else:
+    #        return 0
 
 
-class UserGoalThinDB(db.Model):
+class UserGoal(db.Model):
     goal_user = db.ReferenceProperty(UserThinDB)
     name = db.StringProperty(required=True)
     description = db.StringProperty(required=True)
     rank = db.IntegerProperty(required=False, default=0)
-    goal_status = db.StringProperty(choices=('accomplished', 'active', 'not started'))
-    goal_type = db.StringProperty(choices=('goal', 'step'))
+    goal_status = db.StringProperty(choices=('completed', 'active', 'not started', 'on hold', 'deleted'))
     accomplished_measure = db.StringProperty(required=True)
     due_date = db.DateProperty(required=False)
-    created = db.DateTimeProperty(required=True, auto_now_add=True)
-    updated = db.DateTimeProperty(required=True, auto_now=True)
     started_date = db.DateTimeProperty(required=False)
-    accomplished_date = db.DateTimeProperty(required=False)
-    accomplished_comment = db.StringProperty(required=False)
+    completed_date = db.DateTimeProperty(required=False)
+    completed_comment = db.StringProperty(required=False)
     tags = db.StringListProperty()
     parent_goal = db.SelfReferenceProperty()
+    private = db.BooleanProperty(default=False)
+    created = db.DateTimeProperty(required=True, auto_now_add=True)
+    updated = db.DateTimeProperty(required=True, auto_now=True)
 
 
-class UserGoalEventThinDB(db.Model):
-    goal = db.ReferenceProperty(UserGoalThinDB)
+class GoalAction(UserGoal):
+    estimate = db.IntegerProperty(default=0)
+    effort_to_date = db.IntegerProperty(default=0)
+    effort_remaining = db.IntegerProperty()
+    progress = db.FloatProperty()
+
+    def set_progress(self):
+        self.progress = self.calculate_progress()
+
+    def calculate_progress(self):
+        if self.goal_status == 'active' or self.goal_status == 'on hold':
+            if self.effort_to_date > 0:  # work hasn't started
+                if self.effort_remaining > 0:  # work has started and effort remains
+                    return float(self.effort_to_date) / float(self.effort_to_date + self.effort_remaining)
+                else:  # work has started and no effort remains (essentially this is a complete action)
+                    return float(self.effort_to_date) / float(self.estimate)
+            else:
+                return 0
+        elif self.goal_status == 'completed':
+            return 1
+        elif self.goal_status == 'not started' or self.goal_status == 'deleted':
+            return 0
+        else:
+            return 0
+
+
+class UserGoalEvent(db.Model):
+    goal = db.ReferenceProperty(UserGoal)
     event = db.StringProperty(required=True)
     reason = db.StringProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now_add=True)
