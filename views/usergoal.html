@@ -22,6 +22,9 @@
     $().ready(function() {
 
         $("#msgbox-step1").hide();
+        $("#msgbox-step2").hide();
+        $("#msgbox-step3").hide();
+        $("#msgbox-step4").hide();
 
         // Smart Wizard
         $('#wizard').smartWizard({
@@ -29,14 +32,52 @@
             onFinish:onFinishCallback
         });
 
+
         function leaveAStepCallback(obj, context){
             return validateSteps(context.fromStep); // return false to stay on step and true to continue navigation
         }
 
         function onFinishCallback(objs, context){
-            if(validateAllSteps()){
-                $("#modal-close").click();
-            }
+            //get variables set
+            var goal_name = $('#goal_name').val();
+            var goal_description = $('#goal_description').val();
+            var goal_measure = $('#goal_attainment').val();
+            var goal_date = $('#goal_due').val();
+            var goal_tags = $('#goal_tags').val();
+            var action_name = $('#action_name').val();
+            var action_description = $('#action_description').val();
+            var action_estimate = $('#estimate').val();
+            var friends_email = $('#friends_email').val();
+
+            $.ajax({
+                data:{'goal_name' : goal_name,
+                    'goal_description' : goal_description,
+                    'goal_measure' : goal_measure,
+                    'goal_date' : goal_date,
+                    'goal_tags' : goal_tags,
+                    'action_name' : action_name,
+                    'action_description' : action_description,
+                    'action_estimate' : action_estimate,
+                    'friends_email' : friends_email
+                },
+                url: "/goal/new",
+                async: true,
+                type: "POST",
+                success: function(response) {
+                    if (response == 'ok'){
+                        $("#modal-close").click();
+                        $(window.location.replace('/home/goals/{{ userthin.user_name }}'));
+                    }else{
+                        $('#wizard').smartWizard('showMessage',response);
+                    }
+                },
+                error: function(response) {
+                    $(".buttonFinish").addClass('buttonDisabled');
+                    $(".buttonPrevious").addClass('Disabled');
+                    $('.buttonFinish').html('Something went wrong.');
+                }
+            });
+
         }
 
         // Your Step validation logic
@@ -44,76 +85,60 @@
             var isStepValid = true;
             // validate step 1
             if(stepnumber == 1){
+                //validate goal name
                 var goal_name = $('#goal_name').val();
                 if(!goal_name && goal_name.length <= 0){
-                    isValid = false;
+                    isStepValid = false;
                     $('#msgbox-step1').html('Please name your goal').show();
+                    return isStepValid;
                 }else{
                     $('#msgbox-step1').hide();
-                    isValid = true;
                 }
+
+                //validate goal description
                 var goal_description = $('#goal_description').val();
                 if(!goal_description && goal_description.length <= 0){
-                    isValid = false;
-                    $('#msgbox-step1').html('Please add a description for yor goal').show();
+                    isStepValid = false;
+                    $('#msgbox-step1').html('Please add a description for your goal').show();
+                    return isStepValid;
                 }else{
                     $('#msgbox-step1').hide();
-                isValid = true;
                 }
+                return isStepValid;
             }
-        }
+            else if(stepnumber ==2){
+                var isStepValid = true;
+                //validate goal due
+                //TODO date needs to be in the future
+                var goal_due = $('#goal_due').val();
+                if(!goal_due && goal_due.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step2').html('Please set a date for the goal').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step2').hide();
+                }
 
-        function validateAllSteps(){
-            var isStepValid = true;
-            if(validateStep1() == false){
-                isStepValid = false;
-                $('#wizard').smartWizard('setError',{stepnum:1,iserror:true});
-            }else{
-                $('#wizard').smartWizard('setError',{stepnum:1,iserror:false});
+                var goal_attainment = $('#goal_attainment').val();
+                if(!goal_attainment && goal_attainment.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step2').html('Please describe how you know you accomplished the goal').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step2').hide();
+                }
+                return isStepValid;
             }
-
-            return isStepValid;
+            else {
+                return isStepValid;
+            }
         }
 
         // Click Event for Sortable
         $('.table > tbody > tr').on('click', function(e) {
             $(this).addClass('info').siblings().removeClass('info');
-
-
         });
 
-        $('#goal').validate();
-
-        $('#save_goal').on('click', function(e) {
-
-            valid = $('#goal').valid();
-            if(valid) {
-                // save a goal
-                var goal_name = $('#goal_name').val();
-                var goal_description = $('#goal_description').val();
-                var goal_measure = $('#goal_attainment').val();
-                var goal_date = $('#goal_due').val();
-                var goal_tags = $('#goal_tags').val();
-
-                $.ajax({
-                    data:{'goal_name' : goal_name, 'goal_description' : goal_description, 'goal_measure' : goal_measure, 'goal_date' : goal_date,  'goal_tags' : goal_tags},
-                    url: "/goal/new",
-                    async: true,
-                    type: "POST",
-                    success: function(response) {
-
-                        if (response=='ok'){
-                            $("#modal-close").click();
-                            $(window.location.replace('/home/goals/{{ userthin.user_name }}'));
-
-                        }
-                    },
-                    error: function(response) {
-                        $("#save_goal").addClass('disabled');
-                        $('#save_goal').html('Something went wrong.');
-                    }
-                });
-            }});
     });
 
 {% endblock custom_script %}
@@ -301,13 +326,13 @@
                                     <div class="form-horizontal">
                                         <label id="msgbox-step1" class="alert alert-error"></label>
                                         <div class="control-group">
-                                            <label class="control-label" for="goal_name">Goal Name</label>
+                                            <label class="control-label" for="goal_name">Goal Name<span class="required-field">*</span></label>
                                             <div class="controls">
                                                 <input class="span4" id="goal_name" required name="goal_name" size="50" type="text" value="{{ name }}" maxlength="50" placeholder="Enter a short name for your goal."/>
                                             </div>
                                         </div>
                                         <div class="control-group">
-                                            <label class="control-label" for="goal_description">Brief Description<br/><small>(250 character limit)</small></label>
+                                            <label class="control-label" for="goal_description">Brief Description<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
                                             <div class="controls">
                                                 <textarea rows="4" class="required span4" id="goal_description" name="goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal.">{{ description }}</textarea>
                                             </div>
@@ -327,13 +352,13 @@
                                     <div class="form-horizontal">
                                         <label id="msgbox-step2" class="alert alert-error"></label>
                                         <div class="control-group">
-                                            <label class="control-label" for="goal_due">Target Due Date</label>
+                                            <label class="control-label" for="goal_due">Target Due Date<span class="required-field">*</span></label>
                                             <div class="controls">
                                                 <input type="text" class="span3" id="goal_due" name="goal_due" value="{{ goal_due }}"/>
                                             </div>
                                         </div>
                                         <div class="control-group">
-                                            <label class="control-label" for="goal_attainment">Attainment Measure<br/><small>(250 character limit)</small></label>
+                                            <label class="control-label" for="goal_attainment">Attainment Measure<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
                                             <div class="controls">
                                                 <textarea rows="4" class="span4" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal. Be Specific.">{{ attainment_measure }}</textarea>
                                             </div>

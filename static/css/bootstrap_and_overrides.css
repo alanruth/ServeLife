@@ -2742,12 +2742,26 @@ table .table-row {
 
 .swMain .stepContainer .form-horizontal {
     margin-top: 10px;
+/*    max-height: 800px;
+    height: 100%; */
 }
+
+/*.swMain .stepContainer div.content {
+    height: 100%;
+}*/
 
 .ui-datepicker {
     z-index: 1051 !important;
 }
 
-#add_goal .modal-body, #wizard {
+#add_goal .modal-body {
     max-height: 800px;
+}
+
+#wizard {
+    max-height: 800px;
+}
+
+.required-field {
+    top: -10px;
 }

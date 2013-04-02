@@ -1173,38 +1173,48 @@ class UserGoalHandler(SLRequestHandler):
     def post(self):
         if self.is_logged_in():
             userthin = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            # Save Goal
             goal_name = self.request.get('goal_name')
             goal_description = self.request.get('goal_description')
             goal_measure = self.request.get('goal_measure')
-            goal_date_str = self.request.get('goal_date')
-            if goal_date_str:
-                goal_date = datetime.datetime.strptime(self.request.get('goal_date'), "%m/%d/%Y").date()
-            else:
-                goal_date = None
+            goal_date = datetime.datetime.strptime(self.request.get('goal_date'), "%m/%d/%Y").date()
             goal_tags = self.request.get('goal_tags').split(',')
-            goal = UserGoal.all().filter('goal_name = ', goal_name).get()
-            if goal:
-                goal_status = self.request.get('goal_status')
-            else:
-                goal_status = 'not started'
+            goal_status = 'not started'
             goal = UserGoal(goal_user=userthin,
-                              name=goal_name,
-                              description=goal_description,
-                              goal_status=goal_status,
-                              accomplished_measure=goal_measure,
-                              due_date=goal_date,
-                              tags=goal_tags)
-
+                           name=goal_name,
+                           description=goal_description,
+                           goal_status=goal_status,
+                           accomplished_measure=goal_measure,
+                           due_date=goal_date,
+                           tags=goal_tags)
             goal.put()
-            #TODO increment goal count on userthin
-            #TODO add row to Goal Event
+
+            action_name = self.request.get('action_name')
+            if action_name:
+                # Save Goal Action
+                #action_name = self.request.get('action_name')
+                action_description = self.request.get('action_description')
+                action_estimate = int(self.request.get('action_estimate'))
+                action_status = 'not started'
+                action = GoalAction(goal_user=userthin,
+                                       name=action_name,
+                                       description=action_description,
+                                       estimate=action_estimate,
+                                       goal_status=action_status,
+                                       parent_goal=goal)
+                action.put()
 
             self.response.write('ok')
             return
-
         else:
             self.redirect('/signin')
 
+
+
+
+            #TODO increment goal count on userthin
+            #TODO add row to Goal Event
+            #TODO send email to friend list
 
 #class UserGoalHandler(SLRequestHandler):
 
