@@ -4,13 +4,17 @@
 
 {% block description %}"Your ServeLife account contains your password."{% endblock description %}
 
-{% block submenu %}
-    <div class="container">
-        <h3>Update Your ServeLife Membership</h3>
-        <ul class="nav nav-pills pull-right" id="submenu">
-            <li><a href="/user/profile/{{ user_name }}">Profile</a></li>
-            <li><a href="/user/account/{{ user_name }}">Account</a></li>
-            <li class="active"><a href="#">Subscription</a></li>
-        </ul>
+{% block page %}
+    <div class="main">
+        <div class="container">
+            <div class="wrapper">
+                <h3>Update Your ServeLife Membership</h3>
+                <ul class="nav nav-pills pull-right" id="submenu">
+                    <li><a href="/user/profile/{{ user_name }}">Profile</a></li>
+                    <li><a href="/user/account/{{ user_name }}">Account</a></li>
+                    <li class="active"><a href="#">Subscription</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
-{% endblock submenu %}
+{% endblock page %}

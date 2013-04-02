@@ -1796,9 +1796,9 @@ img.articles {
     margin-top: -6px;
 }
 
-.header-main {
+/*.header-main {
   margin-top: 60px;
-}
+}*/
 
 .profile-details {
   text-align: center;
@@ -2764,4 +2764,8 @@ table .table-row {
 
 .required-field {
     top: -10px;
+}
+
+.hidden-column {
+    display: none;
 }

@@ -1245,7 +1245,7 @@ app = webapp2.WSGIApplication([
                                   ('/user/account/(?P<user_name>.*)', UserAccountEditHandler),
                                   ('/user/subscription/(?P<user_name>.*)', UserSubscriptionEditHandler),
                                   ('/profile/(?P<user_name>.*)', UserPrivateProfileHandler),
-                                  ('/user/profile/(?P<user_name>.*)', UserInternalProfileHandler),
+                                  ('/community/profile/(?P<user_name>.*)', UserInternalProfileHandler),
                                   ('/home/hub/(?P<user_name>.*)', UserHomeHandler),
                                   ('/home/projects/(?P<user_name>.*)', UserProjectHandler),
                                   ('/home/classes/(?P<user_name>.*)', UserClassHandler),

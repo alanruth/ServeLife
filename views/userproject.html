@@ -5,7 +5,7 @@
 {% block description %}"{{ user_name }}'s project page brings together all the projects a ServeLife member either follows or is a member of."{% endblock description %}
 
 {% block page %}
-    <div class="topic-header">
+
         <div class="main">
             <div class="container">
                 <div class="wrapper">
@@ -68,19 +68,19 @@
                             </ul>
                         </div>
                     </div>
+
+                        <h1>This is a {{ user.user_name }} Homebase</h1>
+                        <ul>
+                            {% for project in projects %}
+                                <li><a href="/build/project/profile/{{ project.project_name|e }}">{{ project.project_name|e }}</a></li>
+                            {% else %}
+                                <li>No Projects Found</li>
+                            {%  endfor %}
+                        </ul>
+
+
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="container">
-        <h1>This is a {{ user.user_name }} Homebase</h1>
-        <ul>
-            {% for project in projects %}
-                <li><a href="/build/project/profile/{{ project.project_name|e }}">{{ project.project_name|e }}</a></li>
-            {% else %}
-                <li>No Projects Found</li>
-            {%  endfor %}
-        </ul>
-    </div>
 {% endblock page %}
