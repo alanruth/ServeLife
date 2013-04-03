@@ -2734,7 +2734,7 @@ table .table-row {
 }
 
 /* Overrides on Bootstrap Modal for SmartWizard */
-.modal#add_goal{
+.modal#add_goal, .modal#add_project {
     width: inherit;
     margin-left: inherit;
     left: 20%;
@@ -2754,7 +2754,7 @@ table .table-row {
     z-index: 1051 !important;
 }
 
-#add_goal .modal-body {
+#add_goal .modal-body, #add_project .modal-body {
     max-height: 800px;
 }
 

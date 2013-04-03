@@ -94,6 +94,7 @@ class UserGoalEvent(db.Model):
     reason = db.StringProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now_add=True)
 
+
 class CourseThinDB(db.Model):
     course_name    = db.StringProperty(required=True)
     asset         = db.StringProperty(required=True)
@@ -182,13 +183,13 @@ class ProjectThinDB(db.Model):
     int_value     = db.IntegerProperty(required= False)
     follower_count = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    created_by      = db.ReferenceProperty(UserThinDB, collection_name='creator')
+    #created_by      = db.ReferenceProperty(UserThinDB, collection_name='creator')
     updated       = db.DateTimeProperty(required=True, auto_now=True)
-    updated_by      = db.ReferenceProperty(UserThinDB, collection_name='updater')
+    #updated_by      = db.ReferenceProperty(UserThinDB, collection_name='updater')
     profile_pic     = db.BlobProperty(default=None)
 
 
-class ProjectMemberThinDB(db.Model):
+class ProjectMember(db.Model):
     project = db.ReferenceProperty(ProjectThinDB, required=True)
     team_member = db.ReferenceProperty(UserThinDB, required=True, collection_name='user')
     #may need to break role into its own model and reference UserProject to capture multiple roles on same project

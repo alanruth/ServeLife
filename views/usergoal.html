@@ -17,14 +17,6 @@
 
         $('#sortable').disableSelection();
 
-    });
-
-    $().ready(function() {
-
-        $("#msgbox-step1").hide();
-        $("#msgbox-step2").hide();
-        $("#msgbox-step3").hide();
-        $("#msgbox-step4").hide();
 
         // Smart Wizard
         $('#wizard').smartWizard({
@@ -131,6 +123,16 @@
                 return isStepValid;
             }
         }
+
+    });
+
+    $().ready(function() {
+
+        $("#msgbox-step1").hide();
+        $("#msgbox-step2").hide();
+        $("#msgbox-step3").hide();
+        $("#msgbox-step4").hide();
+
 
         // Click Event for Sortable
         $('.table > tbody > tr').on('click', function(e) {

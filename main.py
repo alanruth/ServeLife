@@ -23,41 +23,28 @@ domain = 'http://servelife.com'
 
 jinja_environment = jinja2.Environment(autoescape=True, loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'views')))
 
-def create_topic(topic):
-    topic_info = json.loads(topic.str_value)
-    topic_description = topic_info.get('topic_description')
-    parent_topic = topic_info.get('parent_topic')
-    created_by = topic.created_by.user_name
-    return search.Document(doc_id=str(topic.key().id()),fields = [search.TextField(name='description',value=topic_description),
-                                                                 search.TextField(name='parent_topic', value=parent_topic),
-                                                                 search.TextField(name='created_by', value=created_by),])
+
+class SLRequestHandler(webapp2.RequestHandler):
+    user = None
+
+    def is_logged_in(self):
+        cookie = self.request.cookies.get('user_id')
+        if cookie!="" and cookie!=None:
+            cookie_split = cookie.split('|')
+            user_id = cookie_split[0]
+            rand_secret = cookie_split[1]
+            hash = cookie_split[2]
+            if hmac.new(str(rand_secret), str(user_id)).hexdigest()==str(hash):
+                self.user = User.get_by_id(int(user_id))
+                return True
+            else:
+                return False
+        else:
+            return False
 
 
-def create_project(project):
-    project_info = json.loads(project.str_value)
-    project_description = project_info.get('project_description')
-    parent_project = project_info.get('parent_project')
-    created_by = project.created_by.user_name
-    return search.Document(doc_id=str(project.key().id()),fields = [search.TextField(name='description',value=project_description),
-                                                                  search.TextField(name='parent_project', value=parent_project),
-                                                                  search.TextField(name='created_by', value=created_by),])
-
-
-def create_activity(actor, actor_type, entity, entity_type, activity_type):
-    if actor_type == "user":
-        actor_name = actor.user_name
-
-    if entity_type == "project":
-        entity_name = entity.project_name
-    elif entity_type == "topic":
-        entity_name = entity.topic_name
-
-    if activity_type == "create":
-        body = str(actor_name + ' created a new ' + entity_type + ' named ' + entity_name)
-
-    activity = Activity(actor=actor, message=body, object_type=entity_type, action=activity_type)
-    activity.put()
-    return True
+class SLBSRequestHandler(SLRequestHandler, blobstore_handlers.BlobstoreUploadHandler):
+    pass
 
 
 #utility function to get gravatar image url
@@ -76,6 +63,13 @@ def is_valid(user_input,regex):
 
 jinja_environment.filters['get_gravatar_url'] = get_gravatar_url
 
+
+def handle_404(request, response, exception):
+    logging.exception(exception)
+    response.write('Oops! I could swear this page was here!')
+    response.set_status(404)
+
+
 #decorator for protecting pages
 def login_required(function):
     def _f(self, *args, **kwargs):
@@ -86,6 +80,102 @@ def login_required(function):
             self.redirect('/signin?next=%s' %next_page)
 
     return _f
+
+
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    def get(self, resource):
+        resource = str(urllib.unquote(resource))
+        blob_info = blobstore.BlobInfo.get(resource)
+        self.send_blob(blob_info)
+
+
+# v-v FOLLOW FUNCTIONALITY & HANDLERS v-v
+class FollowUserHandler(SLRequestHandler):
+    @login_required
+    def post(self, followed):
+        if self.is_logged_in():
+            #user that is following another user is the follower
+            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            #user that is being followed is the followed
+            user_followed = UserThinDB.all().filter('user_name = ', followed).get()
+            follow_index = UserFollowerIndex.all().filter('parent = ', user_followed).get()
+            if follow_index:
+                follow_index = UserFollowerIndex.followers.append(user_follower.key().id())
+                follow_index.put()
+            else:
+                follow_index = UserFollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
+                follow_index.put()
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            user_follow(user_followed, user_follower)
+            self.redirect('/user/profile/' + followed)
+        else:
+            self.redirect('/signin')
+
+
+class FollowTopicHandler(SLRequestHandler):
+    @login_required
+    def post(self, topic):
+        if self.is_logged_in():
+            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            topic_followed = TopicThinDB.all().filter('topic_name = ', topic).get()
+            follow_index = TopicFollowerIndex.all().filter('parent = ', topic_followed).get()
+            if follow_index:
+                follow_index = TopicFollowerIndex.followers.append((follower.key().id()))
+                follow_index.put()
+            else:
+                follow_index = TopicFollowerIndex(key_name='index', parent=topic_followed, followers=[(follower.key().id())])
+                follow_index.put()
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            topic_follow(topic_followed, follower)
+            self.redirect('/discover/topic/'+topic)
+        else:
+            self.redirect('/signin')
+
+
+class UnFollowTopicHandler(SLRequestHandler):
+    @login_required
+    def post(self, topic):
+        if self.is_logged_in():
+            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            topic_unfollowed = TopicThinDB.all().filter('topic_name = ', topic).get()
+            follow_index = TopicFollowerIndex.all().filter('parent = ', topic_unfollowed).get()
+            if follow_index:
+                follow_index = TopicFollowerIndex.followers.remove((follower.key().id()))
+                follow_index.put()
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            #topic_follow(topic_followed, follower)
+            self.redirect('/discover/topic/'+topic)
+        else:
+            self.redirect('/signin')
+
+
+class FollowCourseHandler(SLRequestHandler):
+    @login_required
+    def post(self, course_name):
+        if self.is_logged_in():
+            #user that is following course
+            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            course_followed = CourseThinDB.all().filter('course_name = ', course_name).get()
+            follow_index = CourseFollowerIndex.all().filter('parent = ', course_followed).get()
+            if follow_index:
+                follow_index = CourseFollowerIndex.followers.append(user_follower.key().id())
+                follow_index.put()
+            else:
+                follow_index = CourseFollowerIndex(key_name='index', parent=course_followed, followers=[(user_follower.key().id())])
+                follow_index.put()
+
+            #Increment how many users follow a a certain user = follower count and
+            #Increment how many users a certain user follows = follow count
+            user_follow(course_followed, user_follower)
+            self.redirect('/course/'+course_name)
+        else:
+            self.redirect('/signin')
 
 
 #function to increment follower & follow counts for a user (how many people follow the user and how many they follow)
@@ -144,29 +234,273 @@ def project_unfollow(project_followed, user_follower):
     return True
 
 
-class SLRequestHandler(webapp2.RequestHandler):
-    user = None
+class FollowProjectHandler(SLRequestHandler):
+    def post(self):
+        user_name = str(self.request.get('user_name'))
+        project_name = str(self.request.get('project_name'))
+        user_follower = UserThinDB.all().filter('user_name = ', user_name).get()
+        project_followed = ProjectThinDB.all().filter('project_name = ', project_name).get()
+        follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
 
-    def is_logged_in(self):
-        cookie = self.request.cookies.get('user_id')
-        if cookie!="" and cookie!=None:
-            cookie_split = cookie.split('|')
-            user_id = cookie_split[0]
-            rand_secret = cookie_split[1]
-            hash = cookie_split[2]
-            if hmac.new(str(rand_secret), str(user_id)).hexdigest()==str(hash):
-                self.user = User.get_by_id(int(user_id))
-                return True
-            else:
-                return False
+        #check to see if user is already a follower
+        #is_follower = db.GqlQuery(
+        #    """SELECT * FROM ProjectFollowerIndex WHERE
+        #    followers = :1 AND
+        #    parent = :2""",
+        #    user_follower, project_followed)
+        #if is_follower:
+        #Need to Unfollow
+        #if follow_index:
+        #    follow_index = ProjectFollowerIndex.followers.remove(user_follower.key().id())
+        #    follow_index.put()
+        #Increment how many users follow a a certain project = follower count and
+        #Increment how many projects a certain user follows = follow count
+        #    project_unfollow(project_followed, user_follower)
+        #    self.response.write('unfollowed')
+        #    return
+        #else:
+        #Need to Follow
+        follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
+        if follow_index:
+            follow_index = ProjectFollowerIndex.followers.append(user_follower.key().id())
+            follow_index.put()
         else:
-            return False
+            follow_index = ProjectFollowerIndex(key_name='index', parent=project_followed, followers=[(user_follower.key().id())])
+            follow_index.put()
+            #Increment how many users follow a a certain project = follower count and
+            #Increment how many projects a certain user follows = follow count
+        project_follow(project_followed, user_follower)
+        self.response.write('followed')
+        return
 
 
-class SLBSRequestHandler(SLRequestHandler, blobstore_handlers.BlobstoreUploadHandler):
-    pass
+# v-v SIGN IN & SIGNUP HANDLERS v-v
+class SignUpHandler(SLRequestHandler):
+    def get(self):
+        if self.is_logged_in():
+            user = self.user
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if profile:
+                self.redirect('/home/hub/'+ user.user_name)
+            else:
+                self.redirect('/user/profile/'+ user.user_name)
+        template = jinja_environment.get_template('signup.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+    def post(self):
+        email = self.request.get('email')
+        username = self.request.get('username').lower()
+        password = self.request.get('password')
+        username_exists = User.all().filter('user_name =', username).get()
+        if not username_exists:
+            #save the new user unactivated
+            random_secret = "".join(random.choice(string.letters) for x in xrange(5))
+            password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
+            activation_key = hmac.new(random_secret,username).hexdigest()
+            new_user = User(email=email, user_name=username, password_hash=password_hash, activated='False', activation_key=activation_key)
+            new_user.put()
+            #mail the activation link
+            activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
+            email_template = jinja_environment.get_template('email.html')
+            try:
+                mail.send_mail(sender="alan@notionlabs.com",
+                               to=email,
+                               subject="Activate your Servelife account!",
+                               body="no html version",
+                               html=email_template.render({'activation_link':activation_link}))
+            except:
+                self.response.write('mail config not working..')
+
+            self.response.write('ok')
+        else:
+            self.response.write('user name already exists')
 
 
+class ActivationHandler(SLRequestHandler):
+    def get(self):
+        activation_key = self.request.get('activation_key')
+        user = User.all().filter('activation_key =', activation_key).get()
+        if user:
+            user.activated='True'
+            user.put()
+            username = user.user_name
+            user_influence = UserThinDB(user_name=username,
+                                        asset= 'profile',
+                                        asset_key= 'influence',
+                                        str_value= '',
+                                        int_value= 100)
+            user_influence.put()
+            template = jinja_environment.get_template('publicconfirm.html')
+            alert = "Thank You"
+            msg = "Your ServeLife account has been confirmed. Login and begin your learning adventure!"
+            variables = {'alert': alert, 'msg': msg}
+            self.response.out.write(template.render(variables))
+            #self.response.out.write('Your account has been activated!')
+        else:
+            template = jinja_environment.get_template('publicconfirm.html')
+            alert = "An Error Has Occurred"
+            msg = "The activation key used is not valid. Please submit your email address again."
+            variables = {'alert': alert, 'msg': msg}
+            self.response.out.write(template.render(variables))
+            #self.response.out.write('No such activation key!')
+
+
+class SignInHandler(SLRequestHandler):
+    def get(self):
+        if self.is_logged_in():
+            user = self.user
+            #ABR: check to see if the user has a profile
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if profile:
+                self.redirect('/home/hub/'+ user.user_name)
+            else:
+                self.redirect('/user/profile/'+ user.user_name)
+        template = jinja_environment.get_template('signin.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+    def post(self):
+        password = str(self.request.get('password'))
+        email = str(self.request.get('email'))
+        user = User.all().filter('email =', email).get()
+        if user:
+            pass_split = user.password_hash.split('|')
+            random_secret = str(pass_split[0])
+            password_hash = str(pass_split[1])
+            if str(hmac.new(random_secret,password).hexdigest())==str(password_hash):
+                user_id =  str(user.key().id())
+                #user_id|random_secret|hash
+                cookie_value = user_id+'|'+random_secret+'|'+hmac.new(random_secret,user_id).hexdigest()
+                cookie = 'user_id = '+cookie_value+';Path = /'
+                self.response.headers.add_header('Set-Cookie', cookie)
+
+                #ABR: check to see if the user has a profile
+                profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+                if profile:
+                    url_path = str('/home/hub/' + user.user_name)
+                    #AS: create a response payload of as many items you want to have in a dictionary
+                    response = {'status':'ok', 'location':url_path}
+                    # then serialize this python object into a string representation for a javascript object
+                    # this is what is called JavaScript Object Notation or JSON
+                    response_string = json.dumps(response)
+                    #now send this json to the browser!
+                    self.response.write(response_string)
+                    return
+                else:
+                    url_path = str('/user/profile/' + user.user_name)
+                    response = {'status':'ok', 'location':url_path}
+                    response_string = json.dumps(response)
+                    self.response.write(response_string)
+                    return
+            else:
+                response = {'status':'invalid password'}
+                response_string = json.dumps(response)
+                self.response.write(response_string)
+                return
+        else:
+            response = {'status': 'invalid email'}
+            response_string = json.dumps(response)
+            self.response.write(response_string)
+            return
+
+
+class LogOutHandler(SLRequestHandler):
+    def get(self):
+        self.response.headers.add_header('Set-Cookie','user_id=;Path = /')
+        self.redirect('/')
+
+
+class BetaSignupHandler(SLRequestHandler):
+    def get(self):
+        #if self.is_logged_in():
+        #    user = self.user
+        #    self.redirect('/home/'+user.user_name)
+        template = jinja_environment.get_template('signup.html')
+        variables = {}
+        self.response.out.write(template.render(variables))
+
+    def post(self):
+        beta_password = str(self.request.get('password'))
+        beta_passcode = str(self.request.get('passcode'))
+        if beta_passcode != 'learnwithpurpose':
+            self.response.write('invalid passcode')
+            return
+
+        beta_email = str(self.request.get('email'))
+        if not is_valid(beta_email, valid['email']):
+            self.response.write('invalid email')
+            return
+        else:
+            beta_user = User.all().filter('email =', beta_email).get()
+            if beta_user:
+                self.response.write('duplicate email')
+                return
+
+        beta_username = str(self.request.get('user_name')).lower()
+        username_exists = User.all().filter('user_name =', beta_username).get()
+        if username_exists:
+            self.response.write('duplicate username')
+            return
+
+        self.response.write('ok')
+        return
+
+
+class SubscriptionHandler(webapp2.RequestHandler):
+    def post(self,method):
+        if method == 'email_subscription':
+
+            subscriber_email = str(self.request.get('subscriber_email'))
+            if not is_valid(subscriber_email, valid['email']):
+                self.response.write('invalid')
+                return
+
+            subscriber_exists = Subscriber.all().filter('email =', subscriber_email).get()
+            if not subscriber_exists:
+                email_template = jinja_environment.get_template('subscriber.html')
+                salt = 'atwgwkjerfkjk2343454mf@$'
+                activation_key= hashlib.md5(subscriber_email.lower()+salt).hexdigest()
+                url_enc = urllib.urlencode({'email':subscriber_email,'key':activation_key})
+                activation_link=domain + '/email/email_subscription_activate?'+url_enc
+                #variables = {'url': url}
+                try:
+                    mail.send_mail(sender="alan@notionlabs.com",
+                                   to=subscriber_email,
+                                   subject="Thank You For Signing Up for ServeLife!",
+                                   body="Welcome to ServeLife! ServeLife is a global team of life-long learners working hard to build a better way to effectively transform knowledge into expertise.",
+                                   html=email_template.render({'activation_link':activation_link}))
+                    self.response.out.write('ok')
+                    new_subscriber = Subscriber(email=subscriber_email, verified=False)
+                    new_subscriber.put()
+                except:
+                    self.response.out.write('something went wrong..we will fix this error!')
+            else:
+                self.response.out.write('exists')
+
+    def get(self,method):
+
+        if method=='email_subscription_activate':
+            #add to subscribers list
+            email = self.request.get('email')
+            key = self.request.get('key')
+            salt = 'atwgwkjerfkjk2343454mf@$'
+            if hashlib.md5(email.lower()+salt).hexdigest() == key:
+                real_subscriber = Subscriber.all().filter('email =', email).get()
+                real_subscriber.verified=True
+                real_subscriber.put()
+
+                template = jinja_environment.get_template('publicconfirm.html')
+                alert = "Thank You"
+                msg = "Your email has been confirmed. We will be in touch shortly concerning early access."
+                variables = {'alert': alert, 'msg': msg}
+                self.response.out.write(template.render(variables))
+                #self.response.write('ok')
+            else:
+                self.response.write(email+','+key)
+
+
+# v-v PUBLIC PAGE HANDLERS v-v
 class LandingPageHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
@@ -188,6 +522,90 @@ class PodcastHandler(SLRequestHandler):
         # template = jinja_environment.get_template('innovationintheenterprise.html')
         # variables = {}
         # self.response.out.write(template.render(variables))
+
+
+class TopicExternalProfileHandler(SLRequestHandler):
+    def get(self, topic_name):
+        topic = TopicThinDB.all().filter('topic_name = ', topic_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if topic:
+            variables = json.loads(topic.str_value)
+            variables['topic'] = topic
+            template = jinja_environment.get_template('topicexternalindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such topic exists within the ServeLife ecosystem!')
+
+
+class ProjectExternalProfileHandler(SLRequestHandler):
+    def get(self, project_name):
+        project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if project:
+            variables = json.loads(project.str_value)
+            template = jinja_environment.get_template('projectexternalindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such project exists within the ServeLife ecosystem!')
+
+
+class UserExternalProfileHandler(SLRequestHandler):
+    def get(self, user_name):
+        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
+        if profile:
+            variables = json.loads(profile.str_value)
+            variables['userthin'] = profile
+            template = jinja_environment.get_template('userexternalindex.html')
+            self.response.out.write(template.render(variables))
+        else:
+            self.response.out.write('no such ServeLife member exists within the ecosystem!')
+
+
+# v-v USER ENTITY HANDLERS v-v
+class UserPrivateProfileHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
+            if profile:
+                variables = json.loads(profile.str_value)
+                template = jinja_environment.get_template('userprivateindex.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user profile exists!')
+
+
+class UserAccountEditHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            account = User.all().filter('user_name = ', user.user_name).get()
+            if account:
+                variables = {'user_name': user.user_name, 'user_email': user.email}
+                template = jinja_environment.get_template('useraccountedit.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user account exists!')
+
+        else:
+            self.redirect('/signin')
+
+
+class UserSubscriptionEditHandler(SLRequestHandler):
+    @login_required
+    def get(self, user_name):
+        if self.is_logged_in():
+            user = self.user
+            account = User.all().filter('user_name = ', user.user_name).get()
+            if account:
+                variables = {'user_name': user.user_name, 'user_email': user.email}
+                template = jinja_environment.get_template('usersubscriptionedit.html')
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such user subscription exists!')
+
+        else:
+            self.redirect('/signin')
 
 
 class UserProfileHandler(SLRequestHandler):
@@ -274,225 +692,6 @@ class UserInternalProfileHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
-class UserExternalProfileHandler(SLRequestHandler):
-    def get(self, user_name):
-        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if profile:
-            variables = json.loads(profile.str_value)
-            variables['userthin'] = profile
-            template = jinja_environment.get_template('userexternalindex.html')
-            self.response.out.write(template.render(variables))
-        else:
-            self.response.out.write('no such ServeLife member exists within the ecosystem!')
-
-
-class TopicExternalProfileHandler(SLRequestHandler):
-    def get(self, topic_name):
-        topic = TopicThinDB.all().filter('topic_name = ', topic_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if topic:
-            variables = json.loads(topic.str_value)
-            variables['topic'] = topic
-            template = jinja_environment.get_template('topicexternalindex.html')
-            self.response.out.write(template.render(variables))
-        else:
-            self.response.out.write('no such topic exists within the ServeLife ecosystem!')
-
-
-class ProjectExternalProfileHandler(SLRequestHandler):
-    def get(self, project_name):
-        project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if project:
-            variables = json.loads(project.str_value)
-            template = jinja_environment.get_template('projectexternalindex.html')
-            self.response.out.write(template.render(variables))
-        else:
-            self.response.out.write('no such project exists within the ServeLife ecosystem!')
-
-
-class UserPrivateProfileHandler(SLRequestHandler):
-    @login_required
-    def get(self, user_name):
-        if self.is_logged_in():
-            user = self.user
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
-            if profile:
-                variables = json.loads(profile.str_value)
-                template = jinja_environment.get_template('userprivateindex.html')
-                self.response.out.write(template.render(variables))
-            else:
-                self.response.out.write('no such user profile exists!')
-
-
-class UserAccountEditHandler(SLRequestHandler):
-    @login_required
-    def get(self, user_name):
-        if self.is_logged_in():
-            user = self.user
-            account = User.all().filter('user_name = ', user.user_name).get()
-            if account:
-                variables = {'user_name': user.user_name, 'user_email': user.email}
-                template = jinja_environment.get_template('useraccountedit.html')
-                self.response.out.write(template.render(variables))
-            else:
-                self.response.out.write('no such user account exists!')
-
-        else:
-            self.redirect('/signin')
-
-
-class UserSubscriptionEditHandler(SLRequestHandler):
-    @login_required
-    def get(self, user_name):
-        if self.is_logged_in():
-            user = self.user
-            account = User.all().filter('user_name = ', user.user_name).get()
-            if account:
-                variables = {'user_name': user.user_name, 'user_email': user.email}
-                template = jinja_environment.get_template('usersubscriptionedit.html')
-                self.response.out.write(template.render(variables))
-            else:
-                self.response.out.write('no such user subscription exists!')
-
-        else:
-            self.redirect('/signin')
-
-
-class SignUpHandler(SLRequestHandler):
-    def get(self):
-        if self.is_logged_in():
-            user = self.user
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            if profile:
-                self.redirect('/home/hub/'+ user.user_name)
-            else:
-                self.redirect('/user/profile/'+ user.user_name)
-        template = jinja_environment.get_template('signup.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
-
-    def post(self):
-        email = self.request.get('email')
-        username = self.request.get('username').lower()
-        password = self.request.get('password')
-        username_exists = User.all().filter('user_name =', username).get()
-        if not username_exists:
-            #save the new user unactivated
-            random_secret = "".join(random.choice(string.letters) for x in xrange(5))
-            password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
-            activation_key = hmac.new(random_secret,username).hexdigest()
-            new_user = User(email=email, user_name=username, password_hash=password_hash, activated='False', activation_key=activation_key)
-            new_user.put()
-            #mail the activation link
-            activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
-            email_template = jinja_environment.get_template('email.html')
-            try:
-                mail.send_mail(sender="alan@notionlabs.com",
-                                to=email,
-                                subject="Activate your Servelife account!",
-                                body="no html version",
-                                html=email_template.render({'activation_link':activation_link}))
-            except:
-                self.response.write('mail config not working..')
-
-            self.response.write('ok')
-        else:
-            self.response.write('user name already exists')
-
-
-class ActivationHandler(SLRequestHandler):
-    def get(self):
-        activation_key = self.request.get('activation_key')
-        user = User.all().filter('activation_key =', activation_key).get()
-        if user:
-            user.activated='True'
-            user.put()
-            username = user.user_name
-            user_influence = UserThinDB(user_name=username,
-                                    asset= 'profile',
-                                    asset_key= 'influence',
-                                    str_value= '',
-                                    int_value= 100)
-            user_influence.put()
-            template = jinja_environment.get_template('publicconfirm.html')
-            alert = "Thank You"
-            msg = "Your ServeLife account has been confirmed. Login and begin your learning adventure!"
-            variables = {'alert': alert, 'msg': msg}
-            self.response.out.write(template.render(variables))
-            #self.response.out.write('Your account has been activated!')
-        else:
-            template = jinja_environment.get_template('publicconfirm.html')
-            alert = "An Error Has Occurred"
-            msg = "The activation key used is not valid. Please submit your email address again."
-            variables = {'alert': alert, 'msg': msg}
-            self.response.out.write(template.render(variables))
-            #self.response.out.write('No such activation key!')
-
-
-class SignInHandler(SLRequestHandler):
-    def get(self):
-        if self.is_logged_in():
-            user = self.user
-            #ABR: check to see if the user has a profile
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            if profile:
-                self.redirect('/home/hub/'+ user.user_name)
-            else:
-                self.redirect('/user/profile/'+ user.user_name)
-        template = jinja_environment.get_template('signin.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
-
-    def post(self):
-        password = str(self.request.get('password'))
-        email = str(self.request.get('email'))
-        user = User.all().filter('email =', email).get()
-        if user:
-            pass_split = user.password_hash.split('|')
-            random_secret = str(pass_split[0])
-            password_hash = str(pass_split[1])
-            if str(hmac.new(random_secret,password).hexdigest())==str(password_hash):
-                user_id =  str(user.key().id())
-                #user_id|random_secret|hash
-                cookie_value = user_id+'|'+random_secret+'|'+hmac.new(random_secret,user_id).hexdigest()
-                cookie = 'user_id = '+cookie_value+';Path = /'
-                self.response.headers.add_header('Set-Cookie', cookie)
-
-                #ABR: check to see if the user has a profile
-                profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-                if profile:
-                    url_path = str('/home/hub/' + user.user_name)
-                    #AS: create a response payload of as many items you want to have in a dictionary
-                    response = {'status':'ok', 'location':url_path}
-                    # then serialize this python object into a string representation for a javascript object
-                    # this is what is called JavaScript Object Notation or JSON
-                    response_string = json.dumps(response)
-                    #now send this json to the browser!
-                    self.response.write(response_string)
-                    return
-                else:
-                    url_path = str('/user/profile/' + user.user_name)
-                    response = {'status':'ok', 'location':url_path}
-                    response_string = json.dumps(response)
-                    self.response.write(response_string)
-                    return
-            else:
-                response = {'status':'invalid password'}
-                response_string = json.dumps(response)
-                self.response.write(response_string)
-                return
-        else:
-            response = {'status': 'invalid email'}
-            response_string = json.dumps(response)
-            self.response.write(response_string)
-            return
-
-
-class LogOutHandler(SLRequestHandler):
-    def get(self):
-        self.response.headers.add_header('Set-Cookie','user_id=;Path = /')
-        self.redirect('/')
-
-
 class UserHomeHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
@@ -564,6 +763,7 @@ class UserResearchHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
+# v-v MAIN ENTITY HANDLERS v-v
 class DiscoverHubIndexHandler(SLRequestHandler):
     @login_required
     def get(self):
@@ -633,6 +833,7 @@ class CommunityHubIndexHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
+# v-v COURSE ENTITY HANDLERS v-v
 class NewCourseProfileHandler(SLRequestHandler):
     @login_required
     def get(self):
@@ -725,6 +926,7 @@ class CourseInternalIndexHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
+# v-v TOPIC ENTITY HANDLERS v-v
 class TopicInternalIndexHandler(SLRequestHandler):
     @login_required
     def get(self, topic_name):
@@ -741,65 +943,6 @@ class TopicInternalIndexHandler(SLRequestHandler):
 
             else:
                 self.response.out.write('no such topic exists.')
-
-        else:
-            self.redirect('/signin')
-
-
-class DiscoverTopicIndexHandler(SLRequestHandler):
-    @login_required
-    def get(self):
-        if self.is_logged_in():
-            user = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
-            topics = []
-            topics_followed = db.GqlQuery(
-                "SELECT __key__ FROM TopicFollowerIndex WHERE followers = :1", user.key().id())
-            topics.extend(db.get([k.parent() for k in topics_followed]))
-            template = jinja_environment.get_template('topicprivateindex.html')
-            variables = {'user_email': self.user.email, 'user_name': self.user.user_name, 'topics': topics}
-            self.response.out.write(template.render(variables))
-        else:
-            self.redirect('/signin')
-
-
-class ProjectInternalIndexHandler(SLRequestHandler):
-    @login_required
-    def get(self, project_name):
-        if self.is_logged_in():
-            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            if project:
-                template = jinja_environment.get_template('projectinternalindex.html')
-                variables = json.loads(project.str_value)
-                variables['project'] = project
-                variables['user_email'] = self.user.email
-                variables['user_name'] = self.user.user_name
-                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
-                self.response.out.write(template.render(variables))
-
-            else:
-                self.response.out.write('no such project exists.')
-
-        else:
-            self.redirect('/signin')
-
-
-class ProjectPrivateIndexHandler(SLRequestHandler):
-    @login_required
-    def get(self, project_name):
-        if self.is_logged_in():
-            #Check to see that requestor is member of project
-            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            if project:
-                template = jinja_environment.get_template('projectinternalindex.html')
-                variables = json.loads(project.str_value)
-                variables['project'] = project
-                variables['user_email'] = self.user.email
-                variables['user_name'] = self.user.user_name
-                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
-                self.response.out.write(template.render(variables))
-
-            else:
-                self.response.out.write('no such project exists.')
 
         else:
             self.redirect('/signin')
@@ -841,7 +984,7 @@ class NewTopicProfileHandler(SLBSRequestHandler):
             else:
                 topic = TopicThinDB(topic_name=topic_name_lc, asset='profile', asset_key='info', str_value=json.dumps(topicinfo), int_value=0, created_by=userthin, updated_by=userthin)
                 topic.put()
-            #Add user as a follower
+                #Add user as a follower
             follow_index = TopicFollowerIndex(key_name='index', parent=topic, followers=[(userthin.key().id())])
             follow_index.put()
             topic_follow(topic, userthin)
@@ -854,6 +997,66 @@ class NewTopicProfileHandler(SLBSRequestHandler):
                 self.redirect('/discover/topic/'+topic_name_lc)
             except search.Error:
                 logging.exception('Add topic search index failed')
+
+        else:
+            self.redirect('/signin')
+
+
+class DiscoverTopicIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self):
+        if self.is_logged_in():
+            user = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            topics = []
+            topics_followed = db.GqlQuery(
+                "SELECT __key__ FROM TopicFollowerIndex WHERE followers = :1", user.key().id())
+            topics.extend(db.get([k.parent() for k in topics_followed]))
+            template = jinja_environment.get_template('topicprivateindex.html')
+            variables = {'user_email': self.user.email, 'user_name': self.user.user_name, 'topics': topics}
+            self.response.out.write(template.render(variables))
+        else:
+            self.redirect('/signin')
+
+
+# v-v PROJECT ENTITY HANDLERS v-v
+class ProjectInternalIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self, project_name):
+        if self.is_logged_in():
+            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if project:
+                template = jinja_environment.get_template('projectinternalindex.html')
+                variables = json.loads(project.str_value)
+                variables['project'] = project
+                variables['user_email'] = self.user.email
+                variables['user_name'] = self.user.user_name
+                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
+                self.response.out.write(template.render(variables))
+
+            else:
+                self.response.out.write('no such project exists.')
+
+        else:
+            self.redirect('/signin')
+
+
+class ProjectPrivateIndexHandler(SLRequestHandler):
+    @login_required
+    def get(self, project_name):
+        if self.is_logged_in():
+            #Check to see that requestor is member of project
+            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if project:
+                template = jinja_environment.get_template('projectinternalindex.html')
+                variables = json.loads(project.str_value)
+                variables['project'] = project
+                variables['user_email'] = self.user.email
+                variables['user_name'] = self.user.user_name
+                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
+                self.response.out.write(template.render(variables))
+
+            else:
+                self.response.out.write('no such project exists.')
 
         else:
             self.redirect('/signin')
@@ -913,100 +1116,7 @@ class NewProjectProfileHandler(SLBSRequestHandler):
             self.redirect('/signin')
 
 
-class FollowUserHandler(SLRequestHandler):
-    @login_required
-    def post(self, followed):
-        if self.is_logged_in():
-            #user that is following another user is the follower
-            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
-            #user that is being followed is the followed
-            user_followed = UserThinDB.all().filter('user_name = ', followed).get()
-            follow_index = UserFollowerIndex.all().filter('parent = ', user_followed).get()
-            if follow_index:
-                follow_index = UserFollowerIndex.followers.append(user_follower.key().id())
-                follow_index.put()
-            else:
-                follow_index = UserFollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
-                follow_index.put()
-
-            #Increment how many users follow a a certain user = follower count and
-            #Increment how many users a certain user follows = follow count
-            user_follow(user_followed, user_follower)
-            self.redirect('/user/profile/' + followed)
-        else:
-            self.redirect('/signin')
-
-
-class FollowTopicHandler(SLRequestHandler):
-    @login_required
-    def post(self, topic):
-        if self.is_logged_in():
-            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
-            topic_followed = TopicThinDB.all().filter('topic_name = ', topic).get()
-            follow_index = TopicFollowerIndex.all().filter('parent = ', topic_followed).get()
-            if follow_index:
-                follow_index = TopicFollowerIndex.followers.append((follower.key().id()))
-                follow_index.put()
-            else:
-                follow_index = TopicFollowerIndex(key_name='index', parent=topic_followed, followers=[(follower.key().id())])
-                follow_index.put()
-
-            #Increment how many users follow a a certain user = follower count and
-            #Increment how many users a certain user follows = follow count
-            topic_follow(topic_followed, follower)
-            self.redirect('/discover/topic/'+topic)
-        else:
-            self.redirect('/signin')
-
-
-class UnFollowTopicHandler(SLRequestHandler):
-    @login_required
-    def post(self, topic):
-        if self.is_logged_in():
-            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
-            topic_unfollowed = TopicThinDB.all().filter('topic_name = ', topic).get()
-            follow_index = TopicFollowerIndex.all().filter('parent = ', topic_unfollowed).get()
-            if follow_index:
-                follow_index = TopicFollowerIndex.followers.remove((follower.key().id()))
-                follow_index.put()
-
-            #Increment how many users follow a a certain user = follower count and
-            #Increment how many users a certain user follows = follow count
-            #topic_follow(topic_followed, follower)
-            self.redirect('/discover/topic/'+topic)
-        else:
-            self.redirect('/signin')
-
-
-class FollowCourseHandler(SLRequestHandler):
-    @login_required
-    def post(self, course_name):
-        if self.is_logged_in():
-            #user that is following course
-            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
-            course_followed = CourseThinDB.all().filter('course_name = ', course_name).get()
-            follow_index = CourseFollowerIndex.all().filter('parent = ', course_followed).get()
-            if follow_index:
-                follow_index = CourseFollowerIndex.followers.append(user_follower.key().id())
-                follow_index.put()
-            else:
-                follow_index = CourseFollowerIndex(key_name='index', parent=course_followed, followers=[(user_follower.key().id())])
-                follow_index.put()
-
-            #Increment how many users follow a a certain user = follower count and
-            #Increment how many users a certain user follows = follow count
-            user_follow(course_followed, user_follower)
-            self.redirect('/course/'+course_name)
-        else:
-            self.redirect('/signin')
-
-
-def handle_404(request, response, exception):
-    logging.exception(exception)
-    response.write('Oops! I could swear this page was here!')
-    response.set_status(404)
-
-
+# v-v SEARCH ENTITY HANDLERS v-v
 class SearchHandler(webapp2.RequestHandler):
     def get(self, index):
         q = self.request.get('q')
@@ -1020,142 +1130,44 @@ class SearchHandler(webapp2.RequestHandler):
             logging.exception('search failed')
 
 
-class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
-    def get(self, resource):
-        resource = str(urllib.unquote(resource))
-        blob_info = blobstore.BlobInfo.get(resource)
-        self.send_blob(blob_info)
+def create_topic(topic):
+    topic_info = json.loads(topic.str_value)
+    topic_description = topic_info.get('topic_description')
+    parent_topic = topic_info.get('parent_topic')
+    created_by = topic.created_by.user_name
+    return search.Document(doc_id=str(topic.key().id()),fields = [search.TextField(name='description',value=topic_description),
+                                                                  search.TextField(name='parent_topic', value=parent_topic),
+                                                                  search.TextField(name='created_by', value=created_by),])
 
 
-class SubscriptionHandler(webapp2.RequestHandler):
-    def post(self,method):
-        if method == 'email_subscription':
-
-            subscriber_email = str(self.request.get('subscriber_email'))
-            if not is_valid(subscriber_email, valid['email']):
-                self.response.write('invalid')
-                return
-
-            subscriber_exists = Subscriber.all().filter('email =', subscriber_email).get()
-            if not subscriber_exists:
-                email_template = jinja_environment.get_template('subscriber.html')
-                salt = 'atwgwkjerfkjk2343454mf@$'
-                activation_key= hashlib.md5(subscriber_email.lower()+salt).hexdigest()
-                url_enc = urllib.urlencode({'email':subscriber_email,'key':activation_key})
-                activation_link=domain + '/email/email_subscription_activate?'+url_enc
-                #variables = {'url': url}
-                try:
-                    mail.send_mail(sender="alan@notionlabs.com",
-                                   to=subscriber_email,
-                                   subject="Thank You For Signing Up for ServeLife!",
-                                   body="Welcome to ServeLife! ServeLife is a global team of life-long learners working hard to build a better way to effectively transform knowledge into expertise.",
-                                   html=email_template.render({'activation_link':activation_link}))
-                    self.response.out.write('ok')
-                    new_subscriber = Subscriber(email=subscriber_email, verified=False)
-                    new_subscriber.put()
-                except:
-                    self.response.out.write('something went wrong..we will fix this error!')
-            else:
-                self.response.out.write('exists')
-
-    def get(self,method):
-
-        if method=='email_subscription_activate':
-            #add to subscribers list
-            email = self.request.get('email')
-            key = self.request.get('key')
-            salt = 'atwgwkjerfkjk2343454mf@$'
-            if hashlib.md5(email.lower()+salt).hexdigest() == key:
-                real_subscriber = Subscriber.all().filter('email =', email).get()
-                real_subscriber.verified=True
-                real_subscriber.put()
-
-                template = jinja_environment.get_template('publicconfirm.html')
-                alert = "Thank You"
-                msg = "Your email has been confirmed. We will be in touch shortly concerning early access."
-                variables = {'alert': alert, 'msg': msg}
-                self.response.out.write(template.render(variables))
-                #self.response.write('ok')
-            else:
-                self.response.write(email+','+key)
+def create_project(project):
+    project_info = json.loads(project.str_value)
+    project_description = project_info.get('project_description')
+    parent_project = project_info.get('parent_project')
+    created_by = project.created_by.user_name
+    return search.Document(doc_id=str(project.key().id()),fields = [search.TextField(name='description',value=project_description),
+                                                                    search.TextField(name='parent_project', value=parent_project),
+                                                                    search.TextField(name='created_by', value=created_by),])
 
 
-class BetaSignupHandler(SLRequestHandler):
-    def get(self):
-        #if self.is_logged_in():
-        #    user = self.user
-        #    self.redirect('/home/'+user.user_name)
-        template = jinja_environment.get_template('signup.html')
-        variables = {}
-        self.response.out.write(template.render(variables))
+def create_activity(actor, actor_type, entity, entity_type, activity_type):
+    if actor_type == "user":
+        actor_name = actor.user_name
 
-    def post(self):
-        beta_password = str(self.request.get('password'))
-        beta_passcode = str(self.request.get('passcode'))
-        if beta_passcode != 'learnwithpurpose':
-            self.response.write('invalid passcode')
-            return
+    if entity_type == "project":
+        entity_name = entity.project_name
+    elif entity_type == "topic":
+        entity_name = entity.topic_name
 
-        beta_email = str(self.request.get('email'))
-        if not is_valid(beta_email, valid['email']):
-            self.response.write('invalid email')
-            return
-        else:
-            beta_user = User.all().filter('email =', beta_email).get()
-            if beta_user:
-                self.response.write('duplicate email')
-                return
+    if activity_type == "create":
+        body = str(actor_name + ' created a new ' + entity_type + ' named ' + entity_name)
 
-        beta_username = str(self.request.get('user_name')).lower()
-        username_exists = User.all().filter('user_name =', beta_username).get()
-        if username_exists:
-            self.response.write('duplicate username')
-            return
-
-        self.response.write('ok')
-        return
+    activity = Activity(actor=actor, message=body, object_type=entity_type, action=activity_type)
+    activity.put()
+    return True
 
 
-class FollowProjectHandler(SLRequestHandler):
-    def post(self):
-        user_name = str(self.request.get('user_name'))
-        project_name = str(self.request.get('project_name'))
-        user_follower = UserThinDB.all().filter('user_name = ', user_name).get()
-        project_followed = ProjectThinDB.all().filter('project_name = ', project_name).get()
-        follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
-
-        #check to see if user is already a follower
-        #is_follower = db.GqlQuery(
-        #    """SELECT * FROM ProjectFollowerIndex WHERE
-        #    followers = :1 AND
-        #    parent = :2""",
-        #    user_follower, project_followed)
-        #if is_follower:
-            #Need to Unfollow
-            #if follow_index:
-            #    follow_index = ProjectFollowerIndex.followers.remove(user_follower.key().id())
-            #    follow_index.put()
-                #Increment how many users follow a a certain project = follower count and
-                #Increment how many projects a certain user follows = follow count
-            #    project_unfollow(project_followed, user_follower)
-            #    self.response.write('unfollowed')
-            #    return
-        #else:
-        #Need to Follow
-        follow_index = ProjectFollowerIndex.all().filter('parent = ', project_followed).get()
-        if follow_index:
-            follow_index = ProjectFollowerIndex.followers.append(user_follower.key().id())
-            follow_index.put()
-        else:
-            follow_index = ProjectFollowerIndex(key_name='index', parent=project_followed, followers=[(user_follower.key().id())])
-            follow_index.put()
-            #Increment how many users follow a a certain project = follower count and
-            #Increment how many projects a certain user follows = follow count
-        project_follow(project_followed, user_follower)
-        self.response.write('followed')
-        return
-
-
+# v-v GOAL ENTITY HANDLERS
 class UserGoalHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
@@ -1215,10 +1227,6 @@ class UserGoalHandler(SLRequestHandler):
             #TODO increment goal count on userthin
             #TODO add row to Goal Event
             #TODO send email to friend list
-
-#class UserGoalHandler(SLRequestHandler):
-
-
 
 
 #class TestHandler(SLRequestHandler):
