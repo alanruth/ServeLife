@@ -1156,6 +1156,23 @@ class FollowProjectHandler(SLRequestHandler):
         return
 
 
+class GetGoalById(SLRequestHandler):
+    @login_required
+    def get(self,goal_id):
+        if self.is_logged_in():
+            user = self.user
+            goal = UserGoal.get_by_id(int(goal_id))
+            due_date = str(goal.due_date)
+            goal_json = json.dumps({'name': goal.name,
+                               'description': goal.description,
+                               'measure': goal.accomplished_measure,
+                               'date': due_date,
+                               'tags': goal.tags,
+                               'goal_status': goal.goal_status})
+
+            self.response.out.write(goal_json)
+
+
 class UserGoalHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
@@ -1253,6 +1270,7 @@ app = webapp2.WSGIApplication([
                                   ('/home/research/(?P<user_name>.*)', UserResearchHandler),
                                   ('/home/goals/(?P<user_name>.*)', UserGoalHandler),
                                   ('/goal/new', UserGoalHandler),
+                                  ('/goal/by_id/(?P<goal_id>.*)',GetGoalById),
                                   #('/home/contributions/(?P<user_name>.*)', UserContributionsPageHandler),
                                   #('/home/achievements/(?P<user_name>.*)', UserAchievementsPageHandler),
                                   #('/home/efforts/(?P<user_name>.*)', UserEffortsPageHandler),
