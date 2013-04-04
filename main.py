@@ -1023,14 +1023,15 @@ class ProjectInternalIndexHandler(SLRequestHandler):
     @login_required
     def get(self, project_name):
         if self.is_logged_in():
-            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            project = ProjectThinDB.all().filter('project_name = ', project_name).get()# filter('asset =', 'profile').filter('asset_key =', 'info').get()
             if project:
                 template = jinja_environment.get_template('projectinternalindex.html')
-                variables = json.loads(project.str_value)
-                variables['project'] = project
-                variables['user_email'] = self.user.email
-                variables['user_name'] = self.user.user_name
-                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
+                variables = {'project': project, 'user_email': self.user.email, 'user_name': self.user.user_name}
+                #variables = json.loads(project.str_value)
+                #variables['project'] = project
+                #variables['user_email'] = self.user.email
+                #variables['user_name'] = self.user.user_name
+                #variables['blob_key'] = json.loads(project.str_value).get('blob_key')
                 self.response.out.write(template.render(variables))
 
             else:
@@ -1045,14 +1046,15 @@ class ProjectPrivateIndexHandler(SLRequestHandler):
     def get(self, project_name):
         if self.is_logged_in():
             #Check to see that requestor is member of project
-            project = ProjectThinDB.all().filter('project_name = ', project_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            project = ProjectThinDB.all().filter('project_name = ', project_name).get() # filter('asset =', 'profile').filter('asset_key =', 'info').get()
             if project:
-                template = jinja_environment.get_template('projectinternalindex.html')
-                variables = json.loads(project.str_value)
-                variables['project'] = project
-                variables['user_email'] = self.user.email
-                variables['user_name'] = self.user.user_name
-                variables['blob_key'] = json.loads(project.str_value).get('blob_key')
+                template = jinja_environment.get_template('projectprivateindex.html')
+                #variables = json.loads(project.str_value)
+                variables = {'project': project, 'user_email': self.user.email, 'user_name': self.user.user_name}
+                #variables['project'] = project
+                #variables['user_email'] = self.user.email
+                #variables['user_name'] = self.user.user_name
+                #variables['blob_key'] = json.loads(project.str_value).get('blob_key')
                 self.response.out.write(template.render(variables))
 
             else:
@@ -1080,37 +1082,40 @@ class NewProjectProfileHandler(SLBSRequestHandler):
         if self.is_logged_in():
             user = self.user
             userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
-            project_name = self.request.get('project_name')
-            project_name_lc = project_name.lower()
+            project_name = (self.request.get('project_name')).lower()
             project_description = self.request.get('project_description')
-            parent_project = self.request.get('parent_project')
-            upload_files = self.get_uploads('parent_image')
+            start_date = datetime.datetime.strptime(self.request.get('start_date'), "%m/%d/%Y").date()
+            #parent_project = self.request.get('parent_project')
+            #upload_files = self.get_uploads('parent_image')
             #blob_info = upload_files[0]
             projectinfo = {'project_name': project_name,
                          'project_description': project_description,
-                         'parent_project': parent_project,
+                         'start_date': start_date,
+                         #'parent_project': parent_project,
                          #'blob_key':str(blob_info.key()),
                          }
-            project = ProjectThinDB.all().filter('project_name = ', project_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
-            if project:
-                project.updater = userthin
-                project.str_value = json.dumps(projectinfo)
-                project.put()
-            else:
-                project = ProjectThinDB(project_name=project_name_lc, asset='profile', asset_key='info', str_value=json.dumps(projectinfo), int_value=0, created_by=userthin, updated_by=userthin)
+            project = ProjectThinDB.all().filter('project_name = ', project_name).get()
+            if not project:
+                project = ProjectThinDB(project_name=project_name,
+                                        description=project_description,
+                                        start_date=start_date,
+                                        created_by=userthin)
                 project.put()
             #Add Creator as a team member
-            team_member = TeamMemberThinDB(project=project, team_member=userthin)
+            team_member = ProjectMember(project=project,
+                                        team_member=userthin,
+                                        role='Project Leader')
             team_member.put()
-            activity = create_activity(userthin, "user", project, "project", "create")
-            doc = create_project(project)
-            _INDEX_NAME = 'project'
-            try:
-                search.Index(name=_INDEX_NAME).put(doc)
-                self.redirect('/build/project/'+project_name_lc)
-            except search.Error:
-                logging.exception('Add failed')
-
+            #activity = create_activity(userthin, "user", project, "project", "create")
+            #doc = create_project(project)
+            #_INDEX_NAME = 'project'
+            #try:
+            #    search.Index(name=_INDEX_NAME).put(doc)
+            #    self.redirect('/build/project/'+project_name)
+            #except search.Error:
+            #    logging.exception('Add failed')
+            self.response.write('ok')
+            return
 
         else:
             self.redirect('/signin')

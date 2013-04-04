@@ -13,7 +13,108 @@
 
     $(function() {
         // Smart Wizard
-        $('#wizard').smartWizard();
+        $('#wizard').smartWizard({
+            onLeaveStep:leaveAStepCallback,
+            onFinish:onFinishCallback
+        });
+
+        function leaveAStepCallback(obj, context){
+            return validateSteps(context.fromStep); // return false to stay on step and true to continue navigation
+        }
+
+        function onFinishCallback(objs, context){
+            //get variables set
+            var project_name = $('#project_name').val();
+            var project_description = $('#project_description').val();
+            var start_date = $('#start_date').val();
+            var skill_tags = $('#skill_tags').val();
+            var role_name = $('#role_name').val();
+            var role_description = $('#role_description').val();
+            var commitment = $('#commitment').val();
+            var friends_email = $('#friends_email').val();
+
+            $.ajax({
+                data:{'project_name' : project_name,
+                    'project_description' : project_description,
+                    'start_date' : start_date
+                },
+                url: "/project/new",
+                async: true,
+                type: "POST",
+                success: function(response) {
+                    if (response == 'ok'){
+                        $("#modal-close").click();
+                        $(window.location.replace('/build/project/{{ project_name }}'));
+                    }
+                },
+                error: function(response) {
+                    $(".buttonFinish").addClass('buttonDisabled');
+                    $(".buttonPrevious").addClass('Disabled');
+                    $('.buttonFinish').html('Something went wrong.');
+                }
+            });
+
+        }
+
+        // Your Step validation logic
+        function validateSteps(stepnumber){
+            var isStepValid = true;
+            // validate step 1
+            if(stepnumber == 1){
+                //validate project name
+                var project_name = $('#project_name').val();
+                if(!project_name && project_name.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step1').html('Please name your project').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step1').hide();
+                }
+
+                //validate project description
+                var project_description = $('#project_description').val();
+                if(!project_description && project_description.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step1').html('Please add a description for your project').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step1').hide();
+                }
+
+                //validate start date
+                //TODO date needs to be in the future
+                var start_date = $('#start_date').val();
+                if(!start_date && start_date.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step1').html('Please set a date for the project').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step1').hide();
+                }
+
+                return isStepValid;
+            }
+            else if(stepnumber ==2){
+                var isStepValid = true;
+                //validate skill tags
+
+                var skill_tags = $('#skill_tags').val();
+                if(!skill_tags && skill_tags.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step2').html('Please add some skill keywords.').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step2').hide();
+                }
+                return isStepValid;
+            }
+            else {
+                return isStepValid;
+            }
+        }
+
+        // jQuery UI DatePicker
+        $('#start_date').datepicker();
     });
 
     $().ready(function() {
@@ -33,7 +134,7 @@
             <div class="wrapper">
                 <div class="main">
                     <h1>This is Build's Ecosystem Page</h1>
-                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#add_project">Create a New Project</a>
+                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#add_project">Create a New Learning Project</a>
                     <p>This is where all the learning projects will be aggregated for the ecosystem</p>
                 </div>
                 <div class="body">
@@ -54,7 +155,7 @@
                                     <a href="#step-1">
                                         <label class="stepNumber">1</label>
                                         <span class="stepDesc">Step 1<br />
-                                            <small>Define the project.</small>
+                                            <small>What is the project?</small>
                                         </span>
                                     </a>
                                 </li>
@@ -62,26 +163,26 @@
                                     <a href="#step-2">
                                         <label class="stepNumber">2</label>
                                         <span class="stepDesc">Step 2<br />
-                                            <small>Establish goals and scope.</small>
+                                            <small>What do you want to learn?</small>
                                         </span></a>
                                 </li>
                                 <li>
                                     <a href="#step-3">
                                         <label class="stepNumber">3</label>
                                         <span class="stepDesc">Step 3<br />
-                                            <small>Need help? Build a team.</small>
+                                            <small>Need help? Form a team.</small>
                                         </span>
                                     </a>
                                 </li>
                                 <li><a href="#step-4">
                                     <label class="stepNumber">4</label>
                                         <span class="stepDesc">Step 4<br />
-                                            <small>Invite others to the project.</small>
+                                            <small>Invite others to join you!</small>
                                         </span>
                                 </a></li>
                             </ul>
                             <div id="step-1">
-                                <h2 class="StepTitle">Define Your Goal</h2>
+                                <h2 class="StepTitle">Define some basics for your project.</h2>
                                 <!-- step content -->
                                 <div class="form-horizontal">
                                     <label id="msgbox-step1" class="alert alert-error"></label>
@@ -98,67 +199,77 @@
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label" for="project_tags">Keyword Tags<br/><small>(separate with commas)</small></label>
+                                        <label class="control-label" for="start_date">Target Start Date<span class="required-field">*</span></label>
                                         <div class="controls">
-                                            <textarea rows="2" class="span4" id="project_tags" name="project_tags"
-                                                      placeholder="Provide keywords that help describe the project. Supports categorization and search."></textarea>
+                                            <input type="text" class="span3" id="start_date" name="start_date" placeholder="When should it start?"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div id="step-2">
-                                <h2 class="StepTitle">Define Its Achievement</h2>
+                                <h2 class="StepTitle">Describe what will be learned on the project.</h2>
                                 <!-- step content -->
                                 <div class="form-horizontal">
                                     <label id="msgbox-step2" class="alert alert-error"></label>
                                     <div class="control-group">
-                                        <label class="control-label" for="goal_due">Target Due Date<span class="required-field">*</span></label>
+                                        <label class="control-label" for="skill_tags">Skill Keyword Tags<span class="required-field">*</span><br/><small>(separate with commas)</small></label>
                                         <div class="controls">
-                                            <input type="text" class="span3" id="goal_due" name="goal_due"/>
+                                            <textarea rows="3" class="span4" id="skill_tags" name="skill_tags"
+                                                      placeholder="Provide keywords for the primary skills that will be learned on the project - keywords like python, entrepreneurship, JavaScript, SEO."></textarea>
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label" for="goal_attainment">Attainment Measure<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
+                                        <label class="control-label" for="topic_name">Discover Topic</label>
                                         <div class="controls">
-                                            <textarea rows="4" class="span4" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal. Be Specific."></textarea>
+                                            <input class="span4" disable id="topic_name" name="topic_name" type="text" placeholder="Which topic best matches the main focus of the project?"/>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="course_name">Learning Course</label>
+                                        <div class="controls">
+                                            <input class="span4" disable id="course_name" name="course_name" type="text" placeholder="Is there a learning course inspiring this project?"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div id="step-3">
-                                <h2 class="StepTitle">Define The First Step to be Taken</h2>
+                                <h2 class="StepTitle">Describe your ideal first team member<small>(optional).</small></h2>
                                 <!-- step content -->
                                 <div class="form-horizontal">
                                     <label id="msgbox-step3" class="alert alert-error"></label>
                                     <div class="control-group">
-                                        <label class="control-label" for="action_name">Action Name</label>
+                                        <label class="control-label" for="role_name">Role Name</label>
                                         <div class="controls">
-                                            <input class="span4" id="action_name" required name="action_name" size="50" type="text" maxlength="50" placeholder="Enter a short name for the action to be taken."/>
+                                            <input class="span4" id="role_name" required name="role_name" type="text" maxlength="30" placeholder="Enter a short name for the role."/>
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label" for="action_description">Brief Description<br/><small>(250 character limit)</small></label>
+                                        <label class="control-label" for="role_description">Brief Description<br/><small>(250 character limit)</small></label>
                                         <div class="controls">
-                                            <textarea rows="4" class="required span4" id="action_description" name="action_description" required maxlength="250" placeholder="Enter a brief but specific description for this action."></textarea>
+                                            <textarea rows="4" class="required span4" id="role_description" name="role_description" required maxlength="250" placeholder="Enter a brief but specific description for this role."></textarea>
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label" for="estimate">How much effort?<br/><small>(in hours)</small></label>
+                                        <label class="control-label" for="commitment">Commitment Sought<br/><small>(in hours per week)</small></label>
                                         <div class="controls">
-                                            <input class="span4" id="estimate" required name="estimate" type="number" placeholder="e.g. 40"/>
+                                            <select id="commitment">
+                                                <option>0-5 hours/week</option>
+                                                <option>6-10 hours/week</option>
+                                                <option>10+ hours/week</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div id="step-4">
-                                <h2 class="StepTitle">Share Your Goal With Your Friends</h2>
+                                <h2 class="StepTitle">Share Your Project and Invite Others to Join You</h2>
                                 <!-- step content -->
                                 <div class="form-horizontal">
                                     <div class="control-group">
                                         <label class="control-label" for="friends_email">Email Addresses<br/><small>(separate with commas)</small></label>
                                         <div class="controls">
                                             <textarea rows="5" class="span4" id="friends_email" name="friends_email"
-                                                      placeholder="Provide the email addresses for whom you would like to share this new goal. They won't be spammed. Promise!"></textarea>
+                                                      placeholder="Provide the email addresses for whom you would like to share this new project. They won't be spammed. Promise!"></textarea>
                                         </div>
                                     </div>
                                 </div>

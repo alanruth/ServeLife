@@ -177,16 +177,18 @@ class LikedIndex(db.Model):
 
 class ProjectThinDB(db.Model):
     project_name   = db.StringProperty(required = True)
-    asset         = db.StringProperty(required = True)
-    asset_key     = db.StringProperty(required = True)
+    #asset         = db.StringProperty(required = True)
+    #asset_key     = db.StringProperty(required = True)
     str_value     = db.StringProperty(required = False)
     int_value     = db.IntegerProperty(required= False)
     follower_count = db.IntegerProperty(required=False, default=0)
     created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    #created_by      = db.ReferenceProperty(UserThinDB, collection_name='creator')
+    created_by      = db.ReferenceProperty(UserThinDB)
     updated       = db.DateTimeProperty(required=True, auto_now=True)
     #updated_by      = db.ReferenceProperty(UserThinDB, collection_name='updater')
     profile_pic     = db.BlobProperty(default=None)
+    description = db.StringProperty(required=True)
+    start_date = db.DateProperty(required=True)
 
 
 class ProjectMember(db.Model):
