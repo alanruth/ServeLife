@@ -57,9 +57,10 @@
             '<label>Tags: <input name="tags" value="'+goal_details.tags+'"></label>'+
             '<label>measure: <input name="measure" value="'+goal_details.measure+'"></label>'+
             '<label>status: <input name="status" value="'+goal_details.goal_status+'"></label>'+
-            '<label>date: <input name="date" value="'+goal_details.date+'"></label>'+
+            '<label>date: <input id="goal_details_due" name="date" value="'+goal_details.date+'"></label>'+
             '<a href=javascript:save_goal(' + goal_id + ') id=save_btn class=btn >save</a> </form>';
             $('#goal_details').html(markup);
+            $('#goal_details_due').datepicker();
 
         },
         error: function(response) {
@@ -69,13 +70,6 @@
         }
         });
 
-
-
-
-
-
-details_markup = '<input value='+goal_id+'>';
-        $('#status').html(details_markup);
 
 }
 
