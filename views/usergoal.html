@@ -6,17 +6,90 @@
 {% endblock custom_head %}
 
 {% block custom_script %}
+    var save_goal = function(goal_id){
+        $inputs = $('#edit_'+goal_id+' :input');
+        goal = {};
+        $inputs.each(function() {
+        goal[this.name] = $(this).val();
+        });
 
-    $(function() {
+        $.ajax({
+        data: goal,
+        url: "/goal/edit",
+        async: true,
+        type: "POST",
+        success: function(response) {
+        if (response == 'ok'){
+        $('#save_btn').html('saved');
+        }
+        },
+        error: function(response) {
+        $(".buttonFinish").addClass('buttonDisabled');
+        $(".buttonPrevious").addClass('Disabled');
+        $('.buttonFinish').html('Something went wrong.');
+        }
+        });
+
+
+
+
+}
+    var get_goal_details = function(goal_id){
+        var goal_details = {};
+        $.ajax({
+        data:{},
+        url: "/goal/by_id/"+goal_id,
+        async: true,
+        type: "GET",
+        success: function(response) {
+            goal_details = jQuery.parseJSON( response );
+            /*
+            {"name": "goal2",
+            "tags": ["word1", " word2"],
+            "goal_status": "not started",
+            "measure": "some measure",
+            "date": "2013-04-18",
+            "description": "descr2"}
+            */
+            markup = '<form id=edit_'+goal_id+
+            '><label>name: <input name="name" value="'+goal_details.name+'"></label>'+
+            '<label>description: <input name="description" value="'+goal_details.description+'"></label>'+
+            '<label>Tags: <input name="tags" value="'+goal_details.tags+'"></label>'+
+            '<label>measure: <input name="measure" value="'+goal_details.measure+'"></label>'+
+            '<label>status: <input name="status" value="'+goal_details.goal_status+'"></label>'+
+            '<label>date: <input id="goal_details_due" name="date" value="'+goal_details.date+'"></label>'+
+            '<a href=javascript:save_goal(' + goal_id + ') id=save_btn class=btn >save</a> </form>';
+            $('#goal_details').html(markup);
+            $('#goal_details_due').datepicker();
+
+        },
+        error: function(response) {
+        $(".buttonFinish").addClass('buttonDisabled');
+        $(".buttonPrevious").addClass('Disabled');
+        $('.buttonFinish').html('Something went wrong.');
+        }
+        });
+
+
+}
+
+
+    $(document).ready(function() {
+
         $('#goal_due').datepicker();
 
         $('#sortable').sortable({
-            revert: true,
-            cursor: "move"
+        revert: true,
+        cursor: "move"
         });
 
         $('#sortable').disableSelection();
 
+
+        $("#msgbox-step1").hide();
+        $("#msgbox-step2").hide();
+        $("#msgbox-step3").hide();
+        $("#msgbox-step4").hide();
 
         // Smart Wizard
         $('#wizard').smartWizard({
@@ -233,7 +306,7 @@
                                     </thead>
                                     <tbody id="sortable">
                                     {% for goal in goals %}
-                                    <tr onclick="input">
+                                    <tr onclick="javacript: get_goal_details({{ goal.key().id() }});">
                                         <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span>{{ goal.name }}</td>
                                         <td class="hidden-column">{{ goal.key().id() }}</td>
                                         <td class="text-center">{{ goal.due_date }}</td>
@@ -269,8 +342,8 @@
                                 <h2>Goal Details</h2>
                             </div>
                             <div class=box-content>
-                                <div class="details hide">
-                                    <p id="status"><span class="label label-success">d</span></p>
+                                <div id="goal_details"  class="details hide">
+
                                 </div>
 
 
