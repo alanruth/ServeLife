@@ -978,10 +978,10 @@ class ProjectInternalIndexHandler(SLRequestHandler):
     @login_required
     def get(self, project_name):
         if self.is_logged_in():
-            project = ProjectThinDB.all().filter('project_name = ', project_name).get()# filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            project = Project.get_by_id(project_name)
             if project:
                 template = jinja_environment.get_template('projectinternalindex.html')
-                variables = {'project': project, 'user_email': self.user.email, 'user_name': self.user.user_name}
+                variables = {'project': project, 'user': self.user}
                 #variables = json.loads(project.str_value)
                 #variables['project'] = project
                 #variables['user_email'] = self.user.email
@@ -1000,11 +1000,10 @@ class ProjectPrivateTeamHandler(SLRequestHandler):
     @login_required
     def get(self, project_name):
         if self.is_logged_in():
-            user = self.user
-            project = Project.query(Project.project_name == project_name)
+            project = Project.get_by_id(project_name)
             if project:
                 template = jinja_environment.get_template('projectprivateteam.html')
-                variables = {'project': project, 'user_email': self.user.email, 'user_name': self.user.user_name}
+                variables = {'project': project, 'user': self.user}
                 self.response.out.write(template.render(variables))
             else:
                 self.response.out.write('no such project exists.')
@@ -1017,11 +1016,11 @@ class ProjectPrivateIndexHandler(SLRequestHandler):
     def get(self, project_name):
         if self.is_logged_in():
             #Check to see that requestor is member of project
-            project = ProjectThinDB.all().filter('project_name = ', project_name).get() # filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            project = Project.get_by_id(project_name)
             if project:
                 template = jinja_environment.get_template('projectprivateindex.html')
                 #variables = json.loads(project.str_value)
-                variables = {'project': project, 'user_email': self.user.email, 'user_name': self.user.user_name}
+                variables = {'project': project, 'user': self.user}
                 #variables['project'] = project
                 #variables['user_email'] = self.user.email
                 #variables['user_name'] = self.user.user_name
@@ -1065,11 +1064,10 @@ class NewProjectProfileHandler(SLBSRequestHandler):
             if not project:
                 project = Project(id=project_name,
                                     project_name=project_name,
-                                    description=project_description,
                                     start_date=start_date,
-                                    created_by=user.key.id(),
+                                    created_by=user.key,
                                     profile=projectinfo,
-                                    team_members=[TeamMember(member=user.key.id(),
+                                    team_members=[TeamMember(member=user.key,
                                                              role='Project Leader',
                                                              admin=True)])
                 project.put()

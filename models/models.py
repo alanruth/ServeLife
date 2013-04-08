@@ -26,7 +26,6 @@ class UserGoal(ndb.Model):
     completed_date = ndb.DateTimeProperty(required=False)
     completed_comment = ndb.StringProperty(required=False)
     tags = ndb.JsonProperty()
-    #parent_goal = ndb.KeyProperty(kind='UserGoal')
     private = ndb.BooleanProperty(default=False)
     created = ndb.DateTimeProperty(required=True, auto_now_add=True)
     updated = ndb.DateTimeProperty(required=True, auto_now=True)
