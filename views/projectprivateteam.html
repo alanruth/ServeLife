@@ -12,10 +12,10 @@
                     <div class="row-fluid topic-main">
                         <div class="span2">
                             <!-- INSERT PICTURE FROM PROFILE -->
-                            <img alt="{{ project.project_name }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
+                            <img alt="{{ project.key.id() }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
                         </div>
                         <div class="span5">
-                            <span class="pull-right"><strong>Followers: </strong>{{ project.follower_count }}</span>
+                            <span class="pull-right"><strong>Followers: </strong>?</span>
                             <div class="pull-right">
                                 <a class="btn" href="#">
                                     <img alt="Share" src=""/>
@@ -24,7 +24,7 @@
                                     <img alt="Invite" src=""/>
                                 </a>
                             </div>
-                            <h2 id="project-name">{{ project.project_name }}</h2>
+                            <h2 id="project-name">{{ project.key.id() }}</h2>
                             <p>{{ project.description }}</p>
                             <p>List Tags</p>
                         </div>
@@ -69,7 +69,7 @@
                     <div class="row-fluid topic-body">
                         <div class="span12">
                             <ul class="nav nav-pills btn-topic pull-right">
-                                <li><a href="/build/project/{{ project.project_name }}">News</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}">News</a></li>
                                 <li><a href="#">Backlog</a></li>
                                 <li><a href="#">Tasks</a></li>
                                 <li class="active"><a href="#">Team</a></li>
@@ -78,11 +78,11 @@
                             </ul>
                         </div>
                     </div>
-                    iv class="row-fluid">
+                    <div class="row-fluid">
                     <div class="box span6">
                         <div class="box-header">
                             <h2><img src="/static/img/certificate.png" class="certificate"/>
-                                <span class="break"></span>Learning Goals
+                                <span class="break"></span>Team
                             </h2>
                             <div class="box-icon">
                                 <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_goal"><img src="/static/img/halflings_plus.png"/></a>
@@ -94,16 +94,16 @@
                             <table class="table table-hover table-bordered" id="goals">
                                 <thead class="table_head">
                                 <tr>
-                                    <th class="goal-header">Goal</th>
-                                    <th>Due Date</th>
+                                    <th class="goal-header">Team Member</th>
+                                    <th>Project Role</th>
                                     <th>Status</th>
                                 </tr>
                                 </thead>
                                 <tbody id="sortable">
-                                {% for member in team %}
+                                {% for member in project.team_members %}
                                     <tr>
-                                        <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span>{{ member.team_member }}</td>
-                                        <td class="hidden-column">{{ member.key().id() }}</td>
+                                        <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</td>
+                                        <td class="hidden-column">{{ member.member }}</td>
                                         <td class="text-center">{{ member.role }}</td>
                                         <td>
                                             <span class="label label-success">{{ member.active }}</span>
