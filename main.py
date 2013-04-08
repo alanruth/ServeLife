@@ -35,7 +35,7 @@ class SLRequestHandler(webapp2.RequestHandler):
             rand_secret = cookie_split[1]
             hash = cookie_split[2]
             if hmac.new(str(rand_secret), str(user_id)).hexdigest()==str(hash):
-                self.user = User.get_by_id(int(user_id))
+                self.user = User.get_by_id(str(user_id))
                 return True
             else:
                 return False
@@ -94,22 +94,20 @@ class FollowUserHandler(SLRequestHandler):
     @login_required
     def post(self, followed):
         if self.is_logged_in():
-            #user that is following another user is the follower
-            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             #user that is being followed is the followed
-            user_followed = UserThinDB.all().filter('user_name = ', followed).get()
+            user_followed = User.get_by_id(followed)
             follow_index = UserFollowerIndex.all().filter('parent = ', user_followed).get()
             if follow_index:
-                follow_index = UserFollowerIndex.followers.append(user_follower.key().id())
+                follow_index = UserFollowerIndex.followers.append(self.user.key.id())
                 follow_index.put()
             else:
-                follow_index = UserFollowerIndex(key_name='index', parent=user_followed, followers=[(user_follower.key().id())])
+                follow_index = UserFollowerIndex(key_name='index', parent=user_followed, followers=[(self.user.key.id())])
                 follow_index.put()
 
             #Increment how many users follow a a certain user = follower count and
             #Increment how many users a certain user follows = follow count
-            user_follow(user_followed, user_follower)
-            self.redirect('/user/profile/' + followed)
+            user_follow(user_followed, self.user.key.id())
+            self.redirect('/community/profile/' + user_followed.key.id() )
         else:
             self.redirect('/signin')
 
@@ -118,19 +116,18 @@ class FollowTopicHandler(SLRequestHandler):
     @login_required
     def post(self, topic):
         if self.is_logged_in():
-            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             topic_followed = TopicThinDB.all().filter('topic_name = ', topic).get()
             follow_index = TopicFollowerIndex.all().filter('parent = ', topic_followed).get()
             if follow_index:
-                follow_index = TopicFollowerIndex.followers.append((follower.key().id()))
+                follow_index = TopicFollowerIndex.followers.append((self.user.key.id()))
                 follow_index.put()
             else:
-                follow_index = TopicFollowerIndex(key_name='index', parent=topic_followed, followers=[(follower.key().id())])
+                follow_index = TopicFollowerIndex(key_name='index', parent=topic_followed, followers=[(self.user.key.id())])
                 follow_index.put()
 
             #Increment how many users follow a a certain user = follower count and
             #Increment how many users a certain user follows = follow count
-            topic_follow(topic_followed, follower)
+            topic_follow(topic_followed, self.user.key.id())
             self.redirect('/discover/topic/'+topic)
         else:
             self.redirect('/signin')
@@ -140,11 +137,10 @@ class UnFollowTopicHandler(SLRequestHandler):
     @login_required
     def post(self, topic):
         if self.is_logged_in():
-            follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             topic_unfollowed = TopicThinDB.all().filter('topic_name = ', topic).get()
             follow_index = TopicFollowerIndex.all().filter('parent = ', topic_unfollowed).get()
             if follow_index:
-                follow_index = TopicFollowerIndex.followers.remove((follower.key().id()))
+                follow_index = TopicFollowerIndex.followers.remove((self.user.key.id()))
                 follow_index.put()
 
             #Increment how many users follow a a certain user = follower count and
@@ -160,19 +156,18 @@ class FollowCourseHandler(SLRequestHandler):
     def post(self, course_name):
         if self.is_logged_in():
             #user that is following course
-            user_follower = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             course_followed = CourseThinDB.all().filter('course_name = ', course_name).get()
             follow_index = CourseFollowerIndex.all().filter('parent = ', course_followed).get()
             if follow_index:
-                follow_index = CourseFollowerIndex.followers.append(user_follower.key().id())
+                follow_index = CourseFollowerIndex.followers.append(self.user.key.id())
                 follow_index.put()
             else:
-                follow_index = CourseFollowerIndex(key_name='index', parent=course_followed, followers=[(user_follower.key().id())])
+                follow_index = CourseFollowerIndex(key_name='index', parent=course_followed, followers=[(self.user.key.id())])
                 follow_index.put()
 
             #Increment how many users follow a a certain user = follower count and
             #Increment how many users a certain user follows = follow count
-            user_follow(course_followed, user_follower)
+            user_follow(course_followed, self.user.key.id())
             self.redirect('/course/'+course_name)
         else:
             self.redirect('/signin')
@@ -279,11 +274,12 @@ class SignUpHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            if profile:
-                self.redirect('/home/hub/'+ user.user_name)
+            # TODO need to update to ndb structure
+            #profile = User.query(User.user_name == user.user_name, User.profile != None).get()
+            if user.profile:
+                self.redirect('/home/hub/' + user.key)
             else:
-                self.redirect('/user/profile/'+ user.user_name)
+                self.redirect('/user/profile/' + user.key)
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
@@ -292,23 +288,23 @@ class SignUpHandler(SLRequestHandler):
         email = self.request.get('email')
         username = self.request.get('username').lower()
         password = self.request.get('password')
-        username_exists = User.all().filter('user_name =', username).get()
+        username_exists = User.get_by_id(username)
         if not username_exists:
             #save the new user unactivated
             random_secret = "".join(random.choice(string.letters) for x in xrange(5))
             password_hash = random_secret+'|'+hmac.new(random_secret,password).hexdigest()
             activation_key = hmac.new(random_secret,username).hexdigest()
-            new_user = User(email=email, user_name=username, password_hash=password_hash, activated='False', activation_key=activation_key)
+            new_user = User(id=username, user_name=username, email=email, password_hash=password_hash, activated='False', activation_key=activation_key)
             new_user.put()
             #mail the activation link
             activation_link = domain+'/account_activation?activation_key='+hmac.new(random_secret,username).hexdigest()
             email_template = jinja_environment.get_template('email.html')
             try:
                 mail.send_mail(sender="alan@notionlabs.com",
-                               to=email,
-                               subject="Activate your Servelife account!",
-                               body="no html version",
-                               html=email_template.render({'activation_link':activation_link}))
+                            to=email,
+                            subject="Activate your Servelife account!",
+                            body="no html version",
+                            html=email_template.render({'activation_link':activation_link}))
             except:
                 self.response.write('mail config not working..')
 
@@ -320,17 +316,17 @@ class SignUpHandler(SLRequestHandler):
 class ActivationHandler(SLRequestHandler):
     def get(self):
         activation_key = self.request.get('activation_key')
-        user = User.all().filter('activation_key =', activation_key).get()
+        user = User.query(User.activation_key == activation_key).get()
         if user:
             user.activated='True'
             user.put()
-            username = user.user_name
-            user_influence = UserThinDB(user_name=username,
-                                        asset= 'profile',
-                                        asset_key= 'influence',
-                                        str_value= '',
-                                        int_value= 100)
-            user_influence.put()
+            #username = user.user_name
+            #user_influence = UserThinDB(user_name=username,
+            #                            asset= 'profile',
+            #                            asset_key= 'influence',
+            #                            str_value= '',
+            #                            int_value= 100)
+            #user_influence.put()
             template = jinja_environment.get_template('publicconfirm.html')
             alert = "Thank You"
             msg = "Your ServeLife account has been confirmed. Login and begin your learning adventure!"
@@ -351,8 +347,9 @@ class SignInHandler(SLRequestHandler):
         if self.is_logged_in():
             user = self.user
             #ABR: check to see if the user has a profile
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            if profile:
+            #profile = User.query(User.user_name == user.user_name, User.profile != None).get()
+            #profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            if user.profile:
                 self.redirect('/home/hub/'+ user.user_name)
             else:
                 self.redirect('/user/profile/'+ user.user_name)
@@ -363,21 +360,22 @@ class SignInHandler(SLRequestHandler):
     def post(self):
         password = str(self.request.get('password'))
         email = str(self.request.get('email'))
-        user = User.all().filter('email =', email).get()
+        user = User.query(User.email == email).get()
         if user:
             pass_split = user.password_hash.split('|')
             random_secret = str(pass_split[0])
             password_hash = str(pass_split[1])
             if str(hmac.new(random_secret,password).hexdigest())==str(password_hash):
-                user_id =  str(user.key().id())
+                user_id = str(user.key.id())
                 #user_id|random_secret|hash
                 cookie_value = user_id+'|'+random_secret+'|'+hmac.new(random_secret,user_id).hexdigest()
                 cookie = 'user_id = '+cookie_value+';Path = /'
                 self.response.headers.add_header('Set-Cookie', cookie)
 
                 #ABR: check to see if the user has a profile
-                profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-                if profile:
+                #profile = User.query(User.user_name == user.user_name, User.profile != None).get()
+                #profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+                if user.profile:
                     url_path = str('/home/hub/' + user.user_name)
                     #AS: create a response payload of as many items you want to have in a dictionary
                     response = {'status':'ok', 'location':url_path}
@@ -413,18 +411,20 @@ class LogOutHandler(SLRequestHandler):
 
 class BetaSignupHandler(SLRequestHandler):
     def get(self):
-        #if self.is_logged_in():
-        #    user = self.user
-        #    self.redirect('/home/'+user.user_name)
         template = jinja_environment.get_template('signup.html')
         variables = {}
         self.response.out.write(template.render(variables))
 
     def post(self):
-        beta_password = str(self.request.get('password'))
         beta_passcode = str(self.request.get('passcode'))
         if beta_passcode != 'learnwithpurpose':
             self.response.write('invalid passcode')
+            return
+
+        beta_username = str(self.request.get('user_name')).lower()
+        username_exists = User.query(User.user_name == beta_username).get()
+        if username_exists:
+            self.response.write('duplicate username')
             return
 
         beta_email = str(self.request.get('email'))
@@ -432,16 +432,10 @@ class BetaSignupHandler(SLRequestHandler):
             self.response.write('invalid email')
             return
         else:
-            beta_user = User.all().filter('email =', beta_email).get()
+            beta_user = User.query(User.email == beta_email).get()
             if beta_user:
                 self.response.write('duplicate email')
                 return
-
-        beta_username = str(self.request.get('user_name')).lower()
-        username_exists = User.all().filter('user_name =', beta_username).get()
-        if username_exists:
-            self.response.write('duplicate username')
-            return
 
         self.response.write('ok')
         return
@@ -505,7 +499,7 @@ class LandingPageHandler(SLRequestHandler):
     def get(self):
         if self.is_logged_in():
             user = self.user
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
+            profile = User.query(User.user_name == user.user_name, User.profile != None).get()
             if profile:
                 self.redirect('/home/hub/'+ user.user_name)
             else:
@@ -549,10 +543,9 @@ class ProjectExternalProfileHandler(SLRequestHandler):
 
 class UserExternalProfileHandler(SLRequestHandler):
     def get(self, user_name):
-        profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-        if profile:
-            variables = json.loads(profile.str_value)
-            variables['userthin'] = profile
+        user = User.get_by_id(user_name)
+        if user:
+            variables = {'user': user}
             template = jinja_environment.get_template('userexternalindex.html')
             self.response.out.write(template.render(variables))
         else:
@@ -612,15 +605,9 @@ class UserProfileHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
-            user = self.user
-            variables = {}
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =', 'profile').filter('asset_key =', 'info').get()
-            if profile:
-                variables = json.loads(profile.str_value)
-                variables['userthin'] = profile
-
-            variables['user_email'] = user.email
-            variables['user_name'] = user.user_name
+            #user = self.user
+            user = User.get_by_id(self.user.user_name)
+            variables = {'user': user}
             template = jinja_environment.get_template('userprofile.html')
             self.response.out.write(template.render(variables))
         else:
@@ -635,13 +622,7 @@ class UserProfileHandler(SLRequestHandler):
             last_name = self.request.get('last_name')
             country = self.request.get('country')
             city = self.request.get('city')
-            #linkedin_url = self.request.get('linkedin_url')
-            #facebook_url = self.request.get('facebook_url')
-            #twitter_handle = self.request.get('twitter_handle')
-            #skype_id = self.request.get('skype_id')
             description = self.request.get('description')
-            #gravatar_url = get_gravatar_url(180, user.email)
-            #avatar = images.resize(self.request.get('img'), 180, 180)
             #if self.get_uploads('user_image'):
             #    upload_files = self.get_uploads('user_image')
             #else:
@@ -653,22 +634,11 @@ class UserProfileHandler(SLRequestHandler):
                 'last_name': last_name,
                 'country': country,
                 'city': city,
-                # 'linkedin_url': linkedin_url,
-                # 'facebook_url': facebook_url,
-                # 'twitter_handle': twitter_handle,
-                # 'skype_id': skype_id,
                 'description': description}
-            profile = UserThinDB.all().filter('user_name = ', user.user_name).filter('asset =','profile').filter('asset_key =','info').get()
-            if profile:
-                profile.str_value = json.dumps(profileinfo)
-            else:
-                profile = UserThinDB(user_name=user.user_name,
-                                     asset='profile',
-                                     asset_key='info',
-                                     str_value=json.dumps(profileinfo),
-                                     int_value=0)
-            profile.put()
-            self.redirect('/home/hub/' + user.user_name)
+            user = self.user
+            user.profile = profileinfo
+            user.put()
+            self.redirect('/home/hub/' + user.key.id())
 
         else:
             self.redirect('/signin')
@@ -678,16 +648,13 @@ class UserInternalProfileHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
-            profile = UserThinDB.all().filter('user_name = ', user_name).filter('asset =','profile').filter('asset_key =','info').get()
-            if profile:
-                variables = json.loads(profile.str_value)
-                variables['userthin'] = profile
-                variables['user_email'] = self.user.email
-                template = jinja_environment.get_template('userinternalindex.html')
-                self.response.out.write(template.render(variables))
-            else:
-                self.response.out.write('no such user profile exists!')
+            user = User.get_by_id(user_name)
+            if not user:
+                self.redirect('/home/hub/'+self.user.user_name)
 
+            variables = {'user': user}
+            template = jinja_environment.get_template('userinternalindex.html')
+            self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
 
@@ -696,10 +663,8 @@ class UserHomeHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
-            user = self.user
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             template = jinja_environment.get_template('userhome.html')
-            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin}
+            variables = {'user': self.user}
             # ,'blob_key': json.loads(userthin.str_value).get('blob_key')
             self.response.out.write(template.render(variables))
         else:
@@ -710,12 +675,9 @@ class UserProjectHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
-            user = self.user
-            projects = ProjectThinDB.all()
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            projects = Project.query(Project.team_members.member == self.user.key)
             template = jinja_environment.get_template('userproject.html')
-            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin, 'project': projects}
-            # 'blob_key': json.loads(userthin.str_value).get('blob_key')
+            variables = {'user': self.user, 'projects': projects}
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
@@ -725,11 +687,8 @@ class UserClassHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
-            user = self.user
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             template = jinja_environment.get_template('userclass.html')
-            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin,
-                         'blob_key': json.loads(userthin.str_value).get('blob_key')}
+            variables = {'user': self.user}
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
@@ -739,11 +698,8 @@ class UserTopicHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
-            user = self.user
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             template = jinja_environment.get_template('usertopic.html')
-            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin,
-                         'blob_key': json.loads(userthin.str_value).get('blob_key')}
+            variables = {'user': self.user}
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
@@ -753,11 +709,8 @@ class UserResearchHandler(SLRequestHandler):
     @login_required
     def get(self, user_name):
         if self.is_logged_in():
-            user = self.user
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             template = jinja_environment.get_template('userresearch.html')
-            variables = {'user': user, 'user_name': user.user_name, 'user_email': user.email, 'userthin': userthin,
-                         'blob_key': json.loads(userthin.str_value).get('blob_key')}
+            variables = {'user': self.user}
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
@@ -847,24 +800,25 @@ class NewCourseProfileHandler(SLRequestHandler):
 
     @login_required
     def post(self):
-        user = self.user
-        userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
-        course_name = self.request.get('course_name')
-        course_url = self.request.get('course_url')
-        course_tags = self.request.get('course_tags').split(',')
-        course_organization = self.request.get('organization_name')
-        free = self.request.get('course_free')
-        courseinfo = {'course_name': course_name, 'course_url': course_url, 'course_organization': course_organization, 'course_free': free}
-        course = CourseThinDB.all().filter('course_name = ', course_name.lower()).filter('asset =', 'profile').filter('asset_key =','info').get()
-        if course:
-            course.course_tags = course_tags
-            course.str_value = json.dumps(courseinfo)
-            course.updated_by = userthin
-            course.put()
+        if self.is_logged_in():
+            course_name = self.request.get('course_name')
+            course_url = self.request.get('course_url')
+            course_tags = self.request.get('course_tags').split(',')
+            course_organization = self.request.get('organization_name')
+            free = self.request.get('course_free')
+            courseinfo = {'course_name': course_name, 'course_url': course_url, 'course_organization': course_organization, 'course_free': free}
+            course = CourseThinDB.all().filter('course_name = ', course_name.lower()).filter('asset =', 'profile').filter('asset_key =','info').get()
+            if course:
+                course.course_tags = course_tags
+                course.str_value = json.dumps(courseinfo)
+                #course.updated_by = userthin
+                course.put()
+            else:
+                course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, course_tags=course_tags)
+                course.put()
+            self.redirect('/course/'+course_name)
         else:
-            course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, created_by=userthin, course_tags=course_tags, updated_by=userthin)
-            course.put()
-        self.redirect('/course/'+course_name)
+            self.redirect('/signin')
 
 
 class CourseEditProfileHandler(SLRequestHandler):
@@ -889,7 +843,7 @@ class CourseEditProfileHandler(SLRequestHandler):
 
     @login_required
     def post(self, course_name):
-        userthin = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+        #userthin = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
         course_name = self.request.get('course_name').lower
         course_url = self.request.get('course_url')
         course_tags = self.request.get('course_tags').split(',')
@@ -900,10 +854,10 @@ class CourseEditProfileHandler(SLRequestHandler):
         if course:
             course.course_tags = course_tags
             course.str_value = json.dumps(courseinfo)
-            course.updated_by = userthin
+            #course.updated_by = userthin
             course.put()
         else:
-            course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, created_by=userthin, course_tags=course_tags, updated_by=userthin)
+            course = CourseThinDB(course_name=course_name, asset='profile', asset_key='info', str_value=json.dumps(courseinfo), int_value=0, course_tags=course_tags)
             course.put()
         self.redirect('/course/'+course_name)
 
@@ -965,7 +919,7 @@ class NewTopicProfileHandler(SLBSRequestHandler):
     def post(self):
         if self.is_logged_in():
             user = self.user
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
+            #userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             topic_name = self.request.get('topic_name')
             topic_name_lc = topic_name.lower()
             topic_description = self.request.get('topic_description')
@@ -978,18 +932,18 @@ class NewTopicProfileHandler(SLBSRequestHandler):
                          'blob_key': str(blob_info.key())}
             topic = TopicThinDB.all().filter('topic_name = ', topic_name_lc).filter('asset =', 'profile').filter('asset_key =','info').get()
             if topic:
-                topic.updated_by = userthin
+                #topic.updated_by = userthin
                 topic.str_value = json.dumps(topicinfo)
                 topic.put()
             else:
-                topic = TopicThinDB(topic_name=topic_name_lc, asset='profile', asset_key='info', str_value=json.dumps(topicinfo), int_value=0, created_by=userthin, updated_by=userthin)
+                topic = TopicThinDB(topic_name=topic_name_lc, asset='profile', asset_key='info', str_value=json.dumps(topicinfo), int_value=0)
                 topic.put()
                 #Add user as a follower
-            follow_index = TopicFollowerIndex(key_name='index', parent=topic, followers=[(userthin.key().id())])
-            follow_index.put()
-            topic_follow(topic, userthin)
+            #follow_index = TopicFollowerIndex(key_name='index', parent=topic, followers=[(userthin.key().id())])
+            #follow_index.put()
+            #topic_follow(topic, userthin)
             #write to the activity model
-            activity = create_activity(userthin, "user", topic, "topic", "create")
+            #activity = create_activity(userthin, "user", topic, "topic", "create")
             doc = create_topic(topic)
             _INDEX_NAME = 'topic'
             try:
@@ -1006,11 +960,12 @@ class DiscoverTopicIndexHandler(SLRequestHandler):
     @login_required
     def get(self):
         if self.is_logged_in():
-            user = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
+            #user = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             topics = []
-            topics_followed = db.GqlQuery(
-                "SELECT __key__ FROM TopicFollowerIndex WHERE followers = :1", user.key().id())
-            topics.extend(db.get([k.parent() for k in topics_followed]))
+            #topics_followed = db.GqlQuery(
+            #    "SELECT __key__ FROM TopicFollowerIndex WHERE followers = :1", user.key().id())
+
+            #topics.extend(db.get([k.parent() for k in topics_followed]))
             template = jinja_environment.get_template('topicprivateindex.html')
             variables = {'user_email': self.user.email, 'user_name': self.user.user_name, 'topics': topics}
             self.response.out.write(template.render(variables))
@@ -1037,6 +992,22 @@ class ProjectInternalIndexHandler(SLRequestHandler):
             else:
                 self.response.out.write('no such project exists.')
 
+        else:
+            self.redirect('/signin')
+
+
+class ProjectPrivateTeamHandler(SLRequestHandler):
+    @login_required
+    def get(self, project_name):
+        if self.is_logged_in():
+            user = self.user
+            project = Project.query(Project.project_name == project_name)
+            if project:
+                template = jinja_environment.get_template('projectprivateteam.html')
+                variables = {'project': project, 'user_email': self.user.email, 'user_name': self.user.user_name}
+                self.response.out.write(template.render(variables))
+            else:
+                self.response.out.write('no such project exists.')
         else:
             self.redirect('/signin')
 
@@ -1081,32 +1052,30 @@ class NewProjectProfileHandler(SLBSRequestHandler):
     def post(self):
         if self.is_logged_in():
             user = self.user
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
             project_name = (self.request.get('project_name')).lower()
             project_description = self.request.get('project_description')
             start_date = datetime.datetime.strptime(self.request.get('start_date'), "%m/%d/%Y").date()
             #parent_project = self.request.get('parent_project')
             #upload_files = self.get_uploads('parent_image')
             #blob_info = upload_files[0]
-            projectinfo = {'project_name': project_name,
-                         'project_description': project_description,
-                         'start_date': start_date,
+            projectinfo = {'project_description': project_description}
                          #'parent_project': parent_project,
                          #'blob_key':str(blob_info.key()),
-                         }
-            project = ProjectThinDB.all().filter('project_name = ', project_name).get()
+            project = Project.get_by_id(project_name)
             if not project:
-                project = ProjectThinDB(project_name=project_name,
-                                        description=project_description,
-                                        start_date=start_date,
-                                        created_by=userthin)
+                project = Project(id=project_name,
+                                    project_name=project_name,
+                                    description=project_description,
+                                    start_date=start_date,
+                                    created_by=user.key.id(),
+                                    profile=projectinfo,
+                                    team_members=[TeamMember(member=user.key.id(),
+                                                             role='Project Leader',
+                                                             admin=True)])
                 project.put()
-            #Add Creator as a team member
-            team_member = ProjectMember(project=project,
-                                        team_member=userthin,
-                                        role='Project Leader')
-            team_member.put()
-            #activity = create_activity(userthin, "user", project, "project", "create")
+            else:
+                #TODO Add javascript to ensure no duplicate projects come in
+                self.response.write('duplicate')
             #doc = create_project(project)
             #_INDEX_NAME = 'project'
             #try:
@@ -1194,10 +1163,8 @@ class UserGoalHandler(SLRequestHandler):
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
-            userthin = UserThinDB.all().filter('user_name = ', user.user_name).get()
-            goals = UserGoal.gql("WHERE goal_user = :1", userthin)
             template = jinja_environment.get_template('usergoal.html')
-            variables = {'user_email': user.email, 'userthin': userthin, 'blob_key': json.loads(userthin.str_value).get('blob_key'), 'goals': goals}
+            variables = {'user': user}
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
@@ -1205,22 +1172,16 @@ class UserGoalHandler(SLRequestHandler):
     @login_required
     def post(self):
         if self.is_logged_in():
-            userthin = UserThinDB.all().filter('user_name = ', self.user.user_name).get()
             # Save Goal
+            user = self.user
             goal_name = self.request.get('goal_name')
             goal_description = self.request.get('goal_description')
             goal_measure = self.request.get('goal_measure')
             goal_date = datetime.datetime.strptime(self.request.get('goal_date'), "%m/%d/%Y").date()
             goal_tags = self.request.get('goal_tags').split(',')
             goal_status = 'not started'
-            goal = UserGoal(goal_user=userthin,
-                           name=goal_name,
-                           description=goal_description,
-                           goal_status=goal_status,
-                           accomplished_measure=goal_measure,
-                           due_date=goal_date,
-                           tags=goal_tags)
-            goal.put()
+            user.goals = {name= goal_name}
+            user.put()
 
             action_name = self.request.get('action_name')
             if action_name:
@@ -1229,12 +1190,12 @@ class UserGoalHandler(SLRequestHandler):
                 action_description = self.request.get('action_description')
                 action_estimate = int(self.request.get('action_estimate'))
                 action_status = 'not started'
-                action = GoalAction(goal_user=userthin,
+                action = GoalAction(
                                        name=action_name,
                                        description=action_description,
                                        estimate=action_estimate,
                                        goal_status=action_status,
-                                       parent_goal=goal)
+                                       parent_goal=goal.key)
                 action.put()
 
             self.response.write('ok')
@@ -1309,7 +1270,8 @@ app = webapp2.WSGIApplication([
                                   ('/betasignup', BetaSignupHandler),
                                   ('/project/new', NewProjectProfileHandler),
                                   ('/build/project/profile/(?P<project_name>.*)', ProjectInternalIndexHandler),
-                                  ('/build/project/(?P<project_name>.*)', ProjectPrivateIndexHandler),
+                                  ('/build/project/(?P<project_name>.*)/hub', ProjectPrivateIndexHandler),
+                                  ('/build/project/(?P<project_name>.*)/team', ProjectPrivateTeamHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),

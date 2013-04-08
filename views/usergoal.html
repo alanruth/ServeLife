@@ -131,7 +131,7 @@
                 success: function(response) {
                     if (response == 'ok'){
                         $("#modal-close").click();
-                        $(window.location.replace('/home/goals/{{ userthin.user_name }}'));
+                        $(window.location.replace('/home/goals/{{ user.key.id() }}'));
                     }
                 },
                 error: function(response) {
@@ -238,7 +238,7 @@
                         <div class="span2">
                             <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
                             <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
-                            <img alt="{{ userthin.user_name }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
+                            <img alt="{{ user.key.id() }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
                         </div>
                         <div class="span5">
                             <!-- Insert some metrics, share & invite buttons -->
@@ -248,7 +248,7 @@
                             <div class="row-fluid">
                                 <a class="quick-button-small span2">
                                     <img alt="Followers" src="/static/img/group.png" />
-                                    <span class="notification followers">{{ userthin.follower_count }}</span>
+                                    <span class="notification followers">?</span>
                                     <p>Followers</p>
                                 </a>
                                 <a class="quick-button-small span2">
@@ -271,7 +271,7 @@
                                     <span class="notification ideas">7</span>
                                     <p>Tasks</p>
                                 </a>
-                                <a class="quick-button-small span2" href="/home/goals/{{ userthin.user_name }}">
+                                <a class="quick-button-small span2" href="/home/goals/{{ user.key.id() }}">
                                     <img alt="Goals" src="/static/img/certificate.png" />
                                     <span class="notification ideas">7</span>
                                     <div class="quick-button-small-article"><p>Goals</p></div>
@@ -305,7 +305,7 @@
                                     </tr>
                                     </thead>
                                     <tbody id="sortable">
-                                    {% for goal in goals %}
+                                    {% for goal in user.goals %}
                                     <tr onclick="javacript: get_goal_details({{ goal.key().id() }});">
                                         <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span>{{ goal.name }}</td>
                                         <td class="hidden-column">{{ goal.key().id() }}</td>

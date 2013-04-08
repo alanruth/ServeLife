@@ -1,4 +1,5 @@
 from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.ext.db import polymodel
 
 
@@ -8,30 +9,90 @@ class Subscriber(db.Model):
     verified = db.BooleanProperty(required=True)
 
 
-class User(db.Model):
-    user_name      = db.StringProperty(required = True)
-    password_hash = db.StringProperty(required = True)
-    email         = db.StringProperty(required = True)
-    activated     = db.StringProperty(required = True)
-    activation_key= db.StringProperty(required = True)
-    created       = db.DateTimeProperty(required = True,auto_now_add = True)
+class UserCount(ndb.Model):
+    entity_type = ndb.StringProperty(required=True)
+    count = ndb.IntegerProperty(required=True)
 
 
-class UserThinDB(db.Model):
-    user_name      = db.StringProperty(required=True)
-    asset         = db.StringProperty(required=True)
-    asset_key     = db.StringProperty(required=True)
-    str_value     = db.StringProperty(required=False)
-    int_value     = db.IntegerProperty(required=False)
-    follower_count = db.IntegerProperty(required=False, default=0)
-    follow_count = db.IntegerProperty(required=False, default=0)
-    topics_followed = db.IntegerProperty(required=False, default=0)
-    courses_followed = db.IntegerProperty(required=False, default=0)
-    projects_followed = db.IntegerProperty(required=False, default=0)
-    created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    updated       = db.DateTimeProperty(required=True, auto_now=True)
-    profile_pic     = db.StringProperty()
-    active_goals = db.IntegerProperty(default=0)
+class UserGoal(ndb.Model):
+    name = ndb.StringProperty(required=True)
+    description = ndb.StringProperty(required=False)
+    rank = ndb.IntegerProperty(required=False, default=0)
+    goal_status = ndb.StringProperty(choices=('completed', 'active', 'not started', 'on hold', 'deleted'))
+    accomplished_measure = ndb.StringProperty(required=False)
+    due_date = ndb.DateProperty(required=False)
+    started_date = ndb.DateTimeProperty(required=False)
+    completed_date = ndb.DateTimeProperty(required=False)
+    completed_comment = ndb.StringProperty(required=False)
+    tags = ndb.JsonProperty()
+    #parent_goal = ndb.KeyProperty(kind='UserGoal')
+    private = ndb.BooleanProperty(default=False)
+    created = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    updated = ndb.DateTimeProperty(required=True, auto_now=True)
+
+
+class User(ndb.Model):
+    user_name           = ndb.StringProperty(required=True)
+    password_hash       = ndb.StringProperty(required=True)
+    email               = ndb.StringProperty(required=True)
+    activated           = ndb.StringProperty(required=True)
+    activation_key      = ndb.StringProperty(required=True)
+    created             = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    profile             = ndb.JsonProperty(indexed=True)
+    goals               = ndb.StructuredProperty(UserGoal, repeated=True)
+    following           = ndb.StructuredProperty(UserCount, repeated=True)
+    locked              = ndb.BooleanProperty()
+
+
+class GoalAction(UserGoal):
+    estimate = ndb.IntegerProperty(default=0)
+    effort_to_date = ndb.IntegerProperty(default=0)
+    effort_remaining = ndb.IntegerProperty()
+    progress = ndb.FloatProperty()
+
+
+class UserGoalEvent(ndb.Model):
+    goal = ndb.KeyProperty(kind='UserGoal')
+    event = ndb.StringProperty(required=True)
+    reason = ndb.StringProperty(required=False)
+    created = ndb.DateTimeProperty(required=True, auto_now_add=True)
+
+
+class TeamMember(ndb.Model):
+    member = ndb.KeyProperty(kind='User')
+    role = ndb.StringProperty(required=False)
+    joined = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    active = ndb.BooleanProperty(default=True)
+    inactivated = ndb.DateTimeProperty(required=False)
+    admin = ndb.BooleanProperty(default=False)
+
+
+class Project(ndb.Model):
+    project_name        = ndb.StringProperty(required= True)
+    profile             = ndb.JsonProperty()
+    follower_count      = ndb.IntegerProperty(required=False, default=0)
+    created             = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    created_by          = ndb.KeyProperty(kind='User')
+    start_date          = ndb.DateProperty(required=True)
+    team_members        = ndb.StructuredProperty(TeamMember, repeated=True)
+
+
+#class UserThinDB(ndb.Model):
+#    user_name      = ndb.StringProperty(required=True)
+#    asset         = ndb.StringProperty(required=True)
+#    asset_key     = ndb.StringProperty(required=True)
+#    str_value     = ndb.StringProperty(required=False)
+#    int_value     = ndb.IntegerProperty(required=False)
+#    follower_count = ndb.IntegerProperty(required=False, default=0)
+#    follow_count = ndb.IntegerProperty(required=False, default=0)
+#    topics_followed = ndb.IntegerProperty(required=False, default=0)
+#    courses_followed = ndb.IntegerProperty(required=False, default=0)
+#    projects_followed = ndb.IntegerProperty(required=False, default=0)
+#    created       = ndb.DateTimeProperty(required=True, auto_now_add=True)
+#    updated       = ndb.DateTimeProperty(required=True, auto_now=True)
+#    profile_pic     = ndb.StringProperty()
+#    active_goals = ndb.IntegerProperty(default=0)
+#    goals = ndb.StructuredProperty(UserGoal, repeated=True)
 
     #def set_active_goals(self):
     #    self.active_goals = self.calculate_active_goals()
@@ -43,30 +104,6 @@ class UserThinDB(db.Model):
     #    else:
     #        return 0
 
-
-class UserGoal(db.Model):
-    goal_user = db.ReferenceProperty(UserThinDB)
-    name = db.StringProperty(required=True)
-    description = db.StringProperty(required=False)
-    rank = db.IntegerProperty(required=False, default=0)
-    goal_status = db.StringProperty(choices=('completed', 'active', 'not started', 'on hold', 'deleted'))
-    accomplished_measure = db.StringProperty(required=False)
-    due_date = db.DateProperty(required=False)
-    started_date = db.DateTimeProperty(required=False)
-    completed_date = db.DateTimeProperty(required=False)
-    completed_comment = db.StringProperty(required=False)
-    tags = db.StringListProperty()
-    parent_goal = db.SelfReferenceProperty()
-    private = db.BooleanProperty(default=False)
-    created = db.DateTimeProperty(required=True, auto_now_add=True)
-    updated = db.DateTimeProperty(required=True, auto_now=True)
-
-
-class GoalAction(UserGoal):
-    estimate = db.IntegerProperty(default=0)
-    effort_to_date = db.IntegerProperty(default=0)
-    effort_remaining = db.IntegerProperty()
-    progress = db.FloatProperty()
 
     #def set_progress(self):
     #    self.progress = self.calculate_progress()
@@ -88,11 +125,6 @@ class GoalAction(UserGoal):
     #        return 0
 
 
-class UserGoalEvent(db.Model):
-    goal = db.ReferenceProperty(UserGoal)
-    event = db.StringProperty(required=True)
-    reason = db.StringProperty(required=False)
-    created = db.DateTimeProperty(required=True, auto_now_add=True)
 
 
 class CourseThinDB(db.Model):
@@ -130,10 +162,10 @@ class EventItem(polymodel.PolyModel):
 
 
 class ArticleEvent(EventItem):
-    article_url = db.LinkProperty(required=True)
-    article_title = db.StringProperty()
-    article_image = db.LinkProperty()
-    creator      = db.ReferenceProperty(UserThinDB)
+    article_url = ndb.StringProperty(required=True)
+    article_title = ndb.StringProperty()
+    article_image = ndb.StringProperty()
+    creator      = ndb.KeyProperty(User)
 
 
 class Activity(db.Model):
@@ -175,28 +207,8 @@ class LikedIndex(db.Model):
     liked_id           = db.ListProperty(int)
 
 
-class ProjectThinDB(db.Model):
-    project_name   = db.StringProperty(required = True)
-    #asset         = db.StringProperty(required = True)
-    #asset_key     = db.StringProperty(required = True)
-    str_value     = db.StringProperty(required = False)
-    int_value     = db.IntegerProperty(required= False)
-    follower_count = db.IntegerProperty(required=False, default=0)
-    created       = db.DateTimeProperty(required=True, auto_now_add=True)
-    created_by      = db.ReferenceProperty(UserThinDB)
-    updated       = db.DateTimeProperty(required=True, auto_now=True)
-    #updated_by      = db.ReferenceProperty(UserThinDB, collection_name='updater')
-    profile_pic     = db.BlobProperty(default=None)
-    description = db.StringProperty(required=True)
-    start_date = db.DateProperty(required=True)
 
 
-class ProjectMember(db.Model):
-    project = db.ReferenceProperty(ProjectThinDB, required=True)
-    team_member = db.ReferenceProperty(UserThinDB, required=True, collection_name='user')
-    #may need to break role into its own model and reference UserProject to capture multiple roles on same project
-    role = db.StringProperty(required=False)
-    joined = db.DateTimeProperty(required=True, auto_now_add=True)
 
 
 class TeamThinDB(db.Model):

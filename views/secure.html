@@ -60,17 +60,17 @@
                 </a>
                 <div class="nav-collapse collapse">
                     <ul class="nav pull-right">
-                        <li><a href="/home/hub/{{ user_name }}" alt="Home">Home</a></li>
+                        <li><a href="/home/hub/{{ user.key.id() }}" alt="Home">Home</a></li>
                         <li><a href="/discover/hub">Discover</a></li>
                         <li><a href="/learn/hub">Learn</a></li>
                         <li><a href="/build/hub">Build</a></li>
                         <li><a href="/work/hub">Work</a></li>
                         <li><a href="/community/hub">Community</a></li>
-                        <li class="dropdown"><a href="#" class="btn btn-small btn-header dropdown-toggle" data-toggle="dropdown" >{{ user_email }}<b class="caret"></b></a>
+                        <li class="dropdown"><a href="#" class="btn btn-small btn-header dropdown-toggle" data-toggle="dropdown" >{{ user.email }}<b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                <li><a href="/user/profile/{{ user_name }}">Edit Profile</a></li>
-                                <li><a href="/user/account/{{ user_name }}">Update Account</a></li>
-                                <li><a href="/user/metrics/{{ user_name }}">My Metrics</a></li>
+                                <li><a href="/user/profile/{{ user.key.id() }}">Edit Profile</a></li>
+                                <li><a href="/user/account/{{ user.key.id() }}">Update Account</a></li>
+                                <li><a href="/user/metrics/{{ user.key.id() }}">My Metrics</a></li>
                                 <li class="divider"></li>
                                 <li><a href="#">Support</a></li>
                                 <li class="divider"></li>

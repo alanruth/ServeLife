@@ -1,10 +1,10 @@
 {% extends "external.html" %}
 
 <!-- NEED TO PULL MEMBER NAME FROM DB -->
-{% block title %}{{ first_name }} {{ last_name }}{% endblock title %}
+{% block title %}{{ user.profile.first_name }} {{ user.profile.last_name }}{% endblock title %}
 
 <!-- NEED TO PULL MEMBER HEADLINE FROM DB -->
-{% block description %}"{{ first_name }} {{ last_name }}'s ServeLife Member Profile: {{ description }}"{% endblock description %}
+{% block description %}"{{ user.profile.first_name }} {{ user.profile.last_name }}'s ServeLife Member Profile: {{ user.profile.description }}"{% endblock description %}
 
 {% block page %}
     <div class="topic-header">
@@ -15,23 +15,23 @@
     <div class="span2">
       <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
       <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
-        <img alt="{{ user_name }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
+        <img alt="{{ user.key.id() }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
     </div>
     <div class="span5">
       <!-- INSERT MEMBER CREATE DATE -->
-      <span class="pull-right"><strong>Member since: </strong>{{ userthin.created.strftime('%m/%Y') }}</span>
+      <span class="pull-right"><strong>Member since: </strong>{{ user.created.strftime('%m/%Y') }}</span>
       <!-- INSERT MEMBER NAME FROM PROFILE -->
-      <h2>{{first_name}} {{ last_name }}</h2>
+      <h2>{{user.profile.first_name}} {{ user.profile.last_name }}</h2>
       <!-- INSERT MEMBER LEVEL FROM PROFILE -->
-      <h4>{{title}}</h4>
+      <h4>INSERT LEVEL</h4>
       <!-- INSERT MEMBER HEADLINE FROM PROFILE - WE SHOULD LIMIT LENGTH OF HEADLINE -->
-      <p>{{description}} </p>
+      <p>{{user.profile.description}} </p>
     </div>
     <div class="span5">
       <div class="row-fluid">
         <div class="profile-details span3 offset1">
           <img alt="Followers" src="/static/img/group2x.png" />
-          <span class="notification followers">{{ userthin.follower_count }}</span>
+          <span class="notification followers">?</span>
           <p>Followers</p>
         </div>
         <div class="profile-details span3 offset1 likes">
@@ -216,7 +216,7 @@
     <h2 class="section_header">
       <hr class="left visible-desktop">
       <!-- Enter Member First Name -->
-      <span>{{ first_name }}'s Recent Projects</span>
+      <span>{{ user.profile.first_name }}'s Recent Projects</span>
       <hr class="right visible-desktop">
     </h2>
 
@@ -314,7 +314,7 @@
     <h2 class="section_header">
       <hr class="left visible-desktop">
       <!-- Enter Member First Name -->
-      <span>{{ first_name }}'s Most Impactful Contributions</span>
+      <span>{{ user.profile.first_name }}'s Most Impactful Contributions</span>
       <hr class="right visible-desktop">
     </h2>
     

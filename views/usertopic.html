@@ -1,8 +1,8 @@
 {% extends "secure.html" %}
 
-{% block title %}{{ user_name }}'s Topics{% endblock title %}
+{% block title %}{{ user.key.id() }}'s Topics{% endblock title %}
 
-{% block description %}"{{ user.user_name }}'s topics page brings together all the topics a ServeLife member follows"{% endblock description %}
+{% block description %}"{{ user.key.id() }}'s topics page brings together all the topics a ServeLife member follows"{% endblock description %}
 
 {% block page %}
 
@@ -13,7 +13,7 @@
                         <div class="span2">
                             <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
                             <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
-                            <img alt="{{ user_name }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
+                            <img alt="{{ user.key.id() }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
                         </div>
                         <div class="span5">
                             <!-- Insert some metrics, share & invite buttons -->
@@ -23,7 +23,7 @@
                             <div class="row-fluid">
                                 <a class="quick-button-small span2">
                                     <img alt="Followers" src="/static/img/group.png" />
-                                    <span class="notification followers">{{ userthin.follower_count }}</span>
+                                    <span class="notification followers">?</span>
                                     <p>Followers</p>
                                 </a>
                                 <a class="quick-button-small span2">
@@ -60,11 +60,11 @@
                     <div class="row-fluid">
                         <div class="span12">
                             <ul class="nav nav-pills pull-right">
-                                <li><a href="/home/hub/{{ user_name }}">Activity</a></li>
-                                <li><a href="/home/projects/{{ user_name }}">Projects</a></li>
-                                <li><a href="/home/classes/{{ user_name }}">Classes</a></li>
-                                <li class="active"><a href="/home/topics/{{ user_name }}">Topics</a></li>
-                                <li><a href="/home/research/{{ user_name }}">Research</a></li>
+                                <li><a href="/home/hub/{{ user.key.id() }}">Activity</a></li>
+                                <li><a href="/home/projects/{{ user.key.id() }}">Projects</a></li>
+                                <li><a href="/home/classes/{{ user.key.id() }}">Classes</a></li>
+                                <li class="active"><a href="/home/topics/{{ user.key.id() }}">Topics</a></li>
+                                <li><a href="/home/research/{{ user.key.id() }}">Research</a></li>
                             </ul>
                         </div>
                     </div>

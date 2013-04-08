@@ -2434,7 +2434,15 @@ ul.header-tabs>li.active>a:hover{
 }
 
 .topic-header {
-    background: -moz-linear-gradient(center top , #3F7D9F, #2D71A2) repeat scroll 0 0 #22557A;
+    /*background: -moz-linear-gradient(center top , #3F7D9F, #2D71A2) repeat scroll 0 0 #22557A;*/
+    background: #3f7d9f;
+    background: -moz-linear-gradient(top,  #3f7d9f 0%, #2d71a2 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3f7d9f), color-stop(100%,#2d71a2));
+    background: -webkit-linear-gradient(top,  #3f7d9f 0%,#2d71a2 100%);
+    background: -o-linear-gradient(top,  #3f7d9f 0%,#2d71a2 100%);
+    background: -ms-linear-gradient(top,  #3f7d9f 0%,#2d71a2 100%);
+    background: linear-gradient(to bottom,  #3f7d9f 0%,#2d71a2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3f7d9f', endColorstr='#2d71a2',GradientType=0 );
     box-shadow: 0 -3px 7px -3px rgba(0,0,0,0.3) inset;
     height: 102px;
     width: 100%;
@@ -2768,4 +2776,8 @@ table .table-row {
 
 .hidden-column {
     display: none;
+}
+
+#project-name {
+    margin: 0 0 10px;
 }
