@@ -15,6 +15,7 @@ class UserCount(ndb.Model):
 
 
 class UserGoal(ndb.Model):
+    user = ndb.KeyProperty(kind='User')
     name = ndb.StringProperty(required=True)
     description = ndb.StringProperty(required=False)
     rank = ndb.IntegerProperty(required=False, default=0)

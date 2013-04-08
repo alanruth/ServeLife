@@ -305,10 +305,10 @@
                                     </tr>
                                     </thead>
                                     <tbody id="sortable">
-                                    {% for goal in user.goals %}
-                                    <tr onclick="javacript: get_goal_details({{ goal.key().id() }});">
+                                    {% for goal in goals %}
+                                    <tr onclick="javacript: get_goal_details({{ goal.key.id() }});">
                                         <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span>{{ goal.name }}</td>
-                                        <td class="hidden-column">{{ goal.key().id() }}</td>
+                                        <td class="hidden-column">{{ goal.key.id() }}</td>
                                         <td class="text-center">{{ goal.due_date }}</td>
                                         <td>
                                             <span class="label label-success">{{ goal.goal_status }}</span>

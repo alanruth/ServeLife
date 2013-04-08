@@ -1163,8 +1163,9 @@ class UserGoalHandler(SLRequestHandler):
     def get(self, user_name):
         if self.is_logged_in():
             user = self.user
+            goals = UserGoal.query(UserGoal.user == user.key)
             template = jinja_environment.get_template('usergoal.html')
-            variables = {'user': user}
+            variables = {'user': user, 'goals': goals}
             self.response.out.write(template.render(variables))
         else:
             self.redirect('/signin')
@@ -1180,22 +1181,27 @@ class UserGoalHandler(SLRequestHandler):
             goal_date = datetime.datetime.strptime(self.request.get('goal_date'), "%m/%d/%Y").date()
             goal_tags = self.request.get('goal_tags').split(',')
             goal_status = 'not started'
-            user.goals = {name= goal_name}
-            user.put()
+            goal = UserGoal(user=user.key,
+                            name=goal_name,
+                            description=goal_description,
+                            goal_status=goal_status,
+                            accomplished_measure=goal_measure,
+                            due_date=goal_date,
+                            tags=goal_tags)
+            goal.put()
 
             action_name = self.request.get('action_name')
             if action_name:
                 # Save Goal Action
-                #action_name = self.request.get('action_name')
+                action_name = self.request.get('action_name')
                 action_description = self.request.get('action_description')
                 action_estimate = int(self.request.get('action_estimate'))
                 action_status = 'not started'
-                action = GoalAction(
-                                       name=action_name,
-                                       description=action_description,
-                                       estimate=action_estimate,
-                                       goal_status=action_status,
-                                       parent_goal=goal.key)
+                action = GoalAction(parent=goal.key,
+                                    name=action_name,
+                                    description=action_description,
+                                    estimate=action_estimate,
+                                    goal_status=action_status)
                 action.put()
 
             self.response.write('ok')
