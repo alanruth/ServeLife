@@ -36,7 +36,11 @@
             $.ajax({
                 data:{'project_name' : project_name,
                     'project_description' : project_description,
-                    'start_date' : start_date
+                    'start_date' : start_date,
+                    'skill_tags' : skill_tags,
+                    'opening_name' : role_name,
+                    'opening_description' : role_description,
+                    'commitment_sought' : commitment
                 },
                 url: "/project/new",
                 async: true,
@@ -44,7 +48,7 @@
                 success: function(response) {
                     if (response == 'ok'){
                         $("#modal-close").click();
-                        $(window.location.replace('/build/project/{{ project_name }}'));
+                        $(window.location.replace('/build/project/'+project_name+'/hub'));
                     }
                 },
                 error: function(response) {

@@ -67,6 +67,12 @@ class TeamMember(ndb.Model):
     admin = ndb.BooleanProperty(default=False)
 
 
+class TeamOpening(ndb.Model):
+    role                = ndb.StringProperty(required=True)
+    description         = ndb.StringProperty(required=True)
+    skills              = ndb.JsonProperty()
+    commitment_sought   = ndb.StringProperty()
+
 class Project(ndb.Model):
     project_name        = ndb.StringProperty(required= True)
     profile             = ndb.JsonProperty()
@@ -75,6 +81,8 @@ class Project(ndb.Model):
     created_by          = ndb.KeyProperty(kind='User')
     start_date          = ndb.DateProperty(required=True)
     team_members        = ndb.StructuredProperty(TeamMember, repeated=True)
+    team_openings       = ndb.StructuredProperty(TeamOpening, repeated=True)
+    tags                = ndb.JsonProperty()
 
 
 #class UserThinDB(ndb.Model):

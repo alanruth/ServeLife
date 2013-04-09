@@ -1054,6 +1054,10 @@ class NewProjectProfileHandler(SLBSRequestHandler):
             project_name = (self.request.get('project_name')).lower()
             project_description = self.request.get('project_description')
             start_date = datetime.datetime.strptime(self.request.get('start_date'), "%m/%d/%Y").date()
+            skill_tags = self.request.get('skill_tags').split(',')
+            opening_role = self.request.get('opening_name')
+            opening_description = self.request.get('opening_description')
+            opening_commitment  = self.request.get('commitment_sought')
             #parent_project = self.request.get('parent_project')
             #upload_files = self.get_uploads('parent_image')
             #blob_info = upload_files[0]
@@ -1067,9 +1071,13 @@ class NewProjectProfileHandler(SLBSRequestHandler):
                                     start_date=start_date,
                                     created_by=user.key,
                                     profile=projectinfo,
+                                    tags=skill_tags,
                                     team_members=[TeamMember(member=user.key,
                                                              role='Project Leader',
                                                              admin=True)])
+                project.team_openings = [TeamOpening(role=opening_role,
+                                                     description=opening_description,
+                                                     commitment_sought=opening_commitment)]
                 project.put()
             else:
                 #TODO Add javascript to ensure no duplicate projects come in
