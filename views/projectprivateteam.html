@@ -79,15 +79,65 @@
                         </div>
                     </div>
                     <div class="row-fluid">
-                    <div class="box span6">
-                        <div class="box-header">
-                            <h2><img src="/static/img/certificate.png" class="certificate"/>
-                                <span class="break"></span>Team
-                            </h2>
-                            <div class="box-icon">
-                                <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_goal"><img src="/static/img/halflings_plus.png"/></a>
+                        <div class="box span12">
+                            <div class="box-header">
+                                <h2><img src="/static/img/certificate.png" class="certificate"/>
+                                    <span class="break"></span>Project Team Openings
+                                </h2>
+                                <div class="box-icon">
+                                    <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_opening"><img src="/static/img/halflings_plus.png"/></a>
+                                </div>
+                            </div>
+                    <div class="table-box-content">
+                        <div class="row-fluid grid-header">
+                            <div class="span3 grid-column">
+                                Role
+                            </div>
+                            <div class="span3 grid-column">
+                                Created
+                            </div>
+                            <div class="span3 grid-column">
+                                Views
+                            </div>
+                            <div class="span3 grid-column">
+                                Applications
                             </div>
                         </div>
+                        <div class="row-fluid">
+                            {% for opening in project.team_openings %}
+                                <div class="span3 grid-column">
+                                    {{ opening.role }}
+                                </div>
+                                <div class="span3 grid-column">
+                                    {{ opening.created }}
+                                </div>
+                                <div class="span3 grid-column">
+                                    NEED
+                                </div>
+                                <div class="span3 grid-column">
+                                    NEED
+                                </div>
+                            {% else %}
+                            <div class="span12 grid-column">
+                            No Current Openings for Project.
+                            </div>
+                            {% endfor %}
+                    </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row-fluid">
+                        <div class="box span6">
+                            <div class="box-header">
+                                <h2><img src="/static/img/certificate.png" class="certificate"/>
+                                    <span class="break"></span>Team
+                                </h2>
+                                <div class="box-icon">
+                                    <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_goal"><img src="/static/img/halflings_plus.png"/></a>
+                                </div>
+                            </div>
 
 
                         <div class="table-box-content">
@@ -119,6 +169,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
             </div>
         </div>
 

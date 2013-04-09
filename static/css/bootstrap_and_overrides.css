@@ -2781,3 +2781,13 @@ table .table-row {
 #project-name {
     margin: 0 0 10px;
 }
+
+.grid-column {
+    font-weight: bold;
+    padding: 8px;
+    border-left: 1px solid #DDDDDD;
+}
+
+.grid-header {
+    border: 1px solid #DDDDDD;
+}

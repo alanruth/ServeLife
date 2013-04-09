@@ -72,6 +72,9 @@ class TeamOpening(ndb.Model):
     description         = ndb.StringProperty(required=True)
     skills              = ndb.JsonProperty()
     commitment_sought   = ndb.StringProperty()
+    created             = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    revision            = ndb.IntegerProperty()
+
 
 class Project(ndb.Model):
     project_name        = ndb.StringProperty(required= True)
