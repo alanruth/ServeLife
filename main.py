@@ -1097,7 +1097,7 @@ class NewProjectProfileHandler(SLBSRequestHandler):
             upload_url = blobstore.create_upload_url('/project/new')
             #upload_url = blobstore.create_upload_url('/upload')
             template = jinja_environment.get_template('projectnewprofile.html')
-            variables = {'user_email': self.user.email,'upload_url':upload_url}
+            variables = {'user_email': self.user.email,'upload_url':upload_url, 'user':self.user}
             self.response.out.write(template.render(variables))
 
         else:
