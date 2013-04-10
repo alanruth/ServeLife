@@ -1034,6 +1034,62 @@ class ProjectPrivateIndexHandler(SLRequestHandler):
             self.redirect('/signin')
 
 
+class ProjectOpeningHandler(SLRequestHandler):
+    @login_required
+    def get(self, project_id, opening_created):
+        if self.is_logged_in():
+            opening = Project.query(Project.key == project_id, Project.team_openings.created == opening_created).get()
+            if opening:
+                opening_json = json.dumps({'role': opening.role,
+                                        'description': opening.description,
+                                        'skills': opening.skills,
+                                        'created': opening.created,
+                                        'commitment': opening.commitment_sought})
+
+                self.response.out.write(opening_json)
+            else:
+                self.response.out.write('error')
+        else:
+            self.redirect('/signin')
+
+
+    @login_required
+    def post(self):
+        if self.is_logged_in():
+            project_id = self.request.get('project_id')
+            opening_role = self.request.get('opening_role')
+            opening_description = self.request.get('opening_description')
+            opening_skills = self.request.get('opening_skills').split(',')
+            opening_commitment = self.request.get('opening_commitment')
+            opening_created = self.request.get('opening_created')
+            project = Project.query(Project.key == ndb.Key(Project, project_id),
+                                    Project.team_members.member == self.user.key).get()
+            if project:
+                if opening_created:
+                    for opening in project.team_openings:
+                        if opening.created == opening_created:
+                            opening.role = opening_role
+                            opening.description = opening_description
+                            opening.skills = opening_skills
+                            opening.commitment_sought = opening_commitment
+
+                else:
+                    opening = TeamOpening(role=opening_role,
+                                          description=opening_description,
+                                          commitment_sought=opening_commitment,
+                                          skills=opening_skills)
+                    project.team_openings.append(opening)
+                project.put()
+                self.response.write('ok')
+                return
+            else:
+                self.response.write('bad project')
+                return
+
+        else:
+            self.redirect('/signin')
+
+
 class NewProjectProfileHandler(SLBSRequestHandler):
     @login_required
     def get(self):
@@ -1255,7 +1311,8 @@ app = webapp2.WSGIApplication([
                                   ('/home/research/(?P<user_name>.*)', UserResearchHandler),
                                   ('/home/goals/(?P<user_name>.*)', UserGoalHandler),
                                   ('/goal/new', UserGoalHandler),
-                                  ('/goal/by_id/(?P<goal_id>.*)',GetGoalById),
+                                  ('/goal/by_id/(?P<goal_id>.*)', GetGoalById),
+                                  ('/opening/new', ProjectOpeningHandler),
                                   #('/home/contributions/(?P<user_name>.*)', UserContributionsPageHandler),
                                   #('/home/achievements/(?P<user_name>.*)', UserAchievementsPageHandler),
                                   #('/home/efforts/(?P<user_name>.*)', UserEffortsPageHandler),

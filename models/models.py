@@ -88,6 +88,18 @@ class Project(ndb.Model):
     tags                = ndb.JsonProperty()
 
 
+class Question(ndb.Model):
+    entity_object       = ndb.KeyProperty()
+    entity_type         = ndb.StringProperty()
+    subject             = ndb.StringProperty()
+    body                = ndb.TextProperty()
+    created             = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    owner               = ndb.KeyProperty(kind='User')
+    question_type       = ndb.StringProperty()
+    active              = ndb.BooleanProperty()
+    tags                = ndb.JsonProperty()
+
+
 #class UserThinDB(ndb.Model):
 #    user_name      = ndb.StringProperty(required=True)
 #    asset         = ndb.StringProperty(required=True)
