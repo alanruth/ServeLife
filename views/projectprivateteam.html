@@ -4,24 +4,18 @@
 
 {% block description %}{{ project.project_description }}{% endblock description %}
 
-{% block custom_head %}
-    <script type="text/javascript" src="/static/js/jquery.validate.min.js"></script>
-{% endblock custom_head %}
-
 {% block custom_script %}
 
-
-$().ready(function() {
+$(document).ready(function() {
 
     // Click Event for Existing Opening
     $('.opening_row').on('click', function(e) {
-
-        $('#opening').modal();
 
         var project = $('#project-name').html();
         var created = $(this).data('id');
 
         get_opening_details(project, created);
+
     });
 
     $('#opening').modal({
@@ -46,6 +40,9 @@ $().ready(function() {
                 */
                 $('#opening_role').val(opening_details.role);
                 $('#opening_description').val(opening_details.description);
+                $('#opening_skills').val(opening_details.skills);
+                $('#opening_created').val(opening_created);
+                $('#opening_commitment> option[value="+opening_details.commitment+"]').attr("selected", "selected");
 
             },
             error: function(response) {
@@ -55,12 +52,14 @@ $().ready(function() {
         });
     };
 
+    $('body').on('hidden', '.modal', function () {
+        $(this).data('modal', null);
 
+    });
 
+  $('#opening_body').validate();
 
-    $('#opening_body').validate();
-
-    $('#save_opening').on('click', function(e) {
+  $('#save_opening').on('click', function(e) {
 
         var valid = $('#opening_body').valid();
 
@@ -297,6 +296,9 @@ $().ready(function() {
                         <option>10+ hours/week</option>
                     </select>
                 </div>
+            </div>
+            <div>
+                <input class="span3" type="hidden" id="opening_created" />
             </div>
         </form>
     </div>

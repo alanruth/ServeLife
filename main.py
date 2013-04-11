@@ -1036,21 +1036,31 @@ class ProjectPrivateIndexHandler(SLRequestHandler):
 
 class ProjectOpeningHandler(SLRequestHandler):
     @login_required
-    def get(self, project_id, opening_created):
+    def get(self):
         if self.is_logged_in():
-            opening = Project.query(Project.key == project_id, Project.team_openings.created == opening_created).get()
-            if opening:
-                opening_json = json.dumps({'role': opening.role,
-                                        'description': opening.description,
-                                        'skills': opening.skills,
-                                        'created': opening.created,
-                                        'commitment': opening.commitment_sought})
+            project_id = self.request.get('project_id')
+            opening_created = datetime.datetime.strptime(self.request.get('opening_created'), '%Y-%m-%d %H:%M:%S.%f')
+            project = Project.query(Project.key == ndb.Key(Project, project_id),
+                                    Project.team_openings.created == opening_created).get()
+            if project:
+                for opening in project.team_openings:
+                    if opening.created == opening_created:
+                        opening_json = json.dumps({'role': opening.role,
+                                                  'description': opening.description,
+                                                  'skills': opening.skills,
+                                                  'commitment': opening.commitment_sought})
 
-                self.response.out.write(opening_json)
+                        self.response.out.write(opening_json)
+                        return
+                    else:
+                        self.response.out.write('no opening error')
+                        return
             else:
                 self.response.out.write('error')
+                return
         else:
             self.redirect('/signin')
+            return
 
 
     @login_required
@@ -1061,7 +1071,10 @@ class ProjectOpeningHandler(SLRequestHandler):
             opening_description = self.request.get('opening_description')
             opening_skills = self.request.get('opening_skills').split(',')
             opening_commitment = self.request.get('opening_commitment')
-            opening_created = self.request.get('opening_created')
+            if self.request.get('opening_created'):
+                opening_created = datetime.datetime.strptime(self.request.get('opening_created'), '%Y-%m-%d %H:%M:%S.%f')
+            else:
+                opening_created = None
             project = Project.query(Project.key == ndb.Key(Project, project_id),
                                     Project.team_members.member == self.user.key).get()
             if project:
