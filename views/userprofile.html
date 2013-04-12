@@ -1,62 +1,76 @@
 {% extends "secure.html" %}
 
-{% block title %}{{ userthin.user_name }} : Edit Your ServeLife User Profile{% endblock title %}
+{% block custom_script %}
+    $('input[id=lefile]').change(function() {
+        $('#profile_pic').val($(this).val());
+    });
+{% endblock %}
+
+{% block title %}Edit Profile{% endblock title %}
 
 {% block description %}"Keeping your ServeLife profile up-to-date keeps your information fresh within the ecosystem."{% endblock description %}
 
-{% block submenu %}
-    <div class="container">
-        <h3>Update Your ServeLife Membership</h3>
-        <ul class="nav nav-pills pull-right" id="submenu">
-            <li class="active"><a href="#" alt="Profile">Profile</a></li>
-            <li><a href="/user/account/{{ userthin.user_name }}">Account</a></li>
-            <li><a href="/user/subscription/{{ userthin.user_name }}">Subscription</a></li>
-        </ul>
-    </div>
-{% endblock submenu %}
-
 {% block page %}
-<div id="main" role="main">
+<div class="main">
     <div class="container">
-        <div class="content">
+        <div class="wrapper">
+            <div class="row-fluid topic-main">
+                <h3>Update Your ServeLife Membership</h3>
+                <ul class="nav nav-pills pull-right" id="submenu">
+                    <li class="active"><a href="#">Profile</a></li>
+                    <li><a href="/user/account/{{ user.user_name }}">Account</a></li>
+                    <li><a href="/user/subscription/{{ user.user_name }}">Subscription</a></li>
+                </ul>
+            </div>
 
-            <div class="row">
-                <div class="span12">
-                    <div class="container">
-
-                        <!-- <h3>{{ userthin.user_name }}</h3> -->
-
-
-                        <p>Your ServeLife profile uniquely identifies you within the ServeLife ecosystem. Your profile information is visible to
-                            everyone, both within the ServeLife ecosystem and visitors to your public-facing ServeLife profile page. Your contact
-                            information and social details are visible only within the ServeLife ecosystem by members of your tribe.
-                        </p>
-
-                        <div class="form">
-                            <form accept-charset="UTF-8" action="/user/profile/{{ userthin.user_name }}" enctype="multipart/form-data" method="post">
-
-                                <div class="row">
-                                    <div class="span6">
-                                        <legend>Profile Information</legend>
-
-                                        <div class="row">
-                                            <div class="span3">
-                                                <label for="user_first_name">First name</label>
-                                                <input class="span3" id="user_first_name" name="first_name" size="30" type="text" value="{{ first_name }}" autofocus required=""/>
-                                            </div>
-                                            <div class="span3">
-                                                <label for="user_last_name">Last name</label>
-                                                <input class="span3" id="user_last_name" name="last_name" size="30" type="text" value="{{ last_name }}" required=""/>
+            <p>Your ServeLife profile uniquely identifies you within the ServeLife ecosystem. Your profile information is visible to
+                everyone, both within the ServeLife ecosystem and visitors to your public-facing ServeLife profile page. Your contact
+                information and social details are visible only within the ServeLife ecosystem by members of your tribe.
+            </p>
+            <div class="form">
+                <form accept-charset="UTF-8" action="/user/profile/{{ user.user_name }}" enctype="multipart/form-data" method="post">
+                    <div class="row">
+                        <div class="span12">
+                            <div class="row">
+                                <div class="span5">
+                                    <legend>Profile Picture</legend>
+                                    <div class="row">
+                                        <div class="span2">
+                                            <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
+                                            <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
+                                            <img alt="{{ user.user_name }}" src="/static/img/defaultavatar.png" class="thumbnail img-polaroid member-pic" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="span4">
+                                            <input id="lefile" type="file" style="display:none">
+                                            <div class="input-append">
+                                                <input id="profile_pic" class="input-large" type="text">
+                                                <a class="btn" onclick="$('input[id=lefile]').click();">Browse</a>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="span3">
-                                                <label for="user_city">City</label>
-                                                <input class="span3" id="user_city" name="city" size="30" type="text" value="{{ city }}" required=""/>
-                                            </div>
-                                            <div class="span3">
-                                                <label for="member_country">Country of residence</label>
-                                                <select class="span3" id="member_country" name="country" prompt="Please Select a Country" value="{{ country }}">
+                                    </div>
+                                </div>
+                                <div class="span7">
+                                    <legend>Profile Information</legend>
+                                    <div class="row">
+                                        <div class="span3">
+                                            <label for="user_first_name">First name</label>
+                                            <input class="span3" id="user_first_name" name="first_name" size="30" type="text" value="{{ user.profile.first_name }}" autofocus required=""/>
+                                        </div>
+                                        <div class="span3">
+                                            <label for="user_last_name">Last name</label>
+                                            <input class="span3" id="user_last_name" name="last_name" size="30" type="text" value="{{ user.profile.last_name }}" required=""/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="span3">
+                                            <label for="user_city">City</label>
+                                            <input class="span3" id="user_city" name="city" size="30" type="text" value="{{ user.profile.city }}" required=""/>
+                                        </div>
+                                        <div class="span3">
+                                            <label for="member_country">Country of residence</label>
+                                            <select class="span3" id="member_country" name="country" prompt="Please Select a Country" value="{{ user.profile.country }}">
                                                 <option value="US">United States</option>
                                                 <option disabled>-------------</option>
                                                 <option value="AX">Åland Islands</option>
@@ -308,57 +322,39 @@
                                                 <option value="YE">Yemen</option>
                                                 <option value="ZM">Zambia</option>
                                                 <option value="ZW">Zimbabwe</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="span6">
-                                                <label for="user_description">Headline - 200 Characters Max</label>
-                                                <textarea rows="3" class="span6" id="user_description" name="description"
-                                                          placeholder="Provide a quick headline about yourself, yours skills and interests.">{{ description }}</textarea>
-                                            </div>
+                                            </select>
+                                            <script>
+                                                $(document).ready(function(){
+                                                $('#member_country> option[value="{{ user.profile.country }}"]').attr("selected", "selected");
+                                                });
+                                            </script>
                                         </div>
                                     </div>
-                                    <div class="span6">
-                                        <legend>Social Networking Information</legend>
-                                        <div class="row">
-                                            <div class="span4">
-                                                <label for="user_linkedin">Linkedin public profile URL</label>
-                                                <input class="span4" id="user_linkedin" name="linkedin_url" size="30" type="url" value='{{ linkedin_url }}'/>
-                                            </div>
-                                            <div class="span2">
-                                                <label for="user_twitter">Twitter handle</label>
-                                                <input class="span2" id="user_twitter" name="twitter_handle" size="30" type="text" value='{{ twitter_handle }}'/>
-                                            </div>
+                                    <div class="row">
+                                        <div class="span6">
+                                            <label for="user_description">Headline - 200 Characters Max</label>
+                                            <textarea rows="3" class="span6" id="user_description" name="description"
+                                                      placeholder="Provide a quick headline about yourself, yours skills and interests.">{{ user.profile.description }}</textarea>
                                         </div>
-                                        <div class="row">
-                                            <div class="span4">
-                                                <label for="user_facebook">Facebook public profile URL</label>
-                                                <input class="span4" id="user_facebook" name="facebook_url" size="30" type="url" value='{{ facebook_url }}'/>
-                                            </div>
-                                            <div class="span2">
-                                                <label for="user_skype">Skype handle</label>
-                                                <input class="span2" id="user_skype" name="skype_id" size="30" type="text" value='{{ skype_id }}'/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="row">
-                                    <hr>
-                                    <div class="span3 pull-right">
-                                        <input class="btn btn-large btn-primary span2" name="commit" type="submit"
-                                               value="Save"/>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
+                            <hr/>
                         </div>
                     </div>
-                </div>
+                    <div class="row">
+                        <hr>
+                        <div class="span3 pull-right">
+                            <input class="btn btn-large btn-primary span2" name="commit" type="submit"
+                                   value="Save"/>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
 <!-- end of .container -->
 
 {% endblock page %}

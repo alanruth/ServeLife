@@ -1,37 +1,39 @@
 {% extends "secure.html" %}
 
-{% block title %}{{ first_name }} {{ last_name }}'s ServeLife Profile{% endblock title %}
+{% block title %}{{ user.key.id() }}'s ServeLife Profile{% endblock title %}
 
-{% block description %}"{{ first_name }} {{ last_name }} : ServeLife Member - {{ description }}"{% endblock description %}
+{% block description %}"{{ user.key.id() }} : ServeLife Member - {{ description }}"{% endblock description %}
 
 {% block page %}
+    <div class="main">
     <div class="container">
+    <div class="wrapper">
     <div class="row-fluid header-main">
         <div class="span2">
             <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
-            <img alt="{{ userthin.user_name }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
+            <img alt="{{ user.key.id() }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
 
         </div>
         <div class="span5">
             <!-- INSERT MEMBER CREATE DATE -->
-            <span class="pull-right"><strong>Member since: </strong>{{ userthin.created.strftime('%m/%Y') }}</span>
+            <span class="pull-right"><strong>Member since: </strong>{{ user.created.strftime('%m/%Y') }}</span>
             <!-- NEED USER NAME TO COME IN VARIABLES -->
-            <span class="pull-right follow-button"><form accept-charset="UTF-8" action="/follow/{{ userthin.user_name }}" method="post" class="span2">
+            <span class="pull-right follow-button"><form accept-charset="UTF-8" action="/follow/{{ user.key.id() }}" method="post" class="span2">
                 <input class="btn btn-mini btn-primary" name="commit" type="submit" value="Follow"/>
             </form></span>
 
             <!-- INSERT MEMBER NAME FROM PROFILE -->
-            <h2>{{first_name}} {{ last_name }}</h2>
+            <h2>{{user.profile.first_name}} {{ user.profile.last_name }}</h2>
             <!-- INSERT MEMBER LEVEL FROM PROFILE -->
             <h4>INSERT MEMBER LEVEL</h4>
             <!-- INSERT MEMBER HEADLINE FROM PROFILE - WE SHOULD LIMIT LENGTH OF HEADLINE -->
-            <p>{{ description }}</p>
+            <p>{{ user.profile.description }}</p>
         </div>
         <div class="span5">
             <div class="row-fluid">
                 <div class="profile-details span3 offset1">
                     <img alt="Followers" src="/static/img/group2x.png" />
-                    <span class="notification followers">{{ userthin.follower_count }}</span>
+                    <span class="notification followers">?</span>
                     <p>Followers</p>
                 </div>
                 <div class="profile-details span3 offset1 likes">
@@ -410,15 +412,11 @@
         </div>
     </div>
     </div>
+    </div>
+    </div>
 {% endblock page %}
 
 {% block javascript %}
-    <!-- start: JavaScript -->
-    <script src="/static/js/jquery-1.7.2.min.js"></script>
-    <script src="/static/js/jquery-ui-1.8.21.custom.min.js"></script>
-    <script src="/static/js/bootstrap.js"></script>
-    <script src="/static/js/jquery.cookie.js"></script>
-    <script src='/static/js/fullcalendar.min.js'></script>
     <script src='/static/js/jquery.dataTables.min.js'></script>
     <script src="/static/js/excanvas.js"></script>
     <script src="/static/js/jquery.flot.min.js"></script>
@@ -440,9 +438,4 @@
     <script src="/static/js/jquery.sparkline.min.js"></script>
     <script src="/static/js/custom.js"></script>
     <script type="text/javascript" src="assets/js/jquery.prettyPhoto.js"></script>
-
-
-    <!--<script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/theme.js"></script>-->
 {% endblock javascript %}

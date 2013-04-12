@@ -1,0 +1,42 @@
+{% extends "secure.html" %}
+
+{% block title %}Discover{% endblock title %}
+
+{% block description %}Discover is where ServeLife members can find knowledge on various topics within the ecosystem.{% endblock description %}
+
+{% block page %}
+    <div class="main">
+    <div class="container">
+        <div class="wrapper">
+        <h1>This is Discover's Homebase</h1>
+        <a href="/topic/new" alt="Add New Topic">Add New Topic</a>
+        <p>This is where all the topics and articles will be housed for the ecosystem. </p>
+
+        <div class="row-fluid">
+            <div class="text-center">
+                <h3>New Topics</h3>
+            </div>
+            <ul class="thumbnails">
+                {% for topic in topics %}
+                <li class="span4">
+                    <div class="thumbnail">
+                        <!-- Images should the image used for the article as received from the rss feed -->
+                        <a href="/build/topic/profile/{{ topic.topic_name|e }}">
+                            <img src="/static/img/python.jpg" class="news-pic media-object" />
+                        </a>
+                        <div class="news-title">
+                            <h3>{{ topic.topic_name }}</h3>
+
+                            <p>{{ topic.topic_description }}</p>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                    <li>No Topics</li>
+                {%  endfor %}
+            </ul>
+        </div>
+    </div>
+    </div>
+    </div>
+{% endblock page %}

@@ -1,0 +1,75 @@
+{% extends "secure.html" %}
+
+{% block title %}{{ user.key.id() }}'s Research{% endblock title %}
+
+{% block description %}"{{ user.key.id() }}'s research page brings together all the private articles, private ideas and solo projects for a servelife member."{% endblock description %}
+
+{% block page %}
+
+        <div class="main">
+            <div class="container">
+                <div class="wrapper">
+                    <div class="row-fluid topic-main">
+                        <div class="span2">
+                            <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
+                            <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
+                            <img alt="{{ user.key.id() }}" src="{{ gravatar_url }}" class="thumbnail img-polaroid member-pic" />
+                        </div>
+                        <div class="span5">
+                            <!-- Insert some metrics, share & invite buttons -->
+                            <h4>INSERT METRICS & SHARE/INVITE BUTTONS</h4>
+                        </div>
+                        <div class="span5">
+                            <div class="row-fluid">
+                                <a class="quick-button-small span2">
+                                    <img alt="Followers" src="/static/img/group.png" />
+                                    <span class="notification followers">?</span>
+                                    <p>Followers</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Discussions" src="/static/img/conversation.png" />
+                                    <span class="notification discussions">7</span>
+                                    <p>Discussions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Ideas" class="ideas" src="/static/img/lightbulb.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Ideas</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Questions" class="questions" src="/static/img/question.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Questions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Tasks" class="questions" src="/static/img/alarm.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Tasks</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Goals" src="/static/img/certificate.png" />
+                                    <span class="notification ideas">7</span>
+                                    <div class="quick-button-small-article"><p>Goals</p></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="heavy">
+
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <ul class="nav nav-pills pull-right">
+                                <li><a href="/home/hub/{{ user.key.id() }}">Activity</a></li>
+                                <li><a href="/home/projects/{{ user.key.id() }}">Projects</a></li>
+                                <li><a href="/home/classes/{{ user.key.id() }}">Classes</a></li>
+                                <li><a href="/home/topics/{{ user.key.id() }}">Topics</a></li>
+                                <li class="active"><a href="/home/research/{{ user.key.id() }}">Research</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock page %}

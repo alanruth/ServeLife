@@ -1,0 +1,85 @@
+{% extends "secure.html" %}
+
+{% block title %}{{ project.project_name }}{% endblock title %}
+
+{% block description %}{{ project.project_description }}{% endblock description %}
+
+{% block page %}
+
+        <div class="main">
+            <div class="container">
+                <div class="wrapper">
+                    <div class="row-fluid topic-main">
+                        <div class="span2">
+                            <!-- INSERT PICTURE FROM PROFILE -->
+                            <img alt="{{ project.project_name }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
+                        </div>
+                        <div class="span5">
+                            <span class="pull-right"><strong>Followers: </strong>{{ project.follower_count }}</span>
+                            <div class="pull-right">
+                                <a class="btn" href="#">
+                                    <img alt="Share" src=""/>
+                                </a>
+                                <a class="btn" href="#">
+                                    <img alt="Invite" src=""/>
+                                </a>
+                            </div>
+                            <h2 id="project-name">{{ project.project_name }}</h2>
+                            <p>{{ project.description }}</p>
+                            <p>List Tags</p>
+                        </div>
+                        <div class="span5">
+                            <div class="row-fluid">
+                                <a class="quick-button-small span2">
+                                    <img alt="Discussions" src="/static/img/conversation.png" />
+                                    <span class="notification discussions">7</span>
+                                    <p>Discussions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Ideas" class="ideas" src="/static/img/lightbulb.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Ideas</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Questions" class="questions" src="/static/img/question.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Questions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Articles" class="articles" src="/static/img/warning_sign.png" />
+                                    <p>Issues</p>
+                                    <span class="notification ideas">7</span>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Articles" class="articles" src="/static/img/newspaper.png" />
+                                    <span class="notification ideas">?</span>
+                                    <p class="quick-button-small-article">Articles</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Followers" src="/static/img/group.png" />
+                                    <span class="notification followers">?</span>
+                                    <p>Something</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="heavy">
+
+                    <div class="row-fluid topic-body">
+                        <div class="span12">
+                            <ul class="nav nav-pills btn-topic pull-right">
+                                <li class="active"><a href="/build/project/{{ project.key.id() }}">News</a></li>
+                                <li><a href="#">Backlog</a></li>
+                                <li><a href="#">Tasks</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/team">Team</a></li>
+                                <li><a href="#">Experiments</a></li>
+                                <li><a href="#">Metrics</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock page %}
