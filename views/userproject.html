@@ -72,7 +72,7 @@
                         <h1>This is a {{ user.key.id() }} Homebase</h1>
                         <ul>
                             {% for project in projects %}
-                                <li><a href="/build/project/profile/{{ project.project_name|e }}">{{ project.project_name|e }}</a></li>
+                                <li><a href="/build/project/{{ project.project_name|e }}/hub">{{ project.project_name|e }}</a></li>
                             {% else %}
                                 <li>No Projects Found</li>
                             {%  endfor %}
