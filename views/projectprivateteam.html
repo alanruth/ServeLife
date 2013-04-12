@@ -8,6 +8,15 @@
 
 $(document).ready(function() {
 
+    // Minimize Tables
+    $('.btn-minimize').click(function(e){
+        e.preventDefault();
+        var $target = $(this).parent().parent().next('.box-content');
+        if($target.is(':visible')) $('i',$(this)).removeClass('icon-chevron-up').addClass('icon-chevron-down');
+        else 					   $('i',$(this)).removeClass('icon-chevron-down').addClass('icon-chevron-up');
+        $target.slideToggle();
+    });
+
     // Click Event for Existing Opening
     $('.opening_row').on('click', function(e) {
 
@@ -181,10 +190,11 @@ $(document).ready(function() {
                             <span class="break"></span>Project Team Openings
                         </h2>
                         <div class="box-icon">
-                            <a href="#opening" role="button" class="btn-setting" data-toggle="modal"><img src="/static/img/halflings_plus.png"/></a>
+                            <a class="btn-minimize" href="#"><i class="icon-chevron-up"></i></a>
+                            <a href="#opening" role="button" class="btn-setting" data-toggle="modal"><i class="icon-plus"></i></a>
                         </div>
                     </div>
-                    <div class="table-box-content">
+                    <div class="box-content">
                         <table class="table table-hover table-bordered" id="team_opening">
                             <thead class="table_head">
                             <tr>
@@ -216,10 +226,10 @@ $(document).ready(function() {
                     <div class="box span6">
                         <div class="box-header">
                             <h2><img src="/static/img/certificate.png" class="certificate"/>
-                                <span class="break"></span>Team
+                                <span class="break"></span>Project Team
                             </h2>
                             <div class="box-icon">
-                                <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_goal"><img src="/static/img/halflings_plus.png"/></a>
+                                <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_member"><i class="icon-plus"></i></a>
                             </div>
                         </div>
 
@@ -230,16 +240,22 @@ $(document).ready(function() {
                                     <th class="goal-header">Team Member</th>
                                     <th>Project Role</th>
                                     <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody id="sortable">
                                 {% for member in project.team_members %}
                                     <tr>
-                                        <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</a></td>
+                                        <td class="center"><img src="/static/img/halflings_justify.png"/><span class="row-break"></span><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</a></td>
                                         <td class="hidden-column">{{ member.member }}</td>
-                                        <td class="text-center">{{ member.role }}</td>
-                                        <td>
+                                        <td class="center">{{ member.role }}</td>
+                                        <td class="center">
                                             <span class="label label-success">{{ member.active }}</span>
+                                        </td>
+                                        <td class="center">
+                                            <a class="btn btn-info" href="#">
+                                                <i class="icon-edit icon-white"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 {% else %}
@@ -270,7 +286,7 @@ $(document).ready(function() {
                 <label class="control-label" for="opening_role">Role</label>
                 <div class="controls">
                     <input class="span3" id="opening_role" required name="opening_role"
-                           size="50" type="text" maxlength="50" placeholder="Enter a short name for your goal."/>
+                           size="50" type="text" maxlength="50" placeholder="Enter the name of the role."/>
                 </div>
             </div>
             <div class="control-group">
@@ -308,52 +324,35 @@ $(document).ready(function() {
 </div>
 <!-- END MODAL EDIT AN OPENING -->
 
-<!-- MODAL TO ADD AN OPENING
-<div id="add_opening" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_opening_label" aria-hidden="true">
+<!-- MODAL TO ADD TEAM MEMBER -->
+<div id="add_member" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_member_label" aria-hidden="true">
     <div class="modal-header">
-        <button type="button" id="add-opening-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
-        <h3 id="add_opening_label">Create Project Team Opening</h3>
+        <button type="button" id="add-member-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+        <h3 id="add_member_label">Invite Team Member</h3>
     </div>
 
     <div class="modal-body">
-        <form class="form-horizontal" id="add_opening_body">
+        <form class="form-horizontal" id="add_member_body">
             <div class="control-group">
-                <label class="control-label" for="add_opening_role">Role</label>
+                <label class="control-label" for="member_name">User to Invite</label>
                 <div class="controls">
-                    <input class="span3" id="add_opening_role" required name="add_opening_role"
-                           size="50" type="text" maxlength="50" placeholder="Enter a short name for your goal."/>
+                    <input class="span3" id="member_name" required name="member_name"
+                           size="50" type="text" maxlength="50" placeholder="Enter the user's name to invite."/>
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="add_opening_description">Description</label>
+                <label class="control-label" for="member_role">Role</label>
                 <div class="controls">
-                    <textarea rows="3" class="required span3" id="add_opening_description" name="add_opening_description"
-                              required maxlength="500" placeholder="Enter a brief but specific description for this goal. (500 max)"> </textarea>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="add_opening_skills">Skills</label>
-                <div class="controls">
-                    <textarea rows="3" class="span3" id="add_opening_skills" name="add_opening_skills"
-                              placeholder="Provide keywords (separated by a comma) that help describe the skills  - supports search."> </textarea>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="add_opening_commitment">Commitment Sought<br/><small>(in hours per week)</small></label>
-                <div class="controls">
-                    <select id="add_opening_commitment">
-                        <option>0-5 hours/week</option>
-                        <option>6-10 hours/week</option>
-                        <option>10+ hours/week</option>
-                    </select>
+                    <input class="span3" required id="member_role" name="member_role"
+                              maxlength="50" placeholder="What role will they fulfill on the team?"/>
                 </div>
             </div>
         </form>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" id="create_opening">Create</button>
+        <button class="btn btn-primary" id="create_opening">Invite</button>
     </div>
 </div>
-END MODAL EDIT AN OPENING -->
+<!-- END MODAL EDIT AN OPENING -->
 
 {% endblock page %}

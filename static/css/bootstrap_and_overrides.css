@@ -2791,3 +2791,8 @@ table .table-row {
 .grid-header {
     border: 1px solid #DDDDDD;
 }
+
+.box-header .box-icon i {
+    opacity: 0.4;
+    transition: all 0.1s ease-in-out 0s;
+}
