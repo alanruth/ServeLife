@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" ng-app>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock title %} : ServeLife</title>
@@ -21,6 +21,11 @@
     <script src="/static/js/bootstrap.min.js"></script>
     <!-- Twitter Bootstrap Overrides -->
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap_and_overrides.css">
+
+    <!-- Angular Override -->
+    myModule.config(function($interpolateProvider) {
+        $interpolateProvider.startSymbol('[[').endSymbol(']]');
+    });
 
     {% block custom_head %} {% endblock custom_head %}
 
@@ -88,57 +93,57 @@
 {% block submenu %}{% endblock submenu %}
 
 <div class="topic-header">
-{% block page %}{% endblock page %}
+    {% block page %}{% endblock page %}
 
-{% block footer %}
-    <!-- starts footer-->
-    <footer>
-        <div id="footer">
-            <div class="container">
-                <div class="row-fluid">
-                    <div class="row copyright">
-                        <div class="span5">
-                            <h3>Social</h3>
-                            <a href="http://www.facebook.com/LearnWithPurpose" class="social fb" >
-                                <i class="i_facebook"> </i>
-                            </a>
-                            <a href="#" class="social tw">
-                                <i class="i_twitter"></i>
-                            </a>
-                            <a href="#" class="social yt">
-                                <i class="i_youtube"></i>
-                            </a>
-                        </div>
-                        <div class="span2 offset5 copy">
-                            <p>&copy; 2013 - ServeLife, Inc.</p>
+    {% block footer %}
+        <!-- starts footer-->
+        <footer>
+            <div id="footer">
+                <div class="container">
+                    <div class="row-fluid">
+                        <div class="row copyright">
+                            <div class="span5">
+                                <h3>Social</h3>
+                                <a href="http://www.facebook.com/LearnWithPurpose" class="social fb" >
+                                    <i class="i_facebook"> </i>
+                                </a>
+                                <a href="#" class="social tw">
+                                    <i class="i_twitter"></i>
+                                </a>
+                                <a href="#" class="social yt">
+                                    <i class="i_youtube"></i>
+                                </a>
+                            </div>
+                            <div class="span2 offset5 copy">
+                                <p>&copy; 2013 - ServeLife, Inc.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </footer>
-{% endblock footer %}
+        </footer>
+    {% endblock footer %}
 </div>
 
 {% block uservoice %}
-<!-- UserVoice JavaScript SDK (only needed once on a page) -->
-<script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/gCbdXwSHVVLajR37LmqKw.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+    <!-- UserVoice JavaScript SDK (only needed once on a page) -->
+    <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/gCbdXwSHVVLajR37LmqKw.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
 
-<!-- A tab to launch the Classic Widget -->
-<script>
-    UserVoice = window.UserVoice || [];
-    UserVoice.push(['showTab', 'classic_widget', {
-        mode: 'full',
-        primary_color: '#cc6d00',
-        link_color: '#007dbf',
-        default_mode: 'support',
-        forum_id: 199643,
-        tab_label: 'Feedback & Support',
-        tab_color: '#cc6d00',
-        tab_position: 'middle-right',
-        tab_inverted: true
-    }]);
-</script>
+    <!-- A tab to launch the Classic Widget -->
+    <script>
+        UserVoice = window.UserVoice || [];
+        UserVoice.push(['showTab', 'classic_widget', {
+            mode: 'full',
+            primary_color: '#cc6d00',
+            link_color: '#007dbf',
+            default_mode: 'support',
+            forum_id: 199643,
+            tab_label: 'Feedback & Support',
+            tab_color: '#cc6d00',
+            tab_position: 'middle-right',
+            tab_inverted: true
+        }]);
+    </script>
 {% endblock uservoice %}
 
 {% block load_last_script %} {% endblock load_last_script %}

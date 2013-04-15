@@ -1076,7 +1076,7 @@ class ProjectOpeningHandler(SLRequestHandler):
             else:
                 opening_created = None
             project = Project.query(Project.key == ndb.Key(Project, project_id),
-                                    Project.team_members.member == self.user.key).get()
+                                    Project.team_members.member == self.user.key)
             if project:
                 if opening_created:
                     for opening in project.team_openings:
@@ -1220,7 +1220,6 @@ class GetGoalById(SLRequestHandler):
     @login_required
     def get(self,goal_id):
         if self.is_logged_in():
-            user = self.user
             goal = UserGoal.get_by_id(int(goal_id))
             due_date = str(goal.due_date)
             goal_json = json.dumps({'name': goal.name,
@@ -1231,6 +1230,34 @@ class GetGoalById(SLRequestHandler):
                                'goal_status': goal.goal_status})
 
             self.response.out.write(goal_json)
+
+
+class GetGoalActionById(SLRequestHandler):
+    @login_required
+    def get(self, goal_id):
+        if self.is_logged_in():
+            parent = ndb.Key(UserGoal, goal_id)
+            goal = ndb.gql("SELECT * FROM GoalAction")
+            if goal:
+
+                #goal_json = json.dumps({#'name': goal.name,
+                                        #'description': goal.description,
+                                        #'measure': goal.accomplished_measure,
+                                        #'date': goal.due_date,
+                                        #'tags': goal.tags,
+                                        #'goal_status': goal.goal_status,
+                #                        'estimate': goal.estimate,
+                #                        'effort_to_date': goal.effort_to_date,
+                 #                       'effort_remaining': goal.effort_remaining
+                 #                       })
+                self.response.out.write(goal)
+                return
+            else:
+                self.response.out.write('bad')
+                return
+        else:
+            self.redirect('/signin')
+
 
 
 class UserGoalHandler(SLRequestHandler):
@@ -1325,6 +1352,7 @@ app = webapp2.WSGIApplication([
                                   ('/home/goals/(?P<user_name>.*)', UserGoalHandler),
                                   ('/goal/new', UserGoalHandler),
                                   ('/goal/by_id/(?P<goal_id>.*)', GetGoalById),
+                                  ('/goalaction/by_id/(?P<goal_id>.*)', GetGoalActionById),
                                   ('/opening/new', ProjectOpeningHandler),
                                   #('/home/contributions/(?P<user_name>.*)', UserContributionsPageHandler),
                                   #('/home/achievements/(?P<user_name>.*)', UserAchievementsPageHandler),
