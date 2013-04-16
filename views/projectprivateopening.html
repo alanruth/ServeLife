@@ -278,23 +278,28 @@
                                         <td class="text-center">{{ opening.posted }}</td>
                                         <td class="text-center">NEED</td>
                                         <td class="center">
-                                            <!-- Need to pop modal w/ metrics -->
+                                            <!-- Need to pop modal w/ metrics (UNIQUE VIEWS/TOTAL VIEWS/APPLIED)
                                             <a class="btn btn-primary" href="#">
                                                 <i class="icon-signal icon-white"></i>
-                                            </a>
-                                            <!-- Need to validate. Then save row with posted date. -->
+                                            </a>-->
+                                            <!-- FILL : PICK FROM LIST OF MEMBERS WHO HAVE APPLIED -->
                                             <a class="btn btn-success" href="#">
                                                 <i class="icon-check icon-white"></i>
                                             </a>
-                                            <!-- Load Edit Modal -->
+                                            <!-- EDIT : Load Edit Modal -->
                                             <a class="btn btn-info" href="#edit_opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">
                                                 <i class="icon-edit icon-white"></i>
                                             </a>
-                                            <!-- Load New Modal, Populate w/ Current Row Info -->
+                                            <!-- COPY : Load New Modal, Populate w/ Current Row Info -->
                                             <a class="btn btn-info" href="#">
+                                                <i class="icon-retweet icon-white"></i>
+                                            </a>
+                                            <!-- NEED INVITE CAPABILITY -->
+                                            <a class="btn btn-success" href="#">
                                                 <i class="icon-share icon-white"></i>
                                             </a>
-                                            <!-- Save Row with Closed Date -->
+                                            <!-- CLOSE OR UNPOST : CLOSE = Save Row with Closed Date
+                                             UNPOST = CLEAR OUT POSTED DATE-->
                                             <a class="btn btn-danger" href="#">
                                                 <i class="icon-trash icon-white"></i>
                                             </a>
@@ -343,18 +348,19 @@
                                         <td class="text-center">{{ opening.created }}</td>
                                         <td class="text-center">NEED</td>
                                         <td class="center">
-                                            <!-- Need to validate. Then save row with posted date. -->
+                                            <!-- POST : Validate. Update row with posted date. -->
                                             <a class="btn btn-success" href="#">
                                                 <i class="icon-check icon-white"></i>
                                             </a>
+                                            <!-- EDIT : edit row -->
                                             <a class="btn btn-info" href="#edit_opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">
                                                 <i class="icon-edit icon-white"></i>
                                             </a>
-                                            <!-- Load New Modal, Populate w/ Current Row Info -->
+                                            <!-- COPY : Load New Modal, Populate w/ Current Row Info -->
                                             <a class="btn btn-info" href="#">
-                                                <i class="icon-share icon-white"></i>
+                                                <i class="icon-retweet icon-white"></i>
                                             </a>
-                                            <!-- Save Row with Closed Date -->
+                                            <!-- CLOSE : Save Row with Closed Date -->
                                             <a class="btn btn-danger" href="#">
                                                 <i class="icon-trash icon-white"></i>
                                             </a>
