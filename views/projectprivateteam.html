@@ -136,6 +136,21 @@ $(document).ready(function() {
                 <div class="span5">
                     <div class="row-fluid">
                         <a class="quick-button-small span2">
+                            <img alt="Articles" class="articles" src="/static/img/newspaper.png" />
+                            <span class="notification ideas">?</span>
+                            <p class="quick-button-small-article">Articles</p>
+                        </a>
+                        <a class="quick-button-small span2">
+                            <img alt="Tasks" class="questions" src="/static/img/alarm.png" />
+                            <span class="notification ideas">7</span>
+                            <p>Tasks</p>
+                        </a>
+                        <a class="quick-button-small span2">
+                            <img alt="Questions" class="questions" src="/static/img/question.png" />
+                            <span class="notification ideas">7</span>
+                            <p>Questions</p>
+                        </a>
+                        <a class="quick-button-small span2">
                             <img alt="Discussions" src="/static/img/conversation.png" />
                             <span class="notification discussions">7</span>
                             <p>Discussions</p>
@@ -146,24 +161,9 @@ $(document).ready(function() {
                             <p>Ideas</p>
                         </a>
                         <a class="quick-button-small span2">
-                            <img alt="Questions" class="questions" src="/static/img/question.png" />
-                            <span class="notification ideas">7</span>
-                            <p>Questions</p>
-                        </a>
-                        <a class="quick-button-small span2">
                             <img alt="Articles" class="articles" src="/static/img/warning_sign.png" />
                             <p>Issues</p>
                             <span class="notification ideas">7</span>
-                        </a>
-                        <a class="quick-button-small span2">
-                            <img alt="Articles" class="articles" src="/static/img/newspaper.png" />
-                            <span class="notification ideas">?</span>
-                            <p class="quick-button-small-article">Articles</p>
-                        </a>
-                        <a class="quick-button-small span2">
-                            <img alt="Followers" src="/static/img/group.png" />
-                            <span class="notification followers">?</span>
-                            <p>Something</p>
                         </a>
                     </div>
                 </div>
@@ -175,103 +175,103 @@ $(document).ready(function() {
                 <div class="span12">
                     <ul class="nav nav-pills btn-topic pull-right">
                         <li><a href="/build/project/{{ project.key.id() }}/hub">News</a></li>
-                        <li><a href="#">Backlog</a></li>
-                        <li><a href="#">Tasks</a></li>
-                        <li class="active"><a href="#">Team</a></li>
-                        <li><a href="#">Experiments</a></li>
-                        <li><a href="#">Metrics</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                Backlog
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/build/project/{{ project.key.id() }}/active">In Progress</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/ready">To Do</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/done">Done</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/unplanned">Unplanned</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/archive">Archive</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                Interactions
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/build/project/{{ project.key.id() }}/ideas">Ideas</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/questions">Questions</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/issues">Issues</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/discussions">Discussions</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="/build/project/{{ project.key.id() }}/experiments">Experiments</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                Team
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/build/project/{{ project.key.id() }}/openings">Openings</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/team">Members</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="/build/project/{{ project.key.id() }}/goals">Goals</a></li>
                     </ul>
                 </div>
-            </div>
+            </div
             <div class="row-fluid">
-                <div class="box span12">
+                <div class="box span6">
                     <div class="box-header">
                         <h2><img src="/static/img/certificate.png" class="certificate"/>
-                            <span class="break"></span>Project Team Openings
+                            <span class="break"></span>Project Team
                         </h2>
                         <div class="box-icon">
-                            <a class="btn-minimize" href="#"><i class="icon-chevron-up"></i></a>
-                            <a href="#opening" role="button" class="btn-setting" data-toggle="modal"><i class="icon-plus"></i></a>
+                            <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_member"><i class="icon-plus"></i></a>
                         </div>
                     </div>
-                    <div class="box-content">
-                        <table class="table table-hover table-bordered" id="team_opening">
+
+                    <div class="table-box-content">
+                        <table class="table table-hover table-bordered" id="team_members">
                             <thead class="table_head">
                             <tr>
-                                <th class="goal-header">Role</th>
-                                <th>Created</th>
-                                <th>Views</th>
-                                <th>Applications</th>
+                                <th class="goal-header">Team Member</th>
+                                <th>Project Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
-                            <tbody id="sortable_opening">
-                            {% for opening in project.team_openings %}
+                            <tbody id="sortable">
+                            {% for member in project.team_members %}
                                 <tr>
-                                    <td><img src="/static/img/halflings_justify.png"/><span class="row-break"></span><a href="#opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">{{ opening.role }}</a></td>
-                                    <td class="text-center">{{ opening.created }}</td>
-                                    <td class="text-center">NEED</td>
-                                    <td class="text-center">NEED</td>
+                                    <td class="center"><img src="/static/img/halflings_justify.png"/><span class="row-break"></span><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</a></td>
+                                    <td class="hidden-column">{{ member.member }}</td>
+                                    <td class="center">{{ member.role }}</td>
+                                    <td class="center">
+                                        <span class="label label-success">{{ member.active }}</span>
+                                    </td>
+                                    <td class="center">
+                                        <a class="btn btn-info" href="#">
+                                            <i class="icon-edit icon-white"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                             {% else %}
                                 <tr class="info">
-                                    <td colspan="3" class="table-row"><strong>No current openings for project found.</strong></td>
+                                    <td colspan="3" class="table-row"><strong>No team members found. Please add some.</strong></td>
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
-
-                <div class="row-fluid">
-                    <div class="box span6">
-                        <div class="box-header">
-                            <h2><img src="/static/img/certificate.png" class="certificate"/>
-                                <span class="break"></span>Project Team
-                            </h2>
-                            <div class="box-icon">
-                                <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_member"><i class="icon-plus"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="table-box-content">
-                            <table class="table table-hover table-bordered" id="team_members">
-                                <thead class="table_head">
-                                <tr>
-                                    <th class="goal-header">Team Member</th>
-                                    <th>Project Role</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody id="sortable">
-                                {% for member in project.team_members %}
-                                    <tr>
-                                        <td class="center"><img src="/static/img/halflings_justify.png"/><span class="row-break"></span><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</a></td>
-                                        <td class="hidden-column">{{ member.member }}</td>
-                                        <td class="center">{{ member.role }}</td>
-                                        <td class="center">
-                                            <span class="label label-success">{{ member.active }}</span>
-                                        </td>
-                                        <td class="center">
-                                            <a class="btn btn-info" href="#">
-                                                <i class="icon-edit icon-white"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {% else %}
-                                    <tr class="info">
-                                        <td colspan="3" class="table-row"><strong>No team members found. Please add some.</strong></td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- MODAL TO EDIT AN OPENING -->
 <div id="opening" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="opening_label" aria-hidden="true">

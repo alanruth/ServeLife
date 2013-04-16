@@ -73,6 +73,10 @@ class TeamOpening(ndb.Model):
     skills              = ndb.JsonProperty()
     commitment_sought   = ndb.StringProperty()
     created             = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    posted              = ndb.DateTimeProperty()
+    closed              = ndb.DateTimeProperty()
+    filled              = ndb.BooleanProperty()
+    filled_with         = ndb.KeyProperty(kind='User')
     revision            = ndb.IntegerProperty()
 
 

@@ -1036,31 +1036,45 @@ class ProjectPrivateIndexHandler(SLRequestHandler):
 
 class ProjectOpeningHandler(SLRequestHandler):
     @login_required
-    def get(self):
+    def get(self, project_name):
         if self.is_logged_in():
-            project_id = self.request.get('project_id')
-            opening_created = datetime.datetime.strptime(self.request.get('opening_created'), '%Y-%m-%d %H:%M:%S.%f')
-            project = Project.query(Project.key == ndb.Key(Project, project_id),
-                                    Project.team_openings.created == opening_created).get()
+            project = Project.get_by_id(project_name)
             if project:
-                for opening in project.team_openings:
-                    if opening.created == opening_created:
-                        opening_json = json.dumps({'role': opening.role,
-                                                  'description': opening.description,
-                                                  'skills': opening.skills,
-                                                  'commitment': opening.commitment_sought})
-
-                        self.response.out.write(opening_json)
-                        return
-                    else:
-                        self.response.out.write('no opening error')
-                        return
+                template = jinja_environment.get_template('projectprivateopening.html')
+                variables = {'project': project, 'user': self.user}
+                self.response.out.write(template.render(variables))
             else:
-                self.response.out.write('error')
-                return
+                self.response.out.write('no such project exists.')
         else:
             self.redirect('/signin')
-            return
+
+
+    # @login_required
+    # def get(self):
+    #     if self.is_logged_in():
+    #         project_id = self.request.get('project_id')
+    #         opening_created = datetime.datetime.strptime(self.request.get('opening_created'), '%Y-%m-%d %H:%M:%S.%f')
+    #         project = Project.query(Project.key == ndb.Key(Project, project_id),
+    #                                 Project.team_openings.created == opening_created).get()
+    #         if project:
+    #             for opening in project.team_openings:
+    #                 if opening.created == opening_created:
+    #                     opening_json = json.dumps({'role': opening.role,
+    #                                               'description': opening.description,
+    #                                               'skills': opening.skills,
+    #                                               'commitment': opening.commitment_sought})
+    #
+    #                     self.response.out.write(opening_json)
+    #                     return
+    #                 else:
+    #                     self.response.out.write('no opening error')
+    #                     return
+    #         else:
+    #             self.response.out.write('error')
+    #             return
+    #     else:
+    #         self.redirect('/signin')
+    #         return
 
 
     @login_required
@@ -1071,10 +1085,14 @@ class ProjectOpeningHandler(SLRequestHandler):
             opening_description = self.request.get('opening_description')
             opening_skills = self.request.get('opening_skills').split(',')
             opening_commitment = self.request.get('opening_commitment')
+            opening_post = self.request.get('opening_post')
             if self.request.get('opening_created'):
+                #Means this is an update of existing opening
                 opening_created = datetime.datetime.strptime(self.request.get('opening_created'), '%Y-%m-%d %H:%M:%S.%f')
             else:
+                #Means this is a new opening
                 opening_created = None
+            # Get the project object & make sure requesting user is a member of project
             project = Project.query(Project.key == ndb.Key(Project, project_id),
                                     Project.team_members.member == self.user.key)
             if project:
@@ -1087,10 +1105,17 @@ class ProjectOpeningHandler(SLRequestHandler):
                             opening.commitment_sought = opening_commitment
 
                 else:
-                    opening = TeamOpening(role=opening_role,
-                                          description=opening_description,
-                                          commitment_sought=opening_commitment,
-                                          skills=opening_skills)
+                    if opening_post:
+                        opening = TeamOpening(role=opening_role,
+                                              description=opening_description,
+                                              commitment_sought=opening_commitment,
+                                              skills=opening_skills,
+                                              posted=datetime.datetime.now())
+                    else:
+                        opening = TeamOpening(role=opening_role,
+                                              description=opening_description,
+                                              commitment_sought=opening_commitment,
+                                              skills=opening_skills)
                     project.team_openings.append(opening)
                 project.put()
                 self.response.write('ok')
@@ -1382,6 +1407,7 @@ app = webapp2.WSGIApplication([
                                   ('/build/project/profile/(?P<project_name>.*)', ProjectInternalIndexHandler),
                                   ('/build/project/(?P<project_name>.*)/hub', ProjectPrivateIndexHandler),
                                   ('/build/project/(?P<project_name>.*)/team', ProjectPrivateTeamHandler),
+                                  ('/build/project/(?P<project_name>.*)/openings', ProjectOpeningHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),
                                   #('/teamprofile/(?P<team>.*)', TeamProfileHandler),

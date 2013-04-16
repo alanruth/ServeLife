@@ -1,0 +1,529 @@
+{% extends "secure.html" %}
+
+{% block title %}{{ project.project_name }}{% endblock title %}
+
+{% block description %}{{ project.project_description }}{% endblock description %}
+
+{% block custom_script %}
+
+    $(document).ready(function() {
+
+    // Minimize Tables
+    $('.btn-minimize').click(function(e){
+        e.preventDefault();
+        var $target = $(this).parent().parent().next('.box-content');
+        if($target.is(':visible')) $('i',$(this)).removeClass('icon-chevron-up').addClass('icon-chevron-down');
+        else 					   $('i',$(this)).removeClass('icon-chevron-down').addClass('icon-chevron-up');
+        $target.slideToggle();
+    });
+
+    $('#opening').modal({
+        show: false
+    });
+
+    $('#edit_opening_body').validate();
+
+    $('#update_opening').on('click', function(e) {
+
+        var valid = $('#edit_opening_body').valid();
+
+        if(valid) {
+            // update a goal
+            var project = $('#project-name').html();
+            var opening_role = $('#opening_role').val();
+            var opening_description = $('#opening_description').val();
+            var opening_skills = $('#opening_skills').val();
+            var opening_commitment = $('#opening_commitment').val();
+            var opening_created = $('#opening_created').val
+
+            $.ajax({
+                data:{'project_id' : project, 'opening_role' : opening_role, 'opening_description' : opening_description,
+                    'opening_skills' : opening_skills, 'opening_commitment' : opening_commitment, 'opening_created' : opening_created},
+                url: "/opening/new",
+                async: true,
+                type: "POST",
+                success: function(response) {
+                    if (response=='ok'){
+                        $("#modal-close").click();
+                        $(window.location.replace('/build/project/{{ project.key.id() }}/openings'));
+                    }
+                    if (response=='bad project'){
+                        $("#save_opening").addClass('disabled');
+                        $('#save_opening').html('Project Error');
+                    }
+                },
+                error: function(response) {
+                    $("#save_opening").addClass('disabled');
+                    $('#save_opening').html('Something went wrong.');
+                }
+            });
+        }
+    });
+
+
+        var get_opening_details = function(project_id, opening_created){
+        var opening_details = {};
+        $.ajax({
+            data:{'project_id':project_id, 'opening_created': opening_created},
+            url: "/opening/new",
+            async: true,
+            type: "GET",
+            success: function(response) {
+                opening_details = jQuery.parseJSON( response );
+                /*
+                {"role": "role2",
+                "skills": ["skill1", " skill2"],
+                "created": "datetime",
+                "description": "descr2"
+                "commitment" : "0-5 hours/week"}
+                */
+                $('#opening_role').val(opening_details.role);
+                $('#opening_description').val(opening_details.description);
+                $('#opening_skills').val(opening_details.skills);
+                $('#opening_created').val(opening_created);
+                $('#opening_commitment> option[value="+opening_details.commitment+"]').attr("selected", "selected");
+
+            },
+            error: function(response) {
+                $("#save_opening").addClass('disabled');
+                $('#save_opening').html('Something went wrong.');
+            }
+        });
+    };
+
+    $('#opening_body').validate();
+
+
+    $('#create_opening').on('click', function(e) {
+
+        var valid = $('#opening_body').valid();
+
+        if(valid) {
+            // save a goal
+            var project = $('#project-name').html();
+            var opening_role = $('#opening_role').val();
+            var opening_description = $('#opening_description').val();
+            var opening_skills = $('#opening_skills').val();
+            var opening_commitment = $('#opening_commitment').val();
+            var opening_post = $('post_opening').val();
+
+            $.ajax({
+                data:{'project_id' : project, 'opening_role' : opening_role, 'opening_description' : opening_description,
+                    'opening_skills' : opening_skills, 'opening_commitment' : opening_commitment, 'opening_post' : opening_post},
+                url: "/opening/new",
+                async: true,
+                type: "POST",
+                success: function(response) {
+                    if (response=='ok'){
+                        $("#modal-close").click();
+                        $(window.location.replace('/build/project/{{ project.key.id() }}/openings'));
+                    }
+                    if (response=='bad project'){
+                        $("#save_opening").addClass('disabled');
+                        $('#save_opening').html('Project Error');
+                    }
+                },
+                error: function(response) {
+                    $("#save_opening").addClass('disabled');
+                    $('#save_opening').html('Something went wrong.');
+                }
+            });
+        }
+    });
+ });
+
+
+{% endblock custom_script %}
+
+{% block page %}
+
+    <div class="main">
+        <div class="container">
+            <div class="wrapper">
+                <div class="row-fluid topic-main">
+                    <div class="span2">
+                        <!-- INSERT PICTURE FROM PROFILE -->
+                        <img alt="{{ project.key.id() }}" class="thumbnail img-polaroid member-pic" />
+                    </div>
+                    <div class="span5">
+                        <span class="pull-right"><strong>Followers: </strong>?</span>
+                        <div class="pull-right">
+                            <a class="btn" href="#">
+                                <img alt="Share" src=""/>
+                            </a>
+                            <a class="btn" href="#">
+                                <img alt="Invite" src=""/>
+                            </a>
+                        </div>
+                        <h2 id="project-name">{{ project.key.id() }}</h2>
+                        <p>{{ project.description }}</p>
+                        <p>List Tags</p>
+                    </div>
+                    <div class="span5">
+                        <div class="row-fluid">
+                            <a class="quick-button-small span2">
+                                <img alt="Articles" class="articles" src="/static/img/newspaper.png" />
+                                <span class="notification ideas">?</span>
+                                <p class="quick-button-small-article">Articles</p>
+                            </a>
+                            <a class="quick-button-small span2">
+                                <img alt="Tasks" class="questions" src="/static/img/alarm.png" />
+                                <span class="notification ideas">7</span>
+                                <p>Tasks</p>
+                            </a>
+                            <a class="quick-button-small span2">
+                                <img alt="Questions" class="questions" src="/static/img/question.png" />
+                                <span class="notification ideas">7</span>
+                                <p>Questions</p>
+                            </a>
+                            <a class="quick-button-small span2">
+                                <img alt="Discussions" src="/static/img/conversation.png" />
+                                <span class="notification discussions">7</span>
+                                <p>Discussions</p>
+                            </a>
+                            <a class="quick-button-small span2">
+                                <img alt="Ideas" class="ideas" src="/static/img/lightbulb.png" />
+                                <span class="notification ideas">7</span>
+                                <p>Ideas</p>
+                            </a>
+                            <a class="quick-button-small span2">
+                                <img alt="Articles" class="articles" src="/static/img/warning_sign.png" />
+                                <p>Issues</p>
+                                <span class="notification ideas">7</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="heavy">
+
+                <div class="row-fluid topic-body">
+                    <div class="span12">
+                        <ul class="nav nav-pills btn-topic pull-right">
+                            <li><a href="/build/project/{{ project.key.id() }}/hub">News</a></li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle"
+                                   data-toggle="dropdown"
+                                   href="#">
+                                    Backlog
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/build/project/{{ project.key.id() }}/active">In Progress</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/ready">To Do</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/done">Done</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/unplanned">Unplanned</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/archive">Archive</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle"
+                                   data-toggle="dropdown"
+                                   href="#">
+                                    Interactions
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/build/project/{{ project.key.id() }}/ideas">Ideas</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/questions">Questions</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/issues">Issues</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/discussions">Discussions</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="/build/project/{{ project.key.id() }}/experiments">Experiments</a></li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle"
+                                   data-toggle="dropdown"
+                                   href="#">
+                                    Team
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/build/project/{{ project.key.id() }}/openings">Openings</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/members">Members</a></li>
+                                    <li><a href="/build/project/{{ project.key.id() }}/applications">Application Forms</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="/build/project/{{ project.key.id() }}/goals">Goals</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="box span12">
+                        <div class="box-header">
+                            <h2><img src="/static/img/sun.png" class="header_image"/>
+                                <span class="break"></span>Active Openings
+                            </h2>
+                            <div class="box-icon">
+                                <a class="btn-minimize" href="#"><i class="icon-chevron-up"></i></a>
+                                <a href="#opening" role="button" class="btn-setting" data-toggle="modal"><i class="icon-plus"></i></a>
+                            </div>
+                        </div>
+                        <div class="box-content">
+                            <table class="table table-hover table-bordered" id="team_opening">
+                                <thead class="table_head">
+                                <tr>
+                                    <th class="goal-header">Role</th>
+                                    <th>Posted</th>
+                                    <th>Applied</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody id="sortable_opening">
+                                {% for opening in project.team_openings %}
+                                    {% if opening.posted and not opening.closed %}
+                                    <tr>
+                                        <td><a href="#edit_opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">{{ opening.role }}</a></td>
+                                        <td class="text-center">{{ opening.posted }}</td>
+                                        <td class="text-center">NEED</td>
+                                        <td class="center">
+                                            <!-- Need to pop modal w/ metrics -->
+                                            <a class="btn btn-primary" href="#">
+                                                <i class="icon-signal icon-white"></i>
+                                            </a>
+                                            <!-- Need to validate. Then save row with posted date. -->
+                                            <a class="btn btn-success" href="#">
+                                                <i class="icon-check icon-white"></i>
+                                            </a>
+                                            <!-- Load Edit Modal -->
+                                            <a class="btn btn-info" href="#edit_opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">
+                                                <i class="icon-edit icon-white"></i>
+                                            </a>
+                                            <!-- Load New Modal, Populate w/ Current Row Info -->
+                                            <a class="btn btn-info" href="#">
+                                                <i class="icon-share icon-white"></i>
+                                            </a>
+                                            <!-- Save Row with Closed Date -->
+                                            <a class="btn btn-danger" href="#">
+                                                <i class="icon-trash icon-white"></i>
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+                                    {% endif %}
+                                {% else %}
+                                    <tr class="info">
+                                        <td colspan="3" class="table-row"><strong>No current openings for project found.</strong></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-fluid">
+                    <div class="box span12">
+                        <div class="box-header">
+                            <h2><img src="/static/img/roundabout.png" class="header_image"/>
+                                <span class="break"></span>Positions Not Posted
+                            </h2>
+                            <div class="box-icon">
+                                <a class="btn-minimize" href="#"><i class="icon-chevron-up"></i></a>
+                                <a href="#opening" role="button" class="btn-setting" data-toggle="modal"><i class="icon-plus"></i></a>
+                            </div>
+                        </div>
+                        <div class="box-content">
+                            <table class="table table-hover table-bordered" id="not_posted_opening">
+                                <thead class="table_head">
+                                <tr>
+                                    <th class="goal-header">Role</th>
+                                    <th>Created</th>
+                                    <th>Application</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for opening in project.team_openings %}
+                                    {% if opening.created and not opening.posted %}
+                                    <tr>
+                                        <td>{{ opening.role }}</td>
+                                        <td class="text-center">{{ opening.created }}</td>
+                                        <td class="text-center">NEED</td>
+                                        <td class="center">
+                                            <!-- Need to validate. Then save row with posted date. -->
+                                            <a class="btn btn-success" href="#">
+                                                <i class="icon-check icon-white"></i>
+                                            </a>
+                                            <a class="btn btn-info" href="#edit_opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">
+                                                <i class="icon-edit icon-white"></i>
+                                            </a>
+                                            <!-- Load New Modal, Populate w/ Current Row Info -->
+                                            <a class="btn btn-info" href="#">
+                                                <i class="icon-share icon-white"></i>
+                                            </a>
+                                            <!-- Save Row with Closed Date -->
+                                            <a class="btn btn-danger" href="#">
+                                                <i class="icon-trash icon-white"></i>
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% else %}
+                                    <tr class="info">
+                                        <td colspan="3" class="table-row"><strong>There are no closed openings for the project.</strong></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-fluid">
+                    <div class="box span12">
+                        <div class="box-header">
+                            <h2><img src="/static/img/moon.png" class="header_image"/>
+                                <span class="break"></span>Closed Positions
+                            </h2>
+                            <div class="box-icon">
+                                <a class="btn-minimize" href="#"><i class="icon-chevron-up"></i></a>
+                            </div>
+                        </div>
+                        <div class="box-content">
+                            <table class="table table-hover table-bordered" id="closed_opening">
+                                <thead class="table_head">
+                                <tr>
+                                    <th class="goal-header">Role</th>
+                                    <th>Closed</th>
+                                    <th>Days Open</th>
+                                    <th>Applicants</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for opening in project.team_openings %}
+                                    {% if opening.closed %}
+                                        <tr>
+                                            <td class="text-center"><a href="#opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">{{ opening.role }}</a></td>
+                                            <td class="text-center">{{ opening.closed }}</td>
+                                            <td class="text-center">{{ opening.created }}</td>
+                                            <td class="text-center">NEED</td>
+                                        </tr>
+                                    {% endif %}
+                                {% else %}
+                                    <tr class="info">
+                                        <td colspan="3" class="table-row"><strong>There are no closed openings for the project.</strong></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAY BE ABLE TO USE A SINGLE MODAL FOR ADD & EDIT : CONTROL DOM VIA JAVASCRIPT-->
+
+    <!-- MODAL TO ADD A NEW OPENING -->
+    <div id="opening" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="opening_label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" id="opening-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+            <h3 id="opening_label">Create a New Team Opening</h3>
+        </div>
+
+        <div class="modal-body">
+            <form class="form-horizontal" id="opening_body">
+                <div class="control-group">
+                    <label class="control-label" for="opening_role">Role</label>
+                    <div class="controls">
+                        <input class="span3" id="opening_role" required name="opening_role"
+                               size="50" type="text" maxlength="50" placeholder="Enter the name of the role."/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="opening_description">Description</label>
+                    <div class="controls">
+                        <textarea rows="3" class="required span3" id="opening_description" name="opening_description"
+                                  required maxlength="500" placeholder="Enter a brief but specific description for the role. (500 max)"> </textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="opening_skills">Skills</label>
+                    <div class="controls">
+                        <textarea rows="3" class="span3" id="opening_skills" required name="opening_skills"
+                                  placeholder="Provide keywords (separated by a comma) that help describe the skills for the role."> </textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="opening_commitment">Commitment Sought<br/><small>(in hours per week)</small></label>
+                    <div class="controls">
+                        <select id="opening_commitment">
+                            <option>0-5 hours/week</option>
+                            <option>6-10 hours/week</option>
+                            <option>10+ hours/week</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                    <label class="checkbox">
+                        <input type="checkbox" id="post_opening"> Post Immediately
+                    </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="create_opening">Create</button>
+        </div>
+    </div>
+    <!-- END MODAL ADD A NEW OPENING -->
+
+    <!-- MODAL TO EDIT AN OPENING -->
+    <div id="edit_opening" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit_opening_label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" id="edit_opening-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+            <h3 id="edit_opening_label">Edit a Team Opening</h3>
+        </div>
+
+        <div class="modal-body">
+            <form class="form-horizontal" id="edit_opening_body">
+                <div class="control-group">
+                    <label class="control-label" for="edit_opening_role">Role</label>
+                    <div class="controls">
+                        <input class="span3" id="edit_opening_role" required name="edit_opening_role"
+                               size="50" type="text" maxlength="50" placeholder="Enter the name of the role."/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="edit_opening_description">Description</label>
+                    <div class="controls">
+                        <textarea rows="3" class="required span3" id="edit_opening_description" name="edit_opening_description"
+                                  required maxlength="500" placeholder="Enter a brief but specific description for the role. (500 max)"> </textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="edit_opening_skills">Skills</label>
+                    <div class="controls">
+                        <textarea rows="3" class="span3" id="edit_opening_skills" required name="edit_opening_skills"
+                                  placeholder="Provide keywords (separated by a comma) that help describe the skills for the role."> </textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="edit_opening_commitment">Commitment Sought<br/><small>(in hours per week)</small></label>
+                    <div class="controls">
+                        <select id="edit_opening_commitment">
+                            <option>0-5 hours/week</option>
+                            <option>6-10 hours/week</option>
+                            <option>10+ hours/week</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <input class="span3" type="hidden" id="opening_created"/>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="update_opening">Update</button>
+        </div>
+    </div>
+    <!-- END MODAL EDIT AN OPENING -->
+
+
+{% endblock page %}
