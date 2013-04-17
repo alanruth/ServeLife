@@ -1406,7 +1406,7 @@ app = webapp2.WSGIApplication([
                                   ('/project/new', NewProjectProfileHandler),
                                   ('/build/project/profile/(?P<project_name>.*)', ProjectInternalIndexHandler),
                                   ('/build/project/(?P<project_name>.*)/hub', ProjectPrivateIndexHandler),
-                                  ('/build/project/(?P<project_name>.*)/team', ProjectPrivateTeamHandler),
+                                  ('/build/project/(?P<project_name>.*)/members', ProjectPrivateTeamHandler),
                                   ('/build/project/(?P<project_name>.*)/openings', ProjectOpeningHandler),
                                   #('/project', ProjectCenterPageHandler),
                                   #('/user/account/(?P<user_name>.*)', UserAccountHandler),

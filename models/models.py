@@ -61,9 +61,12 @@ class UserGoalEvent(ndb.Model):
 class TeamMember(ndb.Model):
     member = ndb.KeyProperty(kind='User')
     role = ndb.StringProperty(required=False)
-    joined = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    invited = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    activation_key = ndb.StringProperty()
+    joined = ndb.DateTimeProperty()
     active = ndb.BooleanProperty(default=True)
     inactivated = ndb.DateTimeProperty(required=False)
+    reason_inactivated = ndb.StringProperty()
     admin = ndb.BooleanProperty(default=False)
 
 
