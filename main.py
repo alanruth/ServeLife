@@ -1094,7 +1094,7 @@ class ProjectOpeningHandler(SLRequestHandler):
                 opening_created = None
             # Get the project object & make sure requesting user is a member of project
             project = Project.query(Project.key == ndb.Key(Project, project_id),
-                                    Project.team_members.member == self.user.key)
+                                    Project.team_members.member == self.user.key).get()
             if project:
                 if opening_created:
                     for opening in project.team_openings:
@@ -1116,7 +1116,7 @@ class ProjectOpeningHandler(SLRequestHandler):
                                               description=opening_description,
                                               commitment_sought=opening_commitment,
                                               skills=opening_skills)
-                    project.team_openings.append(opening)
+                        project.team_openings.append(opening)
                 project.put()
                 self.response.write('ok')
                 return
