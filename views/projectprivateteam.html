@@ -1,0 +1,515 @@
+{% extends "secure.html" %}
+
+{% block title %}{{ project.project_name }}{% endblock title %}
+
+{% block description %}{{ project.project_description }}{% endblock description %}
+
+{% block custom_script %}
+
+$(document).ready(function() {
+
+    ("#dialog-confirm").dialog({
+        resizable: false,
+        height:140,
+        modal: true,
+        buttons: {
+            "Inactivate member": function() {
+                $( this ).dialog( "close" );
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+
+    var get_member_details = function(project_id, member_id){
+        var member_details = {};
+        $.ajax({
+            data:{'project_id':project_id, 'member_id': member_id},
+            url: "/member/new",
+            async: true,
+            type: "GET",
+            success: function(response) {
+                member_details = jQuery.parseJSON( response );
+
+                $('#edit_member_role').val(member_details.role);
+                $('#edit_member_admin').val(member_details.admin);
+            },
+            error: function(response) {
+                $("#update_member").addClass('disabled');
+                $('#update_member').html('Something went wrong.');
+            }
+        });
+    };
+
+
+    $('#add_member_body').validate();
+
+
+    $('#invite_member').on('click', function(e) {
+
+        var valid = $('#add_member_body').valid();
+
+        if(valid) {
+            // Invite Member
+            var project = '{{ project.key.id() }}';
+            var member_id = $(this).data('id');
+            var member_role = $('#edit_member_role').val();
+            var member_admin = $('#edit_member_admin').val();
+
+            $.ajax({
+                data:{'project_id' : project, 'member_id' : member_id, 'member_role' : member_role, 'member_admin' : member_admin},
+                url: "/member/new",
+                async: true,
+                type: "POST",
+                success: function(response) {
+
+                    if (response=='ok'){
+                        $("#add_member_close").click();
+                        $(window.location.replace('/build/project/{{ project.key.id() }}/members'));
+                    }
+                    if (response=='bad project'){
+                        $("#invite_member").addClass('disabled');
+                        $('#invite_member').html('Project Error');
+                    }
+                },
+                error: function(response) {
+                    $("#invite_member").addClass('disabled');
+                    $('#invite_member').html('Something went wrong.');
+                }
+            });
+        }
+    });
+
+
+    $('#edit_member_body').validate();
+
+
+    $('#update_member').on('click', function(e) {
+
+        var valid = $('#edit_member_body').valid();
+
+        if(valid) {
+        // save updated member
+            var project = '{{ project.key.id() }}';
+            var member_id = $('#add_member_name').val();
+            var member_role = $('#add_member_role').val();
+            var member_admin = $('#add_member_admin').val();
+
+            $.ajax({
+                data:{'project_id' : project, 'member_id' : member_id, 'member_role' : member_role, 'member_admin' : member_admin},
+                url: "/member/new",
+                async: true,
+                type: "POST",
+                success: function(response) {
+
+                    if (response=='ok'){
+                        $("#edit_member_close").click();
+                        $(window.location.replace('/build/project/{{ project.key.id() }}/members'));
+                    }
+                    if (response=='bad project'){
+                        $("#update_member").addClass('disabled');
+                        $('#update_member').html('Project Error');
+                    }
+                },
+                error: function(response) {
+                $("#update_member").addClass('disabled');
+                $('#update_member').html('Something went wrong.');
+                }
+            });
+        }
+    });
+
+    $('#confirm_inactivation').on('click', function(e) {
+        var project = '{{ project.key.id() }}';
+        var member_id = $(this).data('id');
+        var member_active = false;
+
+        $.ajax({
+            data:{'project_id' : project, 'member_id' : member_id, 'member_active' : member_active},
+            url: "/member/new",
+            async: true,
+            type: "POST",
+            success: function(response) {
+
+                if (response=='ok'){
+                    $("#inactivate-member-close").click();
+                    $(window.location.replace('/build/project/{{ project.key.id() }}/members'));
+                }
+                if (response=='bad project'){
+                    $("#confirm_inactivation").addClass('disabled');
+                    $('#msgbox').removeClass('hide');
+                    $('#msgbox').html('Something went wrong. Try Again.');
+                }
+            },
+            error: function(response) {
+                $("#confirm_inactivation").addClass('disabled');
+                $('#msgbox').removeClass('hide');
+                $('#msgbox').html('Something went wrong. Try Again.');
+
+            }
+        });
+
+    });
+
+});
+
+
+{% endblock custom_script %}
+
+{% block page %}
+
+<div class="main">
+    <div class="container">
+        <div class="wrapper">
+            <div class="row-fluid topic-main">
+                <div class="span2">
+                    <!-- INSERT PICTURE FROM PROFILE -->
+                    <img alt="{{ project.key.id() }}" class="thumbnail img-polaroid member-pic" />
+                </div>
+                <div class="span5">
+                    <span class="pull-right"><strong>Followers: </strong>?</span>
+                    <div class="pull-right">
+                        <a class="btn" href="#">
+                            <img alt="Share" src=""/>
+                        </a>
+                        <a class="btn" href="#">
+                            <img alt="Invite" src=""/>
+                        </a>
+                    </div>
+                    <h2 id="project-name">{{ project.key.id() }}</h2>
+                    <p>{{ project.description }}</p>
+                    <p>List Tags</p>
+                </div>
+                <div class="span5">
+                    <div class="row-fluid">
+                        <a class="quick-button-small span2">
+                            <img alt="Articles" class="articles" src="/static/img/newspaper.png" />
+                            <span class="notification ideas">?</span>
+                            <p class="quick-button-small-article">Articles</p>
+                        </a>
+                        <a class="quick-button-small span2">
+                            <img alt="Tasks" class="questions" src="/static/img/alarm.png" />
+                            <span class="notification ideas">7</span>
+                            <p>Tasks</p>
+                        </a>
+                        <a class="quick-button-small span2">
+                            <img alt="Questions" class="questions" src="/static/img/question.png" />
+                            <span class="notification ideas">7</span>
+                            <p>Questions</p>
+                        </a>
+                        <a class="quick-button-small span2">
+                            <img alt="Discussions" src="/static/img/conversation.png" />
+                            <span class="notification discussions">7</span>
+                            <p>Discussions</p>
+                        </a>
+                        <a class="quick-button-small span2">
+                            <img alt="Ideas" class="ideas" src="/static/img/lightbulb.png" />
+                            <span class="notification ideas">7</span>
+                            <p>Ideas</p>
+                        </a>
+                        <a class="quick-button-small span2">
+                            <img alt="Articles" class="articles" src="/static/img/warning_sign.png" />
+                            <p>Issues</p>
+                            <span class="notification ideas">7</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="heavy">
+
+            <div class="row-fluid topic-body">
+                <div class="span12">
+                    <ul class="nav nav-pills btn-topic pull-right">
+                        <li><a href="/build/project/{{ project.key.id() }}/hub">News</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                Backlog
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/build/project/{{ project.key.id() }}/active">In Progress</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/ready">To Do</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/done">Done</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/unplanned">Unplanned</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/archive">Archive</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                Interactions
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/build/project/{{ project.key.id() }}/ideas">Ideas</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/questions">Questions</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/issues">Issues</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/discussions">Discussions</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="/build/project/{{ project.key.id() }}/experiments">Experiments</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                Team
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/build/project/{{ project.key.id() }}/openings">Openings</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/members">Members</a></li>
+                                <li><a href="/build/project/{{ project.key.id() }}/applications">Application Forms</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="/build/project/{{ project.key.id() }}/goals">Goals</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="box span12">
+                    <div class="box-header">
+                        <h2><img src="/static/img/group.png" class="header_image"/>
+                            <span class="break"></span>Active Project Team Members
+                        </h2>
+                        <div class="box-icon">
+                            <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_member"><i class="icon-plus"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="table-box-content">
+                        <table class="table table-hover table-bordered" id="team_members">
+                            <thead class="table_head">
+                            <tr>
+                                <th class="goal-header">Team Member</th>
+                                <th>Project Role</th>
+                                <th>Joined</th>
+                                <th>Admin</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for member in project.team_members %}
+                                {% if member.joined and not member.inactivated %}
+                                <tr>
+                                    <td class="center"><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</a></td>
+                                    <td class="center">{{ member.role }}</td>
+                                    <td class="center">{{ member.joined }}</td>
+                                    <td class="center">{{ member.admin }}</td>
+                                    <td class="center">
+                                        <a class="btn btn-info" href="#edit_member" role="button" class="member_row" data-toggle="modal" data-id="{{ member.member.id() }}">
+                                            <i class="icon-edit icon-white"></i>
+                                        </a>
+                                        <a class="btn btn-success disabled" href="#">
+                                            <i class="icon-pencil icon-white"></i>
+                                        </a>
+
+                                        <a class="btn btn-danger" href="#dialog-confirm" role="button" class="member_row" data-toggle="modal" data-id="{{ member.joined }}">
+                                            <i class="icon-trash icon-white"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% else %}
+                                <tr class="info">
+                                    <td colspan="3" class="table-row"><strong>No team members found. Please add some.</strong></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-fluid">
+                <div class="box span12">
+                    <div class="box-header">
+                        <h2><img src="/static/img/circle_question_mark.png" class="header_image"/>
+                            <span class="break"></span>Outstanding Invitations
+                        </h2>
+                    </div>
+
+                    <div class="table-box-content">
+                        <table class="table table-hover table-bordered" id="outstanding_invitations">
+                            <thead class="table_head">
+                            <tr>
+                                <th class="goal-header">ServeLife Member</th>
+                                <th>Project Role</th>
+                                <th>Admin</th>
+                                <th>Invited</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for member in project.team_members %}
+                                {% if member.invited and not member.joined %}
+                                <tr>
+                                    <td class="center"><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</a></td>
+                                    <td class="center">{{ member.role }}</td>
+                                    <td class="center">{{ member.admin }}</td>
+                                    <td class="center">{{ member.invited }}</td>
+                                    <td class="center">
+                                        <a class="btn btn-info" href="#edit_member" role="button" class="member_row" data-toggle="modal" data-id="{{ member.member.id() }}">
+                                            <i class="icon-edit icon-white"></i>
+                                        </a>
+                                        <a class="btn btn-success" href="#">
+                                            <i class="icon-envelope icon-white"></i>
+                                        </a>
+
+                                        <a class="btn btn-danger" href="#dialog-confirm" role="button" class="member_row" data-toggle="modal" data-id="{{ member.joined }}">
+                                            <i class="icon-trash icon-white"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% else %}
+                                <tr class="info">
+                                    <td colspan="3" class="table-row"><strong>No outstanding member invitations found.</strong></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row-fluid">
+                <div class="box span12">
+                    <div class="box-header">
+                        <h2><img src="/static/img/moon.png" class="header_image"/>
+                            <span class="break"></span>Inactive Project Team Members
+                        </h2>
+                    </div>
+
+                    <div class="table-box-content">
+                        <table class="table table-hover table-bordered" id="past_team_members">
+                            <thead class="table_head">
+                            <tr>
+                                <th class="goal-header">Team Member</th>
+                                <th>Project Role</th>
+                                <th>Inactivated</th>
+                                <th>Reason Left</th>
+                                <th>Peer Reviews</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for member in project.team_members %}
+                                {% if member.inactivated %}
+                                <tr>
+                                    <td class="center"><a href="/community/profile/{{ member.member.id() }}">{{ member.member.id() }}</a></td>
+                                    <td class="hidden-column">{{ member.member }}</td>
+                                    <td class="center">{{ member.role }}</td>
+                                    <td class="center">{{ member.inactivated}}</td>
+                                    <td class="center">{{ member.reason_inactivated }}</td>
+                                    <td class="center">METRIC</td>
+                                </tr>
+                                {% endif %}
+                            {% else %}
+                                <tr class="info">
+                                    <td colspan="3" class="table-row"><strong>No inactive team members found.</strong></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL TO EDIT A TEAM MEMBER -->
+<div id="edit_member" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit_member_label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" id="edit_member_close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+        <h3 id="edit_member_label">Edit Team Member</h3>
+    </div>
+
+    <div class="modal-body">
+        <form class="form-horizontal" id="edit_member_body">
+            <div class="control-group">
+                <label class="control-label" for="edit_member_role">Role</label>
+                <div class="controls">
+                    <input class="span3" id="edit_member_role" required name="edit_member_role"
+                           size="50" type="text" maxlength="50" placeholder="Enter the name of the role."/>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox">
+                        <input type="checkbox" id="edit_member_admin"> Administrator
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" id="update_member">Update</button>
+    </div>
+</div>
+<!-- END MODAL EDIT TEAM MEMBER -->
+
+<!-- MODAL TO ADD TEAM MEMBER -->
+<div id="add_member" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_member_label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" id="add-member-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+        <h3 id="add_member_label">Invite Team Member</h3>
+    </div>
+
+    <div class="modal-body">
+        <form class="form-horizontal" id="add_member_body">
+            <div class="control-group">
+                <label class="control-label" for="add_member_name">User to Invite</label>
+                <div class="controls">
+                    <input class="span3" id="add_member_name" required name="add_member_name"
+                           size="50" type="text" maxlength="50" placeholder="Enter the user's name to invite."/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="add_member_role">Role</label>
+                <div class="controls">
+                    <input class="span3" required id="add_member_role" name="add_member_role"
+                              maxlength="50" placeholder="What role will they fulfill on the team?"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox">
+                        <input type="checkbox" id="add_admin"> Project Administrator
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" id="invite_member">Invite</button>
+    </div>
+</div>
+<!-- END MODAL ADD TEAM MEMBER -->
+
+
+<!-- CONFIRMATION -->
+<div id="dialog-confirm" title="Inactivate Member?" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="inactivate_member_label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" id="inactivate-member-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+        <h3 id="inactivate_member_label">Inactivate Team Member?</h3>
+    </div>
+    <div class="modal-body">
+        <label id="msgbox" class="alert alert-error hide"></label>
+        <p class="alert-error alert-block"><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>This member will be inactivated and removed as an active contributor. Are you sure?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" id="confirm_inactivation">Inactivate Team Member</button>
+        <button class="btn btn-primary" id="cancel_inactivation" class="close" data-dismiss="modal">Cancel</button>
+    </div>
+</div>
+
+{% endblock page %}

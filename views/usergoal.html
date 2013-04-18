@@ -1,0 +1,664 @@
+{% extends "secure.html" %}
+
+{% block custom_head %}
+    <link href="/static/css/smart_wizard.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="/static/js/jquery.smartWizard.js"></script>
+{% endblock custom_head %}
+
+{% block custom_script %}
+
+    var save_goal = function(goal_id){
+        $inputs = $('#edit_'+goal_id+' :input');
+        goal = {};
+        $inputs.each(function() {
+            goal[this.name] = $(this).val();
+        });
+
+        $.ajax({
+            data: goal,
+            url: "/goal/edit",
+            async: true,
+            type: "POST",
+            success: function(response) {
+                if (response == 'ok'){
+                    $('#save_btn').html('saved');
+                }
+            },
+            error: function(response) {
+                $(".buttonFinish").addClass('buttonDisabled');
+                $(".buttonPrevious").addClass('Disabled');
+                $('.buttonFinish').html('Something went wrong.');
+            }
+        });
+    }
+
+    var get_goal_actions = function(goal_id){
+        var goal_actions = {};
+        $.ajax({
+            data:{},
+            url: "/goalaction/by_id/"+goal_id,
+            async: true,
+            type: "GET",
+            success: function(response) {
+
+                if (response=='ok'){
+                    /*goal_actions = jQuery.parseJSON( response );*/
+
+                markup = '<form id=edit_'+goal_id+
+                        '><label>name: <input name="name" value="'+goal_actions.name+'"></label>'+
+                        '<label>description: <input name="description" value="'+goal_actions.description+'"></label>'+
+                        '<label>Tags: <input name="tags" value="'+goal_actions.tags+'"></label>'+
+                        '<label>measure: <input name="measure" value="'+goal_actions.measure+'"></label>'+
+                        '<label>status: <input name="status" value="'+goal_actions.goal_status+'"></label>'+
+                        '<label>date: <input id="goal_actions_due" name="date" value="'+goal_actions.date+'"></label>'+
+                        '<a href=javascript:save_goal(' + goal_id + ') id=save_btn class=btn >save</a> </form>';
+                $('#goal_details').html(markup);
+                $('#goal_details_due').datepicker();}
+            },
+            error: function(response) {
+                $(".buttonFinish").addClass('buttonDisabled');
+                $(".buttonPrevious").addClass('Disabled');
+                $('.buttonFinish').html('Something went wrong.');
+            }
+        });
+    }
+
+
+    var get_goal_details = function(goal_id){
+        var goal_details = {};
+        $.ajax({
+            data:{},
+            url: "/goal/by_id/"+goal_id,
+            async: true,
+            type: "GET",
+            success: function(response) {
+                goal_details = jQuery.parseJSON( response );
+                /*
+                {"name": "goal2",
+                "tags": ["word1", " word2"],
+                "goal_status": "not started",
+                "measure": "some measure",
+                "date": "2013-04-18",
+                "description": "descr2"}
+                */
+                markup = '<form id=edit_'+goal_id+
+                '><label>name: <input name="name" value="'+goal_details.name+'"></label>'+
+                '<label>description: <input name="description" value="'+goal_details.description+'"></label>'+
+                '<label>Tags: <input name="tags" value="'+goal_details.tags+'"></label>'+
+                '<label>measure: <input name="measure" value="'+goal_details.measure+'"></label>'+
+                '<label>status: <input name="status" value="'+goal_details.goal_status+'"></label>'+
+                '<label>date: <input id="goal_details_due" name="date" value="'+goal_details.date+'"></label>'+
+                '<a href=javascript:save_goal(' + goal_id + ') id=save_btn class=btn >save</a> </form>';
+                $('#goal_details').html(markup);
+                $('#goal_details_due').datepicker();
+            },
+            error: function(response) {
+                $(".buttonFinish").addClass('buttonDisabled');
+                $(".buttonPrevious").addClass('Disabled');
+                $('.buttonFinish').html('Something went wrong.');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+
+        $('#goal_due').datepicker();
+
+        $('#sortable').sortable({
+            revert: true,
+            cursor: "move"
+        });
+
+        $('#sortable').disableSelection();
+
+
+        $("#msgbox-step1").hide();
+        $("#msgbox-step2").hide();
+        $("#msgbox-step3").hide();
+        $("#msgbox-step4").hide();
+
+        // Smart Wizard
+        $('#wizard').smartWizard({
+            onLeaveStep:leaveAStepCallback,
+            onFinish:onFinishCallback
+        });
+
+
+        function leaveAStepCallback(obj, context){
+            return validateSteps(context.fromStep); // return false to stay on step and true to continue navigation
+        }
+
+        function onFinishCallback(objs, context){
+            //get variables set
+            var goal_name = $('#goal_name').val();
+            var goal_description = $('#goal_description').val();
+            var goal_measure = $('#goal_attainment').val();
+            var goal_date = $('#goal_due').val();
+            var goal_tags = $('#goal_tags').val();
+            var action_name = $('#action_name').val();
+            var action_description = $('#action_description').val();
+            var action_estimate = $('#estimate').val();
+            var friends_email = $('#friends_email').val();
+
+            $.ajax({
+                data:{'goal_name' : goal_name,
+                    'goal_description' : goal_description,
+                    'goal_measure' : goal_measure,
+                    'goal_date' : goal_date,
+                    'goal_tags' : goal_tags,
+                    'action_name' : action_name,
+                    'action_description' : action_description,
+                    'action_estimate' : action_estimate,
+                    'friends_email' : friends_email
+                },
+                url: "/goal/new",
+                async: true,
+                type: "POST",
+                success: function(response) {
+                    if (response == 'ok'){
+                        $("#modal-close").click();
+                        $(window.location.replace('/home/goals/{{ user.key.id() }}'));
+                    }
+                },
+                error: function(response) {
+                    $(".buttonFinish").addClass('buttonDisabled');
+                    $(".buttonPrevious").addClass('Disabled');
+                    $('.buttonFinish').html('Something went wrong.');
+                }
+            });
+
+        }
+
+        // Your Step validation logic
+        function validateSteps(stepnumber){
+            var isStepValid = true;
+            // validate step 1
+            if(stepnumber == 1){
+                //validate goal name
+                var goal_name = $('#goal_name').val();
+                if(!goal_name && goal_name.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step1').html('Please name your goal').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step1').hide();
+                }
+
+                //validate goal description
+                var goal_description = $('#goal_description').val();
+                if(!goal_description && goal_description.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step1').html('Please add a description for your goal').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step1').hide();
+                }
+                return isStepValid;
+            }
+            else if(stepnumber ==2){
+                var isStepValid = true;
+                //validate goal due
+                //TODO date needs to be in the future
+                var goal_due = $('#goal_due').val();
+                if(!goal_due && goal_due.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step2').html('Please set a date for the goal').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step2').hide();
+                }
+
+                var goal_attainment = $('#goal_attainment').val();
+                if(!goal_attainment && goal_attainment.length <= 0){
+                    isStepValid = false;
+                    $('#msgbox-step2').html('Please describe how you know you accomplished the goal').show();
+                    return isStepValid;
+                }else{
+                    $('#msgbox-step2').hide();
+                }
+                return isStepValid;
+            }
+            else {
+                return isStepValid;
+            }
+        }
+
+    });
+
+    $().ready(function() {
+
+        $("#msgbox-step1").hide();
+        $("#msgbox-step2").hide();
+        $("#msgbox-step3").hide();
+        $("#msgbox-step4").hide();
+
+
+        // Click Event for Sortable
+        $('.table > tbody > tr').on('click', function(e) {
+            $(this).addClass('info').siblings().removeClass('info');
+            $('#goal_details').addClass('hide');
+            $('#action_details').removeClass('hide');
+        });
+
+    $(function() {
+        var icons = {
+            header: "ui-icon-grip-solid-horizontal",
+            activeHeader: "ui-icon-grip-solid-horizontal"
+        };
+
+        $( "#accordion" )
+            .accordion({
+                icons: icons,
+                collapsible: true,
+                header: "> div > h5"
+            })
+            .sortable({
+                axis: "y",
+                handle: "h5",
+                stop: function( event, ui ) {
+                // IE doesn't register the blur when sorting
+                // so trigger focusout handlers to remove .ui-state-focus
+                ui.item.children( "h5" ).triggerHandler( "focusout" );
+                }
+            });
+        });
+
+    });
+
+{% endblock custom_script %}
+
+{% block custom_style %}
+<style>
+    #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+    #sortable li span { position: absolute; margin-left: -1.3em; }
+</style>
+{% endblock custom_style %}
+
+{% block title %}Goals{% endblock title %}
+
+{% block description %}"Goals are where ServeLife members establish what they want to accomplish, by when and the steps necessary."{% endblock description %}
+
+{% block page %}
+    <!--<div class="topic-header"> -->
+        <div class="main">
+            <div class="container">
+                <div class="wrapper">
+                    <div class="row-fluid topic-main">
+                        <div class="span2">
+                            <!-- INSERT PICTURE FROM PROFILE, GLYPHICON, FACEBOOK OR SOMEPLACE - USE PROFILE FOR MVP -->
+                            <!--<img alt="user_name" src=" 180|get_gravatar_url("alanruth@live.com")" class="thumbnail img-polaroid member-pic" /> -->
+                            <img alt="{{ user.key.id() }}" src="../../serve/{{blob_key}}" class="thumbnail img-polaroid member-pic" />
+                        </div>
+                        <div class="span5">
+                            <!-- Insert some metrics, share & invite buttons -->
+                            <h4>NEED TO REDO PAGE - TEMPORARY DESIGN</h4>
+                        </div>
+                        <div class="span5">
+                            <div class="row-fluid">
+                                <a class="quick-button-small span2">
+                                    <img alt="Followers" src="/static/img/group.png" />
+                                    <span class="notification followers">?</span>
+                                    <p>Followers</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Discussions" src="/static/img/conversation.png" />
+                                    <span class="notification discussions">7</span>
+                                    <p>Discussions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Ideas" class="ideas" src="/static/img/lightbulb.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Ideas</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Questions" class="questions" src="/static/img/question.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Questions</p>
+                                </a>
+                                <a class="quick-button-small span2">
+                                    <img alt="Tasks" class="questions" src="/static/img/alarm.png" />
+                                    <span class="notification ideas">7</span>
+                                    <p>Tasks</p>
+                                </a>
+                                <a class="quick-button-small span2" href="/home/goals/{{ user.key.id() }}">
+                                    <img alt="Goals" src="/static/img/certificate.png" />
+                                    <span class="notification ideas">7</span>
+                                    <div class="quick-button-small-article"><p>Goals</p></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="heavy">
+
+
+                    <div class="row-fluid">
+                        <div class="box span7">
+                            <div class="box-header">
+                                <h2><img src="/static/img/certificate.png" class="certificate"/>
+                                    <span class="break"></span>Personal Goals
+                                </h2>
+                                <div class="box-icon">
+                                    <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_goal"><img src="/static/img/halflings_plus.png"/></a>
+                                </div>
+                            </div>
+
+
+                            <div class="table-box-content">
+                                <table class="table table-hover table-bordered" id="goals">
+                                    <thead class="table_head">
+                                    <tr>
+                                        <th class="goal-header header_">Goal</th>
+                                        <th class="header_due">Target</th>
+                                        <th class="header_status">Status</th>
+                                        <th class="header_action">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="sortable">
+                                    {% for goal in goals %}
+                                    <tr onclick="javacript: get_goal_actions({{ goal.key.id() }});">
+                                        <td class="column_goal"><img src="/static/img/halflings_justify.png"/><span class="row-break"></span><a href="#edit_goal" class="goal_row" data-toggle="modal">{{ goal.name }}</a></td>
+                                        <td class="hidden-column">{{ goal.key.id() }}</td>
+                                        <td class="text-center column_due">{{ goal.due_date }}</td>
+                                        <td class="column_status">
+                                            {%  if goal.goal_status == 'not started' %}
+                                                <span class="label label-info">
+                                            {% elif goal.goal_status == 'active' %}
+                                                <span class="label label-success">
+                                            {% elif goal.goal_status == 'on hold' %}
+                                                <span class="label label-warning">
+                                            {% elif goal.goal_status == 'completed' %}
+                                                <span class="label label-inverse">
+                                            {% else %}
+                                                <span class="label label-danger">
+                                            {% endif %}
+                                            {{ goal.goal_status }}</span>
+                                        </td>
+                                        <td class="column_action">
+                                            <a class="btn btn-info" href="#edit_goal" data-id="{{ goal.key.id() }}" data-toggle="modal">
+                                                <i class="icon-edit icon-white"></i>
+                                            </a>
+                                            <a class="btn btn-success" href="#complete_goal" data-id="{{ goal.key.id }}" data-toggle="modal">
+                                                <i class="icon-check icon-white"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr class="info">
+                                        <td colspan="3" class="table-row"><strong>No goals found. Please add some.</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="box span5">
+                            <div class="box-header">
+                                <h2><img src="/static/img/compass.png" class="compass"/>
+                                    <span class="break"></span>Goal Actions
+                                </h2>
+                                <div class="box-icon">
+                                    <a href="#" class="btn-setting" data-toggle="modal" data-target="#add_action"><img src="/static/img/halflings_plus.png"/></a>
+                                </div>
+                            </div>
+                            <div class=box-content>
+                                <div id="goal_details" class="details">
+                                    <p class="text-center">Select a goal to see details</p>
+                                </div>
+                                <div id="action_details" class="details hide">
+                                    <div id="accordion">
+                                        <div class="group">
+                                            <h5>Action Name Goes Here</h5>
+                                            <div>
+                                                Example Text
+                                            </div>
+                                        </div>
+                                        <div class="group">
+                                            <h5>Action2 Name Goes Here</h5>
+                                            <div>
+                                                Example2 Text
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- MODAL TO ADD A GOAL -->
+    <div id="add_goal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_goal_label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" id="modal-close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+            <h3 id="add_goal_label">Add Personal Goal</h3>
+        </div>
+        <!-- Modal Body -->
+        <div class="modal-body">
+            <div id="wizard" class="swMain">
+                <ul>
+                    <li>
+                        <a href="#step-1">
+                            <label class="stepNumber">1</label>
+                                        <span class="stepDesc">Step 1<br />
+                                            <small>What is your goal?</small>
+                                        </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#step-2">
+                            <label class="stepNumber">2</label>
+                                        <span class="stepDesc">Step 2<br />
+                                            <small>When should it be done?</small>
+                                        </span></a>
+                    </li>
+                    <li>
+                        <a href="#step-3">
+                            <label class="stepNumber">3</label>
+                                        <span class="stepDesc">Step 3<br />
+                                            <small>What is the first step?</small>
+                                        </span>
+                        </a>
+                    </li>
+                    <li><a href="#step-4">
+                        <label class="stepNumber">4</label>
+                                        <span class="stepDesc">Step 4<br />
+                                            <small>Want to share this?</small>
+                                        </span>
+                    </a></li>
+                </ul>
+                <div id="step-1">
+                    <h2 class="StepTitle">Define Your Goal</h2>
+                    <!-- step content -->
+                    <div class="form-horizontal">
+                        <label id="msgbox-step1" class="alert alert-error"></label>
+                        <div class="control-group">
+                            <label class="control-label" for="goal_name">Goal Name<span class="required-field">*</span></label>
+                            <div class="controls">
+                                <input class="span4" id="goal_name" required name="goal_name" size="50" type="text" value="{{ name }}" maxlength="50" placeholder="Enter a short name for your goal."/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="goal_description">Brief Description<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
+                            <div class="controls">
+                                <textarea rows="4" class="required span4" id="goal_description" name="goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal.">{{ description }}</textarea>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="goal_tags">Keyword Tags<br/><small>(separate with commas)</small></label>
+                            <div class="controls">
+                                <textarea rows="2" class="span4" id="goal_tags" name="goal_tags"
+                                          placeholder="Provide keywords that help describe the goal. Supports categorization and search.">{{ goal_tags }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="step-2">
+                    <h2 class="StepTitle">Define Its Achievement</h2>
+                    <!-- step content -->
+                    <div class="form-horizontal">
+                        <label id="msgbox-step2" class="alert alert-error"></label>
+                        <div class="control-group">
+                            <label class="control-label" for="goal_due">Target Due Date<span class="required-field">*</span></label>
+                            <div class="controls">
+                                <input type="text" class="span3" id="goal_due" name="goal_due" value="{{ goal_due }}"/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="goal_attainment">Attainment Measure<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
+                            <div class="controls">
+                                <textarea rows="4" class="span4" id="goal_attainment" name="goal_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal. Be Specific.">{{ attainment_measure }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="step-3">
+                    <h2 class="StepTitle">Define The First Step to be Taken</h2>
+                    <!-- step content -->
+                    <div class="form-horizontal">
+                        <label id="msgbox-step3" class="alert alert-error"></label>
+                        <div class="control-group">
+                            <label class="control-label" for="action_name">Action Name</label>
+                            <div class="controls">
+                                <input class="span4" id="action_name" required name="action_name" size="50" type="text" maxlength="50" placeholder="Enter a short name for the action to be taken."/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="action_description">Brief Description<br/><small>(250 character limit)</small></label>
+                            <div class="controls">
+                                <textarea rows="4" class="required span4" id="action_description" name="action_description" required maxlength="250" placeholder="Enter a brief but specific description for this action."></textarea>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="estimate">How much effort?<br/><small>(in hours)</small></label>
+                            <div class="controls">
+                                <input class="span4" id="estimate" required name="estimate" type="number" placeholder="e.g. 40"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="step-4">
+                    <h2 class="StepTitle">Share Your Goal With Your Friends</h2>
+                    <!-- step content -->
+                    <div class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="friends_email">Email Addresses<br/><small>(separate with commas)</small></label>
+                            <div class="controls">
+                                <textarea rows="5" class="span4" id="friends_email" name="friends_email"
+                                          placeholder="Provide the email addresses for whom you would like to share this new goal. They won't be spammed. Promise!"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL TO EDIT GOAL -->
+    <div id="edit_goal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit_goal_label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" id="edit_goal_close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+            <h3 id="edit_goal_label">Edit Goal</h3>
+        </div>
+
+        <div class="modal-body">
+            <form class="form-horizontal" id="edit_goal_body">
+                <div class="control-group">
+                    <label class="control-label" for="edit_goal_name">Goal Name</label>
+                    <div class="controls">
+                        <input class="span3" id="edit_goal_name" required name="edit_goal_name"
+                               size="50" type="text" maxlength="50" placeholder="Enter a short name for your goal."/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="edit_goal_description">Brief Description<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
+                    <div class="controls">
+                        <textarea rows="4" class="required span4" id="edit_goal_description" name="edit_goal_description" required maxlength="250" placeholder="Enter a brief but specific description for this goal.">{{ description }}</textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="goal_tags">Keyword Tags<br/><small>(separate with commas)</small></label>
+                    <div class="controls">
+                        <textarea rows="2" class="span4" id="edit_goal_tags" name="edit_goal_tags"
+                                  placeholder="Provide keywords that help describe the goal. Supports categorization and search.">{{ goal_tags }}</textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="update_goal">Update</button>
+        </div>
+    </div>
+    <!-- END MODAL EDIT AN OPENING -->
+
+    <!-- MODAL TO COMPLETE GOAL -->
+    <div id="complete_goal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="complete_goal_label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" id="complete_goal_close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+            <h3 id="complete_goal_label">Complete Goal</h3>
+        </div>
+
+        <div class="modal-body">
+            <form class="form-horizontal" id="complete_goal_body">
+                <div class="control-group">
+                    <label class="control-label" for="complete_attainment">Attainment Measure<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
+                    <div class="controls">
+                        <textarea rows="4" class="span4" id="complete_attainment" name="complete_attainment" required maxlength="250" placeholder="Describe how you will know that you attained this goal. Be Specific.">{{ attainment_measure }}</textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="edit_goal_description">Brief Description<span class="required-field">*</span><br/><small>(250 character limit)</small></label>
+                    <div class="controls">
+                        <span class="input-xlarge uneditable-input">{{ description }}</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="goal_complete">Complete</button>
+        </div>
+    </div>
+    <!-- END MODAL COMPLETE GOAL -->
+
+    <!-- MODAL TO ADD ACTION -->
+    <div id="add_action" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="add_action_label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" id="add_action_close" class="close" data-dismiss="modal" aria-hidden="true"><img src="/static/img/halflings_circle_remove.png"/></button>
+            <h3 id="add_action_label">Complete Goal</h3>
+        </div>
+
+        <div class="modal-body">
+            <form class="form-horizontal" id="add_action_body">
+                <div class="control-group">
+                    <label class="control-label" for="add_action_name">Action Name</label>
+                    <div class="controls">
+                        <input class="span4" id="add_action_name" required name="add_action_name" size="50" type="text" maxlength="50" placeholder="Enter a short name for the action to be taken."/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="add_action_description">Brief Description<br/><small>(250 character limit)</small></label>
+                    <div class="controls">
+                        <textarea rows="4" class="required span4" id="add_action_description" name="add_action_description" required maxlength="250" placeholder="Enter a brief but specific description for this action."></textarea>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="estimate">How much effort?<br/><small>(in hours)</small></label>
+                    <div class="controls">
+                        <input class="span4" id="add_action_estimate" required name="add_action_estimate" type="number" placeholder="e.g. 40"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="add_action_save">Save</button>
+        </div>
+    </div>
+    <!-- END MODAL COMPLETE GOAL -->
+
+
+
+{% endblock page %}

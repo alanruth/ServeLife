@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock title %}
+
+{% block description %}"Learn with purpose! ServeLife helps you acquire knowledge and put that knowledge to work building real world experience. Contribute. Collaborate. Be Discovered."{% endblock description %}
+
+{% block page %}
+<div id="main" role="main">
+    <div class="container">
+        <div class="content">
+            <div class="row">
+                <div class="span12">
+                    <div id="comingsoon" class="comingsoon_page">
+                        <div class="container">
+                            <div class="countdown">
+                                <div class="row">
+                                    <div class="alert alert-error">
+                                         <h3>{{ alert }}</h3>
+                                         <p>{{ msg }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%  endblock page %}
+

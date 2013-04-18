@@ -1,0 +1,65 @@
+{% extends "secure.html" %}
+
+{% block title %}Create a New Learning Project{% endblock title %}
+
+{% block description %}Creating a new project enables you to collaborate with others to learn.{% endblock description %}
+
+{% block page %}
+    <div id="main" role="main" xmlns="http://www.w3.org/1999/html">
+        <div class="container">
+            <div class="content">
+                <div class="row">
+                    <div class="span12">
+                        <div class="container">
+
+                            <h3>Create a New Learning Project.</h3>
+
+                            <p>A learning project is where you can collaborate with others to learn, try and do.</p>
+                            <div class="form">
+                                <form accept-charset="UTF-8" enctype="multipart/form-data" action="{{upload_url}}" method="post">
+
+                                    <div class="row">
+                                        <div class="span5">
+                                            <legend>Create a new project</legend>
+
+                                            <div class="row">
+                                                <div class="span3">
+                                                    <label for="project_name">Project Name</label>
+                                                    <input class="span3" id="project_name" name="project_name" size="30" type="text" value="{{ project_name }}" autofocus required=""/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="span3">
+                                                    <label for="project_description">Description</label>
+                                                    <textarea rows="4" class="span3" id="project_description" name="project_description" placeholder="Provide a brief description of the project." required="">
+                                                        {{ project_description }}</textarea>
+                                                </div>
+                                            </div>
+                                            <!--<div class="row">
+                                                <div class="span3">
+                                                    <label for="parent_project">Parent project</label>
+                                                    <input class="span3" id="parent_project" name="parent_project" type="text" value="{{ parent_project }}" />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="span3">
+                                                    <label for="project_image">Profile Image for this project</label>
+                                                    <input class="span3" id="project_image" name="project_image" type="file" />
+                                                </div>
+                                            </div>-->
+                                            <div class="span3">
+                                                <input class="btn btn-large btn-primary span3" name="commit" type="submit"
+                                                       value="Create Project"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end of .container -->
+{% endblock page %}
