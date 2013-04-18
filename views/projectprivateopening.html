@@ -6,7 +6,53 @@
 
 {% block custom_script %}
 
-    $(document).ready(function() {
+    function get_opening_details(project_id, opening_created){
+        var opening_details = {};
+        $.ajax({
+            data:{'project_id': project_id, 'opening_created': opening_created},
+            url: "/opening/new",
+            async: true,
+            type: "GET",
+            success: function(response) {
+                opening_details = jQuery.parseJSON( response );
+                /*
+                 {"role": "role2",
+                 "skills": ["skill1", " skill2"],
+                 "created": "datetime",
+                 "description": "descr2"
+                 "commitment" : "0-5 hours/week"}
+                 */
+
+                if (opening_details.status=='no project error'){
+                    alert('no project');
+                    $("#modal-close").click();
+                    return
+                }
+
+                if (opening_details.status=='no opening error'){
+                    alert('no opening');
+                    $("#modal-close").click();
+                    return
+                }
+
+                $('#edit_opening_role').val(opening_details.role);
+                $('#edit_opening_description').val(opening_details.description);
+                $('#edit_opening_skills').val(opening_details.skills);
+                $('#edit_opening_created').val(opening_created);
+                $('#edit_opening_commitment').val(opening_details.commitment).attr("selected", "selected");
+                $('#edit_opening').modal({show: true});
+                $('#edit_opening').removeClass('hide');
+
+            },
+            error: function(response) {
+                $("#save_opening").addClass('disabled');
+                $('#save_opening').html('Something went wrong.');
+            }
+        });
+    }
+
+    $().ready(function() {
+
 
     // Minimize Tables
     $('.btn-minimize').click(function(e){
@@ -15,10 +61,6 @@
         if($target.is(':visible')) $('i',$(this)).removeClass('icon-chevron-up').addClass('icon-chevron-down');
         else 					   $('i',$(this)).removeClass('icon-chevron-down').addClass('icon-chevron-up');
         $target.slideToggle();
-    });
-
-    $('#opening').modal({
-        show: false
     });
 
     $('#edit_opening_body').validate();
@@ -30,15 +72,17 @@
         if(valid) {
             // update a goal
             var project = $('#project-name').html();
-            var opening_role = $('#opening_role').val();
-            var opening_description = $('#opening_description').val();
-            var opening_skills = $('#opening_skills').val();
-            var opening_commitment = $('#opening_commitment').val();
-            var opening_created = $('#opening_created').val
+            var opening_role = $('#edit_opening_role').val();
+            var opening_description = $('#edit_opening_description').val();
+            var opening_skills = $('#edit_opening_skills').val();
+            var opening_commitment = $('#edit_opening_commitment').val();
+            var opening_created = $('#edit_opening_created').val();
+            var opening_post = $('#edit_post_opening').val();
 
             $.ajax({
                 data:{'project_id' : project, 'opening_role' : opening_role, 'opening_description' : opening_description,
-                    'opening_skills' : opening_skills, 'opening_commitment' : opening_commitment, 'opening_created' : opening_created},
+                    'opening_skills' : opening_skills, 'opening_commitment' : opening_commitment, 'opening_created' : opening_created,
+                    'opening_post' : opening_post},
                 url: "/opening/new",
                 async: true,
                 type: "POST",
@@ -60,39 +104,7 @@
         }
     });
 
-
-        var get_opening_details = function(project_id, opening_created){
-        var opening_details = {};
-        $.ajax({
-            data:{'project_id':project_id, 'opening_created': opening_created},
-            url: "/opening/new",
-            async: true,
-            type: "GET",
-            success: function(response) {
-                opening_details = jQuery.parseJSON( response );
-                /*
-                {"role": "role2",
-                "skills": ["skill1", " skill2"],
-                "created": "datetime",
-                "description": "descr2"
-                "commitment" : "0-5 hours/week"}
-                */
-                $('#opening_role').val(opening_details.role);
-                $('#opening_description').val(opening_details.description);
-                $('#opening_skills').val(opening_details.skills);
-                $('#opening_created').val(opening_created);
-                $('#opening_commitment> option[value="+opening_details.commitment+"]').attr("selected", "selected");
-
-            },
-            error: function(response) {
-                $("#save_opening").addClass('disabled');
-                $('#save_opening').html('Something went wrong.');
-            }
-        });
-    };
-
     $('#opening_body').validate();
-
 
     $('#create_opening').on('click', function(e) {
 
@@ -100,16 +112,25 @@
 
         if(valid) {
             // save a goal
-            var project = $('#project-name').html();
+            var project_id = $('#project-name').html();
             var opening_role = $('#opening_role').val();
             var opening_description = $('#opening_description').val();
             var opening_skills = $('#opening_skills').val();
             var opening_commitment = $('#opening_commitment').val();
-            var opening_post = $('post_opening').val();
+            if ($('#add_post_opening').is(":checked"))
+                {
+                    var opening_post = 'True';
+                }
+            else
+                {
+                    var opening_post = 'False';
+                }
+            var opening_created = null;
 
             $.ajax({
-                data:{'project_id' : project, 'opening_role' : opening_role, 'opening_description' : opening_description,
-                    'opening_skills' : opening_skills, 'opening_commitment' : opening_commitment, 'opening_post' : opening_post},
+                data:{'project_id' : project_id, 'opening_role' : opening_role, 'opening_description' : opening_description,
+                    'opening_skills' : opening_skills, 'opening_commitment' : opening_commitment, 'opening_post' : opening_post,
+                    'opening_created' : opening_created},
                 url: "/opening/new",
                 async: true,
                 type: "POST",
@@ -287,17 +308,17 @@
                                                 <i class="icon-check icon-white"></i>
                                             </a>
                                             <!-- EDIT : Load Edit Modal -->
-                                            <a class="btn btn-info" href="#edit_opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">
+                                            <a class="btn btn-info opening_row" onclick="javascript: get_opening_details('{{ project.key.id()}}','{{ opening.created }}');">
                                                 <i class="icon-edit icon-white"></i>
                                             </a>
                                             <!-- COPY : Load New Modal, Populate w/ Current Row Info -->
                                             <a class="btn btn-info" href="#">
                                                 <i class="icon-retweet icon-white"></i>
                                             </a>
-                                            <!-- NEED INVITE CAPABILITY -->
+                                            <!-- NEED INVITE CAPABILITY
                                             <a class="btn btn-success" href="#">
                                                 <i class="icon-share icon-white"></i>
-                                            </a>
+                                            </a>-->
                                             <!-- CLOSE OR UNPOST : CLOSE = Save Row with Closed Date
                                              UNPOST = CLEAR OUT POSTED DATE-->
                                             <a class="btn btn-danger" href="#">
@@ -353,7 +374,7 @@
                                                 <i class="icon-check icon-white"></i>
                                             </a>
                                             <!-- EDIT : edit row -->
-                                            <a class="btn btn-info" href="#edit_opening" role="button" class="opening_row" data-toggle="modal" data-id="{{ opening.created }}">
+                                            <a class="btn btn-info opening_row" onclick="javascript: get_opening_details('{{ project.key.id()}}','{{ opening.created }}');">
                                                 <i class="icon-edit icon-white"></i>
                                             </a>
                                             <!-- COPY : Load New Modal, Populate w/ Current Row Info -->
@@ -468,7 +489,7 @@
                 <div class="control-group">
                     <div class="controls">
                     <label class="checkbox">
-                        <input type="checkbox" id="post_opening"> Post Immediately
+                        <input type="checkbox" id="add_post_opening" name="add_post_opening"> Post Immediately
                     </label>
                     </div>
                 </div>
@@ -521,7 +542,7 @@
                     </div>
                 </div>
                 <div>
-                    <input class="span3" type="hidden" id="opening_created"/>
+                    <input class="span3" type="hidden" id="edit_opening_created"/>
                 </div>
             </form>
         </div>
